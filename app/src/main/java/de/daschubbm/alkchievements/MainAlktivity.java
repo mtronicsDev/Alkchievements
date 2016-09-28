@@ -86,9 +86,6 @@ public class MainAlktivity extends AppCompatActivity {
                 Toast.makeText(context, "Do, " + name + ", dei "
                         + String.valueOf(dataSnapshot.getValue()) + ". "
                         + dataSnapshot.getKey() + "!", Toast.LENGTH_SHORT).show();
-
-                if (adapter != null) {
-                }
             }
 
             @Override
@@ -106,6 +103,10 @@ public class MainAlktivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void updateDrink(String drink, int count) {
+        myDrinks.child(drink).setValue(count);
     }
 
     private void setupViews() {
