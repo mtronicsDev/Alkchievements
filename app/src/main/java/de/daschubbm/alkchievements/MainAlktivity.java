@@ -3,9 +3,13 @@ package de.daschubbm.alkchievements;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainAlktivity extends AppCompatActivity {
 
@@ -31,8 +35,16 @@ public class MainAlktivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_alktivity);
+
         context = this;
+
+        setupFirebase();
         setupViews();
+    }
+
+    private void setupFirebase() {
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference("people/Maxl/Spezi/");
+        db.setValue(1);
     }
 
     private void setupViews() {
