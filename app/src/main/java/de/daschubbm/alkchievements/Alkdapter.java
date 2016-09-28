@@ -20,6 +20,8 @@ public class Alkdapter extends ArrayAdapter<String[]> {
     private int layoutResourceId;
     private ArrayList<String[]> alks = new ArrayList<>();
 
+    private int[] images = {R.mipmap.kasten, R.mipmap.kasten};
+
     public Alkdapter(Context context, int layoutResourceId, ArrayList<String[]> data) {
 
         super(context, layoutResourceId, data);
@@ -45,6 +47,14 @@ public class Alkdapter extends ArrayAdapter<String[]> {
             TextView preis = (TextView) v.findViewById(R.id.preis);
             TextView num_beer = (TextView) v.findViewById(R.id.num_beer);
             ImageView kasten = (ImageView) v.findViewById(R.id.kasten);
+            TextView name = (TextView) v.findViewById(R.id.name);
+            name.setText(alk[2]);
+            kasten.setVisibility(View.INVISIBLE);
+            if(position < images.length) {
+                kasten.setImageResource(images[position]);
+                kasten.setVisibility(View.VISIBLE);
+            }
+
             ImageView add_flasche = (ImageView) v.findViewById(R.id.add_flasche);
 
             add_flasche.setTag(alk[2]);
