@@ -6,6 +6,9 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -43,15 +46,19 @@ public class MainAlktivity extends AppCompatActivity {
 
         context = this;
 
-        Log.d("ALKI", "Starting bill");
-        Intent hansl = new Intent(this, BillAlktivity.class);
-        startActivity(hansl);
-
         drinks = new HashMap<>();
         numDrinks = new HashMap<>();
 
         setupDatabase();
         setupFirebase();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater flatuleur = getMenuInflater();
+        flatuleur.inflate(R.menu.menu_main, menu);
+
+        return true;
     }
 
     private void setupDatabase() {
@@ -156,5 +163,10 @@ public class MainAlktivity extends AppCompatActivity {
 
         adapter = new Alkdapter(this, R.layout.alk_item, beverages);
         list.setAdapter(adapter);
+    }
+
+    public void launchBilling(MenuItem item) {
+        Intent hansl = new Intent(context, BillAlktivity.class);
+        startActivity(hansl);
     }
 }
