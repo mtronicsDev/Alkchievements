@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 public class MainAlktivity extends AppCompatActivity {
 
     private ListView list;
+    Alkdapter adapter;
 
     private Context context;
     private Database database;
@@ -43,22 +45,6 @@ public class MainAlktivity extends AppCompatActivity {
 
         setupDatabase();
         setupFirebase();
-        setupViews();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < 100; i++) {
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    myDrinks.child("Spezi").setValue(i + 1);
-                }
-            }
-        }).start();
     }
 
     private void setupDatabase() {
@@ -81,6 +67,8 @@ public class MainAlktivity extends AppCompatActivity {
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                     drinks.put(child.getKey(), Float.parseFloat(String.valueOf(child.getValue())));
                 }
+
+                setupViews();
             }
 
             @Override
@@ -101,6 +89,9 @@ public class MainAlktivity extends AppCompatActivity {
                 Toast.makeText(context, "Do, " + name + ", dei "
                         + String.valueOf(dataSnapshot.getValue()) + ". "
                         + dataSnapshot.getKey() + "!", Toast.LENGTH_SHORT).show();
+
+                if (adapter != null) {
+                }
             }
 
             @Override
@@ -122,12 +113,13 @@ public class MainAlktivity extends AppCompatActivity {
 
     private void setupViews() {
         list = (ListView) findViewById(R.id.alkList);
-        ArrayList<String[]> dummy = new ArrayList<String[]>();
-        String[] uno = {"1,00" , "2", "Bier"};
-        String[] due = {"0,90" , "1", "Radler"};
-        dummy.add(uno);
-        dummy.add(due);
-        Alkdapter adapter = new Alkdapter(this, R.layout.alk_item, dummy);
+        ArrayList<String[]> beverages = new ArrayList<>(drinks.size());
+
+        for (Map.Entry<String, Float> drink : drinks.entrySet()) {
+            beverages.add(new String[]{String.valueOf(drink.getValue()), "0", drink.getKey()});
+        }
+
+        adapter = new Alkdapter(this, R.layout.alk_item, beverages);
         list.setAdapter(adapter);
     }
 }
