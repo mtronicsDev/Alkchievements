@@ -22,7 +22,7 @@ public class Database {
     private static final String KEY_NAME = "name";
     private static final String KEY_STATE = "state";
 
-    private  ToDoDBOpenHelper dbHelper;
+    private ToDoDBOpenHelper dbHelper;
     private SQLiteDatabase db;
 
     public Database(Context context) {
