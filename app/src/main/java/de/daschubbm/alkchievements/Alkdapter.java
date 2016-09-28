@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Jonathan on 28.09.2016.
@@ -19,16 +21,20 @@ public class Alkdapter extends ArrayAdapter<String[]> {
     private Context context;
     private int layoutResourceId;
     private ArrayList<String[]> alks = new ArrayList<>();
+    private MainAlktivity main;
 
-    private int[] images = {R.mipmap.kasten, R.mipmap.kasten};
+    private Map<String, Integer> images = new HashMap<>();
 
-    public Alkdapter(Context context, int layoutResourceId, ArrayList<String[]> data) {
+    public Alkdapter(MainAlktivity alk, int layoutResourceId, ArrayList<String[]> data) {
 
-        super(context, layoutResourceId, data);
+        super(alk, layoutResourceId, data);
 
+        main = alk;
         this.layoutResourceId = layoutResourceId;
-        this.context = context;
+        this.context = alk;
         alks = data;
+
+        images.put("Radler", R.mipmap.kasten);
     }
 
     @Override
@@ -45,17 +51,17 @@ public class Alkdapter extends ArrayAdapter<String[]> {
 
         if(alk != null) {
             TextView preis = (TextView) v.findViewById(R.id.preis);
-            TextView num_beer = (TextView) v.findViewById(R.id.num_beer);
+            final TextView num_beer = (TextView) v.findViewById(R.id.num_beer);
             ImageView kasten = (ImageView) v.findViewById(R.id.kasten);
             TextView name = (TextView) v.findViewById(R.id.name);
             name.setText(alk[2]);
             kasten.setVisibility(View.INVISIBLE);
-            if(position < images.length) {
-                kasten.setImageResource(images[position]);
+            if(images.containsKey(alk[2])) {
+                kasten.setImageResource(images.get(alk[2]));
                 kasten.setVisibility(View.VISIBLE);
             }
 
-            ImageView add_flasche = (ImageView) v.findViewById(R.id.add_flasche);
+            final ImageView add_flasche = (ImageView) v.findViewById(R.id.add_flasche);
 
             add_flasche.setTag(alk[2]);
             preis.setText(alk[0] + " €");
@@ -64,7 +70,10 @@ public class Alkdapter extends ArrayAdapter<String[]> {
             add_flasche.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    int added = Integer.parseInt(alk[1]) + 1;
+                    alk[1] = String.valueOf(added);
+                    num_beer.setText(alk[1]);
+                    main.updateDrink((String) add_flasche.getTag(), added);
                 }
             });
         }
