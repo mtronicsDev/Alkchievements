@@ -10,15 +10,18 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainAlktivity">
+        <activity android:name=".MainAlktivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginAlktivity" />
-        <activity android:name=".BillAlktivity"></activity>
+        <activity android:name=".LoginAlktivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".BillAlktivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -2,8 +2,10 @@ package de.daschubbm.alkchievements;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -30,6 +32,9 @@ public class MainAlktivity extends AppCompatActivity {
     private DatabaseReference myDrinks;
 
     private Map<String, Float> drinks;
+    private Map<String, Integer> numDrinks;
+
+    private boolean drinksLoaded = false, numsLoaded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,7 @@ public class MainAlktivity extends AppCompatActivity {
         context = this;
 
         drinks = new HashMap<>();
+        numDrinks = new HashMap<>();
 
         setupDatabase();
         setupFirebase();
@@ -65,7 +71,8 @@ public class MainAlktivity extends AppCompatActivity {
                     drinks.put(child.getKey(), Float.parseFloat(String.valueOf(child.getValue())));
                 }
 
-                setupViews();
+                drinksLoaded = true;
+                if (numsLoaded) setupViews();
             }
 
             @Override
@@ -75,10 +82,28 @@ public class MainAlktivity extends AppCompatActivity {
         });
 
         myDrinks = FirebaseDatabase.getInstance().getReference("people/" + name);
+        myDrinks.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    numDrinks.put(child.getKey(), Integer.parseInt(String.valueOf(child.getValue())));
+                }
+
+                numsLoaded = true;
+                if (drinksLoaded) setupViews();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         myDrinks.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
+                numDrinks.put(dataSnapshot.getKey(),
+                        Integer.parseInt(String.valueOf(dataSnapshot.getValue())));
             }
 
             @Override
@@ -86,11 +111,13 @@ public class MainAlktivity extends AppCompatActivity {
                 Toast.makeText(context, "Do, " + name + ", dei "
                         + String.valueOf(dataSnapshot.getValue()) + ". "
                         + dataSnapshot.getKey() + "!", Toast.LENGTH_SHORT).show();
+                numDrinks.put(dataSnapshot.getKey(),
+                        Integer.parseInt(String.valueOf(dataSnapshot.getValue())));
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                numDrinks.remove(dataSnapshot.getKey());
             }
 
             @Override
@@ -114,7 +141,13 @@ public class MainAlktivity extends AppCompatActivity {
         ArrayList<String[]> beverages = new ArrayList<>(drinks.size());
 
         for (Map.Entry<String, Float> drink : drinks.entrySet()) {
-            beverages.add(new String[]{String.valueOf(drink.getValue()), "0", drink.getKey()});
+            String price =String.valueOf(drink.getValue());
+            String name =drink.getKey();
+            String count=String.valueOf(numDrinks.get(drink.getKey()));
+
+            if (count.equals("null")) count = "0";
+
+            beverages.add(new String[]{price, count, name});
         }
 
         adapter = new Alkdapter(this, R.layout.alk_item, beverages);

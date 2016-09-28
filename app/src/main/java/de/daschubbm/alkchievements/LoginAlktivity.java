@@ -2,19 +2,12 @@ package de.daschubbm.alkchievements;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 public class LoginAlktivity extends AppCompatActivity {
 
@@ -43,8 +36,6 @@ public class LoginAlktivity extends AppCompatActivity {
                 String name = nameTextField.getText().toString();
 
                 if (!"".equals(name) && name.matches("[A-Z][a-z]+")) {
-                    DatabaseReference people = FirebaseDatabase.getInstance().getReference("people");
-
                     database.insertItemIntoDataBase("name", name);
 
                     Toast.makeText(context, "Habedere " + database.getItem(0)[1] + ", du bist ja aa do!", Toast.LENGTH_SHORT).show();
