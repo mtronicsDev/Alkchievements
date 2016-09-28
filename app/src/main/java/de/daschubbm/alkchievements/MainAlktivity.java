@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
@@ -12,6 +13,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import java.util.ArrayList;
 
@@ -25,12 +30,16 @@ public class MainAlktivity extends AppCompatActivity {
 
     private DatabaseReference myDrinks;
 
+    private Map<String, Float> drinks;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_alktivity);
 
         context = this;
+
+        drinks = new HashMap<>();
 
         setupDatabase();
         setupFirebase();
@@ -65,7 +74,20 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     private void setupFirebase() {
-        DatabaseReference beverages = FirebaseDatabase.getInstance().getReference("beverages");
+        final DatabaseReference beverages = FirebaseDatabase.getInstance().getReference("beverages");
+        beverages.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    drinks.put(child.getKey(), Float.parseFloat(String.valueOf(child.getValue())));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         myDrinks = FirebaseDatabase.getInstance().getReference("people/" + name);
         myDrinks.addChildEventListener(new ChildEventListener() {
