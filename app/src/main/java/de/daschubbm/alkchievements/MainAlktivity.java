@@ -43,6 +43,10 @@ public class MainAlktivity extends AppCompatActivity {
 
         context = this;
 
+        Log.d("ALKI", "Starting bill");
+        Intent hansl = new Intent(this, BillAlktivity.class);
+        startActivity(hansl);
+
         drinks = new HashMap<>();
         numDrinks = new HashMap<>();
 
