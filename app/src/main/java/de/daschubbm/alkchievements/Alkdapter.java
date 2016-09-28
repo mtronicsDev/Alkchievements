@@ -34,7 +34,13 @@ public class Alkdapter extends ArrayAdapter<String[]> {
         this.context = alk;
         alks = data;
 
-        images.put("Radler", R.mipmap.kasten);
+        images.put("Bier", R.drawable.karsten_bier);
+        images.put("Radler", R.drawable.karsten_radler);
+        images.put("Weizen", R.drawable.karsten_weizen);
+        images.put("Almdudler", R.drawable.karsten_almdudler);
+        images.put("Spezi", R.drawable.karsten_spezi);
+        images.put("Wasser", R.drawable.karsten_wasser);
+        images.put("Schnaps", R.drawable.karsten_schnaps);
     }
 
     @Override
