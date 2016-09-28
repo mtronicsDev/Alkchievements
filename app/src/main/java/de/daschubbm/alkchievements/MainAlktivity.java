@@ -1,6 +1,7 @@
 package de.daschubbm.alkchievements;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -32,6 +33,10 @@ public class MainAlktivity extends AppCompatActivity {
     private int num_shot = 0;
 
     private Context context;
+    private Database database;
+    private String name;
+
+    private DatabaseReference myDrinks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +45,43 @@ public class MainAlktivity extends AppCompatActivity {
 
         context = this;
 
+        setupDatabase();
         setupFirebase();
         setupViews();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < 100; i++) {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    myDrinks.child("Spezi").setValue(i + 1);
+                }
+            }
+        }).start();
+    }
+
+    private void setupDatabase() {
+        database = new Database(context);
+        database.open();
+
+        if (!database.getStatus()) {
+            Intent hansl = new Intent(context, LoginAlktivity.class);
+            startActivity(hansl);
+        } else {
+            name = database.getItem(0)[1];
+        }
     }
 
     private void setupFirebase() {
-        DatabaseReference people = FirebaseDatabase.getInstance().getReference("people/Maxl/");
-        people.addChildEventListener(new ChildEventListener() {
+        DatabaseReference beverages = FirebaseDatabase.getInstance().getReference("beverages");
+
+        myDrinks = FirebaseDatabase.getInstance().getReference("people/" + name);
+        myDrinks.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
@@ -54,22 +89,9 @@ public class MainAlktivity extends AppCompatActivity {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                String beverage = dataSnapshot.getKey();
-                int amount = Integer.parseInt(String.valueOf(dataSnapshot.getValue()));
-
-                switch (beverage) {
-                    case "Bier":
-                        num_beer = amount;
-                        break;
-                    case "Radler":
-                        num_biker = amount;
-                        break;
-                    case "Spezi":
-                        num_spezi = amount;
-                        break;
-                }
-
-                Toast.makeText(context, "Das ist dein " + amount + ". " + beverage + " heute!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Do, " + name + ", dei "
+                        + String.valueOf(dataSnapshot.getValue()) + ". "
+                        + dataSnapshot.getKey() + "!", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -90,7 +112,7 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     private void setupViews() {
-        beer = (ImageView) findViewById(R.id.add_beer);
+        /*beer = (ImageView) findViewById(R.id.add_beer);
         wheat = (ImageView) findViewById(R.id.add_wheat);
         almi = (ImageView) findViewById(R.id.add_almi);
         biker = (ImageView) findViewById(R.id.add_biker);
@@ -159,6 +181,6 @@ public class MainAlktivity extends AppCompatActivity {
                 Toast toast = Toast.makeText(context, "Hau weg! Der " + String.valueOf(num_shot) + ". Shot ballert!", Toast.LENGTH_LONG);
                 toast.show();
             }
-        });
+        });*/
     }
 }
