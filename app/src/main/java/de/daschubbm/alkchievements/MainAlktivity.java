@@ -2,10 +2,8 @@ package de.daschubbm.alkchievements;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -70,6 +68,7 @@ public class MainAlktivity extends AppCompatActivity {
             startActivity(hansl);
         } else {
             name = database.getItem(0)[1];
+            getSupportActionBar().setTitle(name);
         }
     }
 
