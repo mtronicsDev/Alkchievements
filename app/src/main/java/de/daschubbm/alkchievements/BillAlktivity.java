@@ -26,10 +26,14 @@ public class BillAlktivity extends AppCompatActivity {
 
     private Context context;
 
+    String title = "Rechnung";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill_alktivity);
+
+        getSupportActionBar().setTitle(title);
 
         context = this;
         Log.d("ALKI", "Started bill");
