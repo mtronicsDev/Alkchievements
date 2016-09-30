@@ -7,6 +7,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+
 /**
  * Created by Jonathan on 28.09.2016.
  */
@@ -47,7 +49,8 @@ public class Database {
 
     public boolean getStatusSecond() {
         Cursor results = getCursorForAllItemsFromDatabase();
-        return results.moveToPosition(1);
+        results.moveToFirst();
+        return results.moveToNext();
     }
 
     public long insertItemIntoDataBase(String name, String state) {
@@ -78,6 +81,37 @@ public class Database {
         }
 
         return item;
+    }
+
+    public ArrayList<String[]> getItems() {
+        ArrayList<String[]> items = new ArrayList<String[]>();
+        String[] item;
+        Cursor results = getCursorForAllItemsFromDatabase();
+
+        int iName = results.getColumnIndex(KEY_NAME);
+        int iState = results.getColumnIndex(KEY_STATE);
+
+        if(results.moveToFirst()) do{
+            item = new String[2];
+            item[0] = results.getString(iName);
+            item[1] = results.getString(iState);
+            items.add(item);
+        } while (results.moveToNext());
+
+        return items;
+    }
+
+    public void updateValue(int id, int value) {
+        ArrayList<String[]> tempo = getItems();
+        removeAllItemsFromDatabase();
+        for(int i = 0; i < tempo.size(); i++) {
+            if (i != id) {
+                insertItemIntoDataBase(tempo.get(i)[0], tempo.get(i)[1]);
+            }
+            if (i == id) {
+                insertItemIntoDataBase(tempo.get(i)[0], String.valueOf(value));
+            }
+        }
     }
 
     private class ToDoDBOpenHelper extends SQLiteOpenHelper {

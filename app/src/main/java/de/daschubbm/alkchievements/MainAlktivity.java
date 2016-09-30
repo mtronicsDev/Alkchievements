@@ -54,6 +54,8 @@ public class MainAlktivity extends AppCompatActivity {
     private int num_drinks = 0;
     private int num_kasten_clicked = 0;
 
+    private int[] varchievements = {0,0,0,0,0,0,0,0,0};
+
     private String[] alkchievements= {"Armer Schlucker/Erhalte eine Rechnung von über 5€!",
             "Bierkenner/Trinke 2 Bier an einem Abend!",
             "Stammgast/Beschließe 3 Tage in Folge eine Transaktion im Schubbm!",
@@ -79,7 +81,11 @@ public class MainAlktivity extends AppCompatActivity {
         numDrinks = new HashMap<>();
 
         setupDatabase();
+        if (database.getStatus() && !database.getStatusSecond()) {
+            setupAlkchievementValues();
+        }
         setupAlkchivements();
+        loadAlkchievementValues();
         setupFirebase();
     }
 
@@ -115,6 +121,19 @@ public class MainAlktivity extends AppCompatActivity {
         } else {
             name = database.getItem(0)[1];
             getSupportActionBar().setTitle(name);
+        }
+    }
+
+    private void setupAlkchievementValues() {
+        for (int i = 0; i < varchievements.length; i++) {
+            database.insertItemIntoDataBase(String.valueOf(i), String.valueOf(varchievements[i]));
+        }
+    }
+
+    private void loadAlkchievementValues() {
+        ArrayList<String[]> varies = database.getItems();
+        for(int i = 1; i <= varchievements.length; i++) {
+            varchievements[i-1] = Integer.parseInt(varies.get(i)[1]);
         }
     }
 
@@ -190,7 +209,9 @@ public class MainAlktivity extends AppCompatActivity {
 
     public void addStorno() {
         num_storno++;
-        if (num_storno == 5) {
+        varchievements[6] = varchievements[6] + 1;
+        database.updateValue(7, varchievements[6]);
+        if (varchievements[6] == 5) {
             alkchievementsDatabase.changeStatusForItem(10, "true");
             Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
         }
@@ -198,14 +219,16 @@ public class MainAlktivity extends AppCompatActivity {
 
     public void addClickKasten() {
         num_kasten_clicked++;
-        if (num_kasten_clicked == 100) {
+        varchievements[8] = varchievements[8] + 1;
+        database.updateValue(9, varchievements[8]);
+        if (varchievements[8] == 100) {
             alkchievementsDatabase.changeStatusForItem(8, "true");
             Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void updateDrink(String drink, int count) {
-        myDrinks.child(drink).setValue(count);
+            myDrinks.child(drink).setValue(count);
     }
 
     private void setupViews() {
