@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -44,12 +45,15 @@ public class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
         if (goal != null) {
             TextView title = (TextView) v.findViewById(R.id.title_alkchivement);
             TextView description = (TextView) v.findViewById(R.id.description_alkchivement);
+            ImageView image = (ImageView) v.findViewById(R.id.image_alkchivement);
 
             title.setText(goal[0]);
             description.setText(goal[1]);
+            description.setVisibility(View.INVISIBLE);
 
-            if (goal[2].equals("false")) {
-                description.setVisibility(View.INVISIBLE);
+            if (goal[2].equals("true")) {
+                image.setImageResource(R.mipmap.achievement_solved);
+                description.setVisibility(View.VISIBLE);
             }
         }
         return v;

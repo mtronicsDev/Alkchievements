@@ -1,9 +1,7 @@
 package de.daschubbm.alkchievements;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -26,14 +24,6 @@ public class AchievementsAlktivity extends AppCompatActivity {
         list = (ListView) findViewById(R.id.achievements_list);
 
         setNewList();
-
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                database.changeStatusForItem(position, "true");
-                setNewList();
-            }
-        });
     }
 
     private void setNewList() {

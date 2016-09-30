@@ -39,6 +39,10 @@ public class MainAlktivity extends AppCompatActivity {
 
     private boolean drinksLoaded = false, numsLoaded = false;
 
+    //Variables for the Alkchievements
+    private int num_storno = 0;
+    private int num_kasten_clicked = 0;
+
     private String[] alkchievements= {"Armer Schlucker/Erhalte eine Rechnung von über 5€!",
             "Bierkenner/Trinke 2 Bier an einem Abend!",
             "Stammgast/Beschließe 3 Tage in Folge eine Transaktion im Schubbm!",
@@ -169,6 +173,22 @@ public class MainAlktivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void addStorno() {
+        num_storno++;
+        if (num_storno == 5) {
+            alkchievementsDatabase.changeStatusForItem(10, "true");
+            Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void addClickKasten() {
+        num_kasten_clicked++;
+        if (num_kasten_clicked == 100) {
+            alkchievementsDatabase.changeStatusForItem(8, "true");
+            Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void updateDrink(String drink, int count) {

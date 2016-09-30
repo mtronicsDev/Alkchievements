@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,6 +81,26 @@ public class Alkdapter extends ArrayAdapter<String[]> {
                     alk[1] = String.valueOf(added);
                     num_beer.setText(alk[1]);
                     main.updateDrink((String) add_flasche.getTag(), added);
+                }
+            });
+
+            add_flasche.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    int taken = Integer.parseInt(alk[1]) - 1;
+                    alk[1] = String.valueOf(taken);
+                    num_beer.setText(alk[1]);
+                    main.updateDrink((String) add_flasche.getTag(), taken);
+                    main.addStorno();
+                    Toast.makeText(context, "Storniert :/ Fettfinger!", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
+
+            kasten.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    main.addClickKasten();
                 }
             });
         }
