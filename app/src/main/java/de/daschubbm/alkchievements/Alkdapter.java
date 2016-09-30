@@ -81,6 +81,9 @@ public class Alkdapter extends ArrayAdapter<String[]> {
                         alk[1] = String.valueOf(added);
                         num_beer.setText(alk[1]);
                         main.updateDrink((String) add_flasche.getTag(), added);
+                    if (alk[2].equals("Bier")) {
+                        main.addEverBeer(true);
+                    }
                 }
             });
 
@@ -94,6 +97,9 @@ public class Alkdapter extends ArrayAdapter<String[]> {
                         main.updateDrink((String) add_flasche.getTag(), taken);
                         main.addStorno();
                         Toast.makeText(context, "Storniert :/ Fettfinger!", Toast.LENGTH_SHORT).show();
+                        if (alk[2].equals("Bier")) {
+                            main.addEverBeer(false);
+                        }
                     }
                     return true;
                 }

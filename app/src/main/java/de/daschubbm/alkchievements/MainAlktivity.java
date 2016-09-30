@@ -209,6 +209,21 @@ public class MainAlktivity extends AppCompatActivity {
         });
     }
 
+    public void addEverBeer(boolean add) {
+        if (add) {
+            varchievements[5] = varchievements[5] + 1;
+            database.updateValue(6, varchievements[5]);
+            if (varchievements[5] == 20 && alkchievementsDatabase.getItems().get(6)[2].equals("false")) {
+                alkchievementsDatabase.changeStatusForItem(6, "true");
+                Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+            }
+        }
+        if (!add) {
+            varchievements[5] = varchievements[5] - 1;
+            database.updateValue(6, varchievements[5]);
+        }
+    }
+
     public void addStorno() {
         varchievements[6] = varchievements[6] + 1;
         database.updateValue(7, varchievements[6]);
