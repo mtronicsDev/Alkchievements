@@ -25,8 +25,12 @@
         <activity
             android:name=".BillAlktivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".AchievementsAlktivity" />
-        <activity android:name=".SettingsAlktivity"></activity>
+        <activity
+            android:name=".AchievementsAlktivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SettingsAlktivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

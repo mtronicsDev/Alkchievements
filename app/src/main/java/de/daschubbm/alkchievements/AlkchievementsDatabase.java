@@ -83,6 +83,19 @@ public class AlkchievementsDatabase {
         return items;
     }
 
+    public void changeStatusForItem(int id, String status) {
+        ArrayList<String[]> tempo = getItems();
+        removeAllItemsFromDatabase();
+        for(int i = 0; i < tempo.size(); i++) {
+            if (i != id) {
+                insertItemIntoDataBase(tempo.get(i)[0], tempo.get(i)[1], tempo.get(i)[2]);
+            }
+            if (i == id) {
+                insertItemIntoDataBase(tempo.get(i)[0], tempo.get(i)[1], status);
+            }
+        }
+    }
+
     private class ToDoDBOpenHelper extends SQLiteOpenHelper {
         private static final String DATABASE_CREATE = "create table "
                 + DATABASE_TABLE + " (" + KEY_ID
