@@ -35,7 +35,7 @@ public class LoginAlktivity extends AppCompatActivity {
             public void onClick(View view) {
                 String name = nameTextField.getText().toString();
 
-                if (!"".equals(name) && name.matches("[A-Z][a-z]+")) {
+                if (!"".equals(name) && name.matches("[A-ZÄÖÜ][a-zäöüß]+")) {
                     database.insertItemIntoDataBase("name", name);
 
                     Toast.makeText(context, "Habedere " + database.getItem(0)[1] + ", du bist ja aa do!", Toast.LENGTH_SHORT).show();

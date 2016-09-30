@@ -9,4 +9,64 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="de.daschubbm.alkchievements.SettingsAlktivity">
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Abrechnung"
+            android:id="@+id/button"
+            android:onClick="launchPasswordCheck"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Getränkeliste:"
+            android:id="@+id/textView3"
+            android:layout_marginTop="30dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary">
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/add_drink_name"
+                android:layout_weight="3"
+                android:hint="Neues Getränk" />
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:id="@+id/add_drink_price"
+                android:layout_weight="1"
+                android:hint="Preis" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Hinzufügen"
+                android:id="@+id/add_drink_button"
+                android:layout_weight="3"
+                android:onClick="addDrink"/>
+        </LinearLayout>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/settings_list"
+            android:layout_gravity="center_horizontal" />
+
+    </LinearLayout>
+
 </RelativeLayout>
