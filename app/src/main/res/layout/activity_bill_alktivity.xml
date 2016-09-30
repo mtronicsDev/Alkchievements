@@ -10,10 +10,20 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="de.daschubbm.alkchievements.BillAlktivity">
 
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:id="@+id/loading"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/bill">
+        android:id="@+id/bill"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
     </ListView>
 
 </RelativeLayout>

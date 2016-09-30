@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -262,6 +263,8 @@ public class MainAlktivity extends AppCompatActivity {
 
         adapter = new Alkdapter(this, R.layout.alk_item, beverages);
         list.setAdapter(adapter);
+
+        findViewById(R.id.loading).setVisibility(View.GONE);
     }
 
     public void launchBilling(MenuItem item) {

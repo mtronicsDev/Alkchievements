@@ -2,6 +2,7 @@ package de.daschubbm.alkchievements;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -48,6 +49,8 @@ public class SettingsAlktivity extends AppCompatActivity {
 
                 drinks = (ListView) findViewById(R.id.settings_list);
                 drinks.setAdapter(alkdapter = new SettingsAlkdapter(context, names));
+
+                findViewById(R.id.loading).setVisibility(View.GONE);
             }
 
             @Override
@@ -57,7 +60,7 @@ public class SettingsAlktivity extends AppCompatActivity {
         });
     }
 
-    public void launchPasswordCheck(View view) {
+    public void launchPasswordCheck(final View view) {
         final Dialog dialog = new Dialog(this);
         dialog.setTitle("Passwort eingeben");
         dialog.setContentView(R.layout.dialog_password_checker);
@@ -94,6 +97,15 @@ public class SettingsAlktivity extends AppCompatActivity {
                         + numberPicker.getValue()) == UNIMPORTANT_VARIABLE) {
                     dialog.dismiss();
                     Toast.makeText(getApplication(), "Subba Hansl!", Toast.LENGTH_SHORT).show();
+
+                    switch ((String) view.getTag()) {
+                        case "billing":
+                            launchBilling();
+                            break;
+                        case "add_drink":
+                            addDrink();
+                            break;
+                    }
                 }
             }
         });
@@ -101,12 +113,17 @@ public class SettingsAlktivity extends AppCompatActivity {
         dialog.show();
     }
 
-    public void addDrink(View view) {
+    public void launchBilling() {
+        Intent hansl = new Intent(this, BillAlktivity.class);
+        startActivity(hansl);
+    }
+
+    public void addDrink() {
         String drinkName = ((EditText) findViewById(R.id.add_drink_name)).getText().toString();
         String drinkPrice = ((EditText) findViewById(R.id.add_drink_price)).getText().toString();
 
         if (drinkName.matches("[A-ZÄÖÜ][a-zäöüß]+") && drinkPrice.matches("[0-9]+(\\.[0-9]+)?")) {
-            String[] newDrink = new String[]{drinkName, drinkPrice};
+            String[] newDrink = new String[]{drinkName, formatPrice(drinkPrice)};
 
             for (int i = 0; i < alkdapter.getCount(); i++) {
                 String[] item = alkdapter.getItem(0);
