@@ -51,7 +51,7 @@ public class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
             description.setText(goal[1]);
             description.setVisibility(View.INVISIBLE);
 
-            if (goal[2].equals("true")) {
+            if (goal[2].equals("true") || goal[2].equals("1") || goal[2].equals("2") || goal[2].equals("3")) {
                 image.setImageResource(R.mipmap.achievement_solved);
                 description.setVisibility(View.VISIBLE);
             }

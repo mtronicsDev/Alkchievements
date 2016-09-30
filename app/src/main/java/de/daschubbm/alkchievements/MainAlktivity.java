@@ -42,6 +42,8 @@ public class MainAlktivity extends AppCompatActivity {
     private boolean drinksLoaded = false, numsLoaded = false;
 
     //Variables for the Alkchievements
+    /**
+     * Reihenfolge im Array wie die unten Stehenden Integers
     private int num_beer_session = 0;
     private int evenings_in_row = 0;
 
@@ -52,7 +54,7 @@ public class MainAlktivity extends AppCompatActivity {
 
     private int num_storno = 0;
     private int num_drinks = 0;
-    private int num_kasten_clicked = 0;
+    private int num_kasten_clicked = 0;**/
 
     private int[] varchievements = {0,0,0,0,0,0,0,0,0};
 
@@ -208,7 +210,6 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     public void addStorno() {
-        num_storno++;
         varchievements[6] = varchievements[6] + 1;
         database.updateValue(7, varchievements[6]);
         if (varchievements[6] == 5) {
@@ -218,7 +219,6 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     public void addClickKasten() {
-        num_kasten_clicked++;
         varchievements[8] = varchievements[8] + 1;
         database.updateValue(9, varchievements[8]);
         if (varchievements[8] == 100) {
@@ -251,6 +251,7 @@ public class MainAlktivity extends AppCompatActivity {
 
     public void launchBilling(MenuItem item) {
         Intent hansl = new Intent(context, BillAlktivity.class);
+        hansl.putExtra("NAME", name);
         startActivity(hansl);
     }
 

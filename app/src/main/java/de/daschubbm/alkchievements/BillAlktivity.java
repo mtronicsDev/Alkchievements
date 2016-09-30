@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,7 +27,10 @@ public class BillAlktivity extends AppCompatActivity {
 
     private Map<String, Float> beverages = new HashMap<>();
 
+    private AlkchievementsDatabase alkchievementsDatabase;
+
     private Context context;
+    private String name = "Hansl";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +41,10 @@ public class BillAlktivity extends AppCompatActivity {
 
         context = this;
         Log.d("ALKI", "Started bill");
+
+        alkchievementsDatabase = new AlkchievementsDatabase(this);
+        alkchievementsDatabase.open();
+        name = getIntent().getStringExtra("NAME");
 
         final DatabaseReference all = FirebaseDatabase.getInstance().getReference();
         all.child("beverages").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -71,6 +79,7 @@ public class BillAlktivity extends AppCompatActivity {
 
                         adapter = new BillAlkdapter(context, R.layout.bill_item, debtors);
                         list.setAdapter(adapter);
+                        checkPrize();
                     }
 
                     @Override
@@ -85,5 +94,29 @@ public class BillAlktivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void checkPrize() {
+        float prize = 0;
+        for (int i = 0; i < debtors.size(); i++) {
+            if (debtors.get(i)[0].equals(name)) {
+                prize = Float.parseFloat(debtors.get(i)[1]);
+            }
+        }
+        String state = alkchievementsDatabase.getItems().get(0)[2];
+        if (prize > 5 && state.equals("false")) {
+            alkchievementsDatabase.changeStatusForItem(0, "1");
+            Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+            }
+        if (prize > 10 && (state.equals("false") || state.equals("1"))) {
+            alkchievementsDatabase.changeStatusForItem(0, "2");
+            alkchievementsDatabase.changeDescriptionForItem(0, "Erhalte eine Rechnung von über 10€!");
+            Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+        }
+        if (prize > 20 && (state.equals("false") || state.equals("1") || state.equals("2"))) {
+            alkchievementsDatabase.changeStatusForItem(0, "3");
+            alkchievementsDatabase.changeDescriptionForItem(0, "Erhalte eine Rechnung von über 20€!");
+            Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+        }
     }
 }
