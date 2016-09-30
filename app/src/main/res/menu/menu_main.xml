@@ -2,10 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/achievements"
+        android:icon="@drawable/trophy"
+        android:orderInCategory="50"
+        app:showAsAction="ifRoom"
+        android:title="@string/trophaeen_anzeigen"
+        android:onClick="launchAchievements" />
+    <item
         android:id="@+id/billing"
         android:icon="@drawable/bill"
         android:orderInCategory="100"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:title="@string/rechnung_anzeigen"
         android:onClick="launchBilling"/>
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/cog"
+        android:orderInCategory="150"
+        app:showAsAction="ifRoom"
+        android:title="@string/einstellungen_oeffnen"
+        android:onClick="launchSettings" />
 </menu>

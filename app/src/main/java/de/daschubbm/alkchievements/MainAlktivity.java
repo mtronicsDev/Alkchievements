@@ -24,7 +24,7 @@ import java.util.Map;
 public class MainAlktivity extends AppCompatActivity {
 
     private ListView list;
-    Alkdapter adapter;
+    private Alkdapter adapter;
 
     private Context context;
     private Database database;
@@ -151,9 +151,9 @@ public class MainAlktivity extends AppCompatActivity {
         ArrayList<String[]> beverages = new ArrayList<>(drinks.size());
 
         for (Map.Entry<String, Float> drink : drinks.entrySet()) {
-            String price =String.valueOf(drink.getValue());
-            String name =drink.getKey();
-            String count=String.valueOf(numDrinks.get(drink.getKey()));
+            String price = String.valueOf(drink.getValue());
+            String name = drink.getKey();
+            String count = String.valueOf(numDrinks.get(drink.getKey()));
 
             if (count.equals("null")) count = "0";
 
@@ -166,6 +166,16 @@ public class MainAlktivity extends AppCompatActivity {
 
     public void launchBilling(MenuItem item) {
         Intent hansl = new Intent(context, BillAlktivity.class);
+        startActivity(hansl);
+    }
+
+    public void launchAchievements(MenuItem item) {
+        Intent hansl = new Intent(context, AchievementsAlktivity.class);
+        startActivity(hansl);
+    }
+
+    public void launchSettings(MenuItem item) {
+        Intent hansl = new Intent(context, SettingsAlktivity.class);
         startActivity(hansl);
     }
 }
