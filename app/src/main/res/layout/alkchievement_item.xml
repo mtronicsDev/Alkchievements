@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@mipmap/unknown_alkchivement"
+        android:paddingLeft="10dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/image_alkchivement" />
+
+    <TextView
+        android:text="Alkchivement"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:textSize="24dp"
+        android:textAlignment="center"
+        android:id="@+id/title_alkchivement"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/image_alkchivement" />
+
+    <TextView
+        android:text=""
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:paddingLeft="10dp"
+        android:textSize="12dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/description_alkchivement"
+        android:layout_below="@+id/title_alkchivement"
+        android:layout_toEndOf="@+id/image_alkchivement" />
+</RelativeLayout>

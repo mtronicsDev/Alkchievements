@@ -30,12 +30,26 @@ public class MainAlktivity extends AppCompatActivity {
     private Database database;
     private String name;
 
+    private AlkchievementsDatabase alkchievementsDatabase;
+
     private DatabaseReference myDrinks;
 
     private Map<String, Float> drinks;
     private Map<String, Integer> numDrinks;
 
     private boolean drinksLoaded = false, numsLoaded = false;
+
+    private String[] alkchievements= {"Armer Schlucker/Erhalte eine Rechnung von über 5€!",
+            "Bierkenner/Trinke 2 Bier an einem Abend!",
+            "Stammgast/Beschließe 3 Tage in Folge eine Transaktion im Schubbm!",
+            "Kegelsportverein/Trinke 5 Radler an einemAbend!",
+            "0,0/Trinke 5 antialkoholische Getränke an einem Abend!",
+            "Blau wie das Meer/Trinke 5 Shots an einem Abend!",
+            "Kasten leer/Trinke insgesamt 20 Bier",
+            "Schuldner Nr. 1/Erreiche die höchste Summe auf der gesamten Rechnung!",
+            "Hobbylos/Drücke 100 mal auf einen Kasten!",
+            "Sparfuchs/Bleibe bei 10 Getränken bei unter 7 €!",
+            "Wurschtfinger/Storniere 5 Getränkbestellungen!"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +62,7 @@ public class MainAlktivity extends AppCompatActivity {
         numDrinks = new HashMap<>();
 
         setupDatabase();
+        setupAlkchivements();
         setupFirebase();
     }
 
@@ -57,6 +72,20 @@ public class MainAlktivity extends AppCompatActivity {
         flatuleur.inflate(R.menu.menu_main, menu);
 
         return true;
+    }
+
+    private void setupAlkchivements() {
+        alkchievementsDatabase = new AlkchievementsDatabase(this);
+        alkchievementsDatabase.open();
+        if (!alkchievementsDatabase.getStatus()) {
+            ArrayList<String[]> alkis = new ArrayList<String[]>();
+            for (int i = 0; i < alkchievements.length; i++) {
+                alkis.add(alkchievements[i].split("/"));
+            }
+            for (int i = 0; i < alkis.size(); i++) {
+                alkchievementsDatabase.insertItemIntoDataBase(alkis.get(i)[0], alkis.get(i)[1], "false");
+            }
+        }
     }
 
     private void setupDatabase() {
