@@ -45,6 +45,11 @@ public class Database {
         return results.moveToFirst();
     }
 
+    public boolean getStatusSecond() {
+        Cursor results = getCursorForAllItemsFromDatabase();
+        return results.moveToPosition(1);
+    }
+
     public long insertItemIntoDataBase(String name, String state) {
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, name);

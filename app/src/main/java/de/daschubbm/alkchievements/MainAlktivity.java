@@ -40,16 +40,27 @@ public class MainAlktivity extends AppCompatActivity {
     private boolean drinksLoaded = false, numsLoaded = false;
 
     //Variables for the Alkchievements
+    private int num_beer_session = 0;
+    private int evenings_in_row = 0;
+
+    private int num_radler_session = 0;
+    private int num_nonalk_session = 0;
+    private int num_shots_session = 0;
+    private int num_beer_ever = 0;
+
     private int num_storno = 0;
+    private int num_drinks = 0;
     private int num_kasten_clicked = 0;
 
     private String[] alkchievements= {"Armer Schlucker/Erhalte eine Rechnung von über 5€!",
             "Bierkenner/Trinke 2 Bier an einem Abend!",
             "Stammgast/Beschließe 3 Tage in Folge eine Transaktion im Schubbm!",
-            "Kegelsportverein/Trinke 5 Radler an einemAbend!",
+
+            "Kegelsportverein/Trinke 5 Radler an einem Abend!",
             "0,0/Trinke 5 antialkoholische Getränke an einem Abend!",
             "Blau wie das Meer/Trinke 5 Shots an einem Abend!",
             "Kasten leer/Trinke insgesamt 20 Bier",
+
             "Schuldner Nr. 1/Erreiche die höchste Summe auf der gesamten Rechnung!",
             "Hobbylos/Drücke 100 mal auf einen Kasten!",
             "Sparfuchs/Bleibe bei 10 Getränken bei unter 7 €!",
