@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
+
 public class BillAlktivity extends AppCompatActivity {
 
     private ListView list;
@@ -60,7 +62,7 @@ public class BillAlktivity extends AppCompatActivity {
                                         * beverages.get(drink.getKey());
                             }
 
-                            debtors.add(new String[]{name, String.valueOf(moneyToPay)});
+                            debtors.add(new String[]{name, formatPrice(moneyToPay)});
                         }
 
                         Log.d("ALKI", "Done with people");

@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
+
 public class MainAlktivity extends AppCompatActivity {
 
     private ListView list;
@@ -211,7 +213,7 @@ public class MainAlktivity extends AppCompatActivity {
         ArrayList<String[]> beverages = new ArrayList<>(drinks.size());
 
         for (Map.Entry<String, Float> drink : drinks.entrySet()) {
-            String price = String.valueOf(drink.getValue());
+            String price = formatPrice(String.valueOf(drink.getValue()));
             String name = drink.getKey();
             String count = String.valueOf(numDrinks.get(drink.getKey()));
 

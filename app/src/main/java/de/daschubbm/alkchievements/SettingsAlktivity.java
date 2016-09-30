@@ -1,6 +1,7 @@
 package de.daschubbm.alkchievements;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -9,10 +10,15 @@ import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+
+import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class SettingsAlktivity extends AppCompatActivity {
 
@@ -20,6 +26,7 @@ public class SettingsAlktivity extends AppCompatActivity {
 
     private SettingsAlkdapter alkdapter;
     private ListView drinks;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,15 +34,27 @@ public class SettingsAlktivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings_alktivity);
         getSupportActionBar().setTitle("Einstellungen");
 
-        ArrayList<String[]> names = new ArrayList<>(6);
-        names.add(new String[]{"Spezi", "0.60"});
-        names.add(new String[]{"Radler", "0.90"});
-        names.add(new String[]{"Wasser", "0.30"});
-        names.add(new String[]{"Bier", "0.90"});
-        names.add(new String[]{"Weizen", "1.00"});
+        context = this;
 
-        drinks = (ListView) findViewById(R.id.settings_list);
-        drinks.setAdapter(alkdapter = new SettingsAlkdapter(this, names));
+        DatabaseReference beverages = FirebaseDatabase.getInstance().getReference("beverages");
+        beverages.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<String[]> names = new ArrayList<>((int) dataSnapshot.getChildrenCount());
+
+                for (DataSnapshot drink : dataSnapshot.getChildren()) {
+                    names.add(new String[]{drink.getKey(), formatPrice(String.valueOf(drink.getValue()))});
+                }
+
+                drinks = (ListView) findViewById(R.id.settings_list);
+                drinks.setAdapter(alkdapter = new SettingsAlkdapter(context, names));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void launchPasswordCheck(View view) {
