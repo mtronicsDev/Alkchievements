@@ -46,7 +46,12 @@ public class BillAlkdapter extends ArrayAdapter<String[]> {
             TextView debt = (TextView) v.findViewById(R.id.zu_zahlen);
 
             name.setText(debtor[0]);
-            debt.setText(debtor[1]);
+            if ("-1".equals(debtor[1])) {
+                debt.setVisibility(View.GONE);
+
+                v.findViewById(R.id.geld).setVisibility(View.GONE);
+            }
+            else debt.setText(debtor[1]);
         }
         return v;
     }

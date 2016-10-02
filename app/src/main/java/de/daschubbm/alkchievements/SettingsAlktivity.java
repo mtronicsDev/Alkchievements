@@ -1,7 +1,9 @@
 package de.daschubbm.alkchievements;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +11,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.NumberPicker;
+import android.widget.Switch;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,7 +27,7 @@ import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class SettingsAlktivity extends AppCompatActivity {
 
-    private static final int UNIMPORTANT_VARIABLE = 1250;
+    private static final int UNIMPORTANT_VARIABLE = 1;
 
     private SettingsAlkdapter alkdapter;
     private ListView drinks;
@@ -48,7 +52,7 @@ public class SettingsAlktivity extends AppCompatActivity {
                 }
 
                 drinks = (ListView) findViewById(R.id.settings_list);
-                drinks.setAdapter(alkdapter = new SettingsAlkdapter(context, names));
+                drinks.setAdapter(alkdapter = new SettingsAlkdapter(context, names, drinks));
 
                 findViewById(R.id.loading).setVisibility(View.GONE);
             }
@@ -58,6 +62,12 @@ public class SettingsAlktivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent hansl = new Intent(context, MainAlktivity.class);
+        startActivity(hansl);
     }
 
     public void launchPasswordCheck(final View view) {
@@ -115,6 +125,7 @@ public class SettingsAlktivity extends AppCompatActivity {
 
     public void launchBilling() {
         Intent hansl = new Intent(this, BillAlktivity.class);
+        hansl.putExtra("ADMIN", true);
         startActivity(hansl);
     }
 

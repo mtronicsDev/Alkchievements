@@ -23,7 +23,19 @@
         android:layout_height="match_parent"
         android:id="@+id/bill"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/admin_share_button">
     </ListView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rechnung ind Grupp&apos;n einedoa"
+        android:id="@+id/admin_share_button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/bill"
+        android:visibility="gone"
+        android:backgroundTint="@color/colorAccent" />
 
 </RelativeLayout>

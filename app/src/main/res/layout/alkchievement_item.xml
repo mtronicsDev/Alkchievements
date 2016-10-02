@@ -7,7 +7,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@mipmap/unknown_alkchivement"
+        app:srcCompat="@drawable/nicht_freigeschaltet"
         android:paddingLeft="10dp"
         android:paddingTop="15dp"
         android:paddingBottom="15dp"
@@ -20,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
+        android:paddingTop="7dp"
         android:textSize="24dp"
         android:textAlignment="center"
         android:id="@+id/title_alkchivement"
@@ -29,7 +30,6 @@
     <TextView
         android:text=""
         android:paddingRight="10dp"
-        android:paddingTop="5dp"
         android:paddingLeft="10dp"
         android:textSize="12dp"
         android:layout_width="wrap_content"

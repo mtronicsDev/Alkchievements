@@ -1,12 +1,21 @@
 package de.daschubbm.alkchievements;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
+import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -15,14 +24,16 @@ import java.util.ArrayList;
  */
 public class SettingsAlkdapter extends ArrayAdapter<String[]> {
 
+    private ListView parentList;
     private Context context;
     private int layoutResourceId;
     private ArrayList<String[]> drinks = new ArrayList<>();
 
 
-    public SettingsAlkdapter(Context context, ArrayList<String[]> data) {
+    public SettingsAlkdapter(Context context, ArrayList<String[]> data, ListView parentList) {
 
         super(context, R.layout.settings_drink_item, data);
+        this.parentList = parentList;
 
         this.layoutResourceId = R.layout.settings_drink_item;
         this.context = context;
@@ -30,7 +41,7 @@ public class SettingsAlkdapter extends ArrayAdapter<String[]> {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, final View convertView, final ViewGroup parent) {
 
         View v = convertView;
 
@@ -41,6 +52,54 @@ public class SettingsAlkdapter extends ArrayAdapter<String[]> {
 
         final String drinkName = drinks.get(position)[0];
         String drinkPrice = drinks.get(position)[1];
+
+        Switch toggle = (Switch) v.findViewById(R.id.drink_toggle);
+        toggle.setLongClickable(true);
+
+        toggle.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                DialogInterface.OnClickListener deleteDialogListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        switch (i) {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                if (drinkName.equals(drinks.get(position)[0])) {
+                                    drinks.remove(position);
+                                    DatabaseReference drink = FirebaseDatabase.getInstance()
+                                            .getReference("beverages/" + drinkName);
+
+                                    drink.removeValue();
+                                    parentList.setAdapter(SettingsAlkdapter.this);
+
+                                    Toast.makeText(context, drinkName + " wurde entfernt!",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                                else throw new ApplicationFuckedUpError("Listenindex stimmt " +
+                                        "nicht mit Adapterindex überein!");
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                Toast.makeText(context, "Dann lass ma's hoid bleim.",
+                                        Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setPositiveButton("Weg damit!", deleteDialogListener)
+                        .setNegativeButton("B'hoidn!", deleteDialogListener)
+                .setTitle("\"" + drinkName + "\" löschen?")
+                .setMessage("Das Getränk und alle damit verbundenen Rechnungen werden gelöscht! \n\n" +
+                        "Falls nur der Preis geändert werden soll, einfach neues Getränk " +
+                        "mit selbem Namen und neuem Preis hinzufügen aber NICHT LÖSCHEN!");
+                AlertDialog dialog = builder.show();
+
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.RED);
+                dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(Color.LTGRAY);
+
+                return true;
+            }
+        });
 
         if (drinkName != null && drinkPrice != null) {
             TextView name = (TextView) v.findViewById(R.id.drink_name);

@@ -9,6 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by Jonathan on 30.09.2016.
@@ -19,6 +22,7 @@ public class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
     private Context context;
     private int layoutResourceId;
     private ArrayList<String[]> alkchievements = new ArrayList<>();
+    private Map<String, Integer> imageMap;
 
 
     public AlkchievementsAlkdapder(Context context, int layoutResourceId, ArrayList<String[]> data) {
@@ -28,6 +32,12 @@ public class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
         this.layoutResourceId = layoutResourceId;
         this.context = context;
         alkchievements = data;
+
+        imageMap = new HashMap<>();
+        imageMap.put("Wurschtfinger", R.drawable.wurstfinger);
+        imageMap.put("Blau wie das Meer", R.drawable.blau_wie_das_meer);
+        imageMap.put("Schuldner Nr. 1", R.drawable.schuldner_nr_1);
+        imageMap.put("Kegelsportverein", R.drawable.kegelsportverein);
     }
 
     @Override
@@ -52,7 +62,9 @@ public class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
             description.setVisibility(View.INVISIBLE);
 
             if (goal[2].equals("true") || goal[2].equals("1") || goal[2].equals("2") || goal[2].equals("3")) {
-                image.setImageResource(R.mipmap.achievement_solved);
+                Integer res = imageMap.get(goal[0]);
+
+                image.setImageResource(res == null ? R.mipmap.achievement_solved : res);
                 description.setVisibility(View.VISIBLE);
             }
         }
