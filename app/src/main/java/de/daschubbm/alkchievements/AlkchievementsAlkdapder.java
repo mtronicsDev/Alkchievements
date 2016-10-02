@@ -38,6 +38,8 @@ public class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
         imageMap.put("Blau wie das Meer", R.drawable.blau_wie_das_meer);
         imageMap.put("Schuldner Nr. 1", R.drawable.schuldner_nr_1);
         imageMap.put("Kegelsportverein", R.drawable.kegelsportverein);
+        imageMap.put("Bierkenner", R.drawable.bierkenner);
+        imageMap.put("0,0", R.drawable.null_komma_null);
     }
 
     @Override
