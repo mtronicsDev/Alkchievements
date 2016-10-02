@@ -83,6 +83,20 @@ public class Alkdapter extends ArrayAdapter<String[]> {
                         main.updateDrink((String) add_flasche.getTag(), added);
                     if (alk[2].equals("Bier")) {
                         main.addEverBeer(true);
+                        main.addSessionBeer(true);
+                    }
+                    if (alk[2].equals("Weizen")) {
+                        main.addSessionBeer(true);
+                    }
+                    if (alk[2].equals("Radler")) {
+                        main.addSessionRadler(true);
+                        main.addSessionNonAlk(true);
+                    }
+                    if (alk[2].equals("Wasser") || alk[2].equals("Almdudler") || alk[2].equals("Spezi")) {
+                        main.addSessionNonAlk(true);
+                    }
+                    if (alk[2].equals("Schnaps")) {
+                        main.addSessionShot(true);
                     }
                 }
             });
@@ -99,6 +113,20 @@ public class Alkdapter extends ArrayAdapter<String[]> {
                         Toast.makeText(context, "Storniert :/ Fettfinger!", Toast.LENGTH_SHORT).show();
                         if (alk[2].equals("Bier")) {
                             main.addEverBeer(false);
+                            main.addSessionBeer(false);
+                        }
+                        if (alk[2].equals("Weizen")) {
+                            main.addSessionBeer(false);
+                        }
+                        if (alk[2].equals("Radler")) {
+                            main.addSessionRadler(false);
+                            main.addSessionNonAlk(false);
+                        }
+                        if (alk[2].equals("Wasser") || alk[2].equals("Almdudler") || alk[2].equals("Spezi")) {
+                            main.addSessionNonAlk(false);
+                        }
+                        if (alk[2].equals("Schnaps")) {
+                            main.addSessionShot(false);
                         }
                     }
                     return true;

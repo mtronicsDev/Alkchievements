@@ -18,7 +18,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +37,7 @@ public class MainAlktivity extends AppCompatActivity {
     private String name;
 
     private AlkchievementsDatabase alkchievementsDatabase;
+    private TimeDatabase timeDatabase;
 
     private DatabaseReference myDrinks;
 
@@ -45,6 +49,7 @@ public class MainAlktivity extends AppCompatActivity {
     //Variables for the Alkchievements
     /**
      * Reihenfolge im Array wie die unten Stehenden Integers
+     *
     private int num_beer_session = 0;
     private int evenings_in_row = 0;
 
@@ -89,6 +94,9 @@ public class MainAlktivity extends AppCompatActivity {
         }
         setupAlkchivements();
         loadAlkchievementValues();
+
+        setupTimeDatabase();
+
         setupFirebase();
     }
 
@@ -111,6 +119,18 @@ public class MainAlktivity extends AppCompatActivity {
             for (int i = 0; i < alkis.size(); i++) {
                 alkchievementsDatabase.insertItemIntoDataBase(alkis.get(i)[0], alkis.get(i)[1], "false");
             }
+        }
+    }
+
+    private void setupTimeDatabase() {
+        timeDatabase = new TimeDatabase(this);
+        timeDatabase.open();
+        if (!timeDatabase.getStatus()) {
+            timeDatabase.insertItemIntoDataBase("num_beer_session", "0");
+            timeDatabase.insertItemIntoDataBase("num_radler_session", "0");
+            timeDatabase.insertItemIntoDataBase("num_nonalk_session", "0");
+            timeDatabase.insertItemIntoDataBase("num_shots_session", "0");
+            timeDatabase.insertItemIntoDataBase("last_buy", "0");
         }
     }
 
@@ -208,6 +228,224 @@ public class MainAlktivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void addSessionBeer(boolean add) {
+        if (!alkchievementsDatabase.getItems().get(1)[2].equals("3")) {
+            DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+            String date = df.format(Calendar.getInstance().getTime());
+
+            if (timeDatabase.getItem(0)[1].equals("0")) {
+                timeDatabase.updateValue(0, date);
+                varchievements[0] = varchievements[0] + 1;
+                database.updateValue(1, varchievements[0]);
+                return;
+            }
+
+            boolean isSession = timeDatabase.getItem(0)[1].split("/")[2].equals(date.split("/")[2]) && Integer.parseInt(date.split("/")[3]) - Integer.parseInt(timeDatabase.getItem(0)[1].split("/")[3]) < 2;
+            if (!isSession) {
+                boolean newDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(0)[1].split("/")[2]) == 1 || date.split("/")[2].equals("01");
+                if (newDay) {
+                    if (Integer.parseInt(date.split("/")[3]) < 2) {
+                        isSession = true;
+                    }
+                }
+            }
+
+            if (isSession && add) {
+                timeDatabase.updateValue(0, date);
+                varchievements[0] = varchievements[0] + 1;
+                database.updateValue(1, varchievements[0]);
+
+                if (varchievements[0] == 2 && alkchievementsDatabase.getItems().get(1)[2].equals("false")) {
+                    alkchievementsDatabase.changeStatusForItem(1, "1");
+                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+                }
+                if (varchievements[0] == 4 && alkchievementsDatabase.getItems().get(1)[2].equals("1")) {
+                    alkchievementsDatabase.changeStatusForItem(1, "2");
+                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+                    alkchievementsDatabase.changeDescriptionForItem(1, "Trinke 4 Bier an einem Abend!");
+                }
+                if (varchievements[0] == 6 && alkchievementsDatabase.getItems().get(1)[2].equals("2")) {
+                    alkchievementsDatabase.changeStatusForItem(1, "3");
+                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+                    alkchievementsDatabase.changeDescriptionForItem(1, "Trinke 6 Bier an einem Abend!");
+                }
+            }
+
+            if (isSession && !add) {
+                varchievements[0] = varchievements[0] - 1;
+                database.updateValue(1, varchievements[0]);
+            }
+
+            if (!isSession && add) {
+                timeDatabase.updateValue(0, date);
+                varchievements[0] = 1;
+                database.updateValue(1, varchievements[0]);
+            }
+
+            if (!isSession && !add) {
+                varchievements[0] = 0;
+                database.updateValue(1, varchievements[0]);
+            }
+        }
+    }
+
+    public void addFollowDay() {
+
+    }
+
+    public void addSessionRadler(boolean add) {
+        if (!alkchievementsDatabase.getItems().get(3)[2].equals("true")) {
+            DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+            String date = df.format(Calendar.getInstance().getTime());
+
+            if (timeDatabase.getItem(1)[1].equals("0")) {
+                timeDatabase.updateValue(1, date);
+                varchievements[2] = varchievements[2] + 1;
+                database.updateValue(3, varchievements[2]);
+                return;
+            }
+
+            boolean isSession = timeDatabase.getItem(1)[1].split("/")[2].equals(date.split("/")[2]) && Integer.parseInt(date.split("/")[3]) - Integer.parseInt(timeDatabase.getItem(1)[1].split("/")[3]) < 2;
+            if (!isSession) {
+                boolean newDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(1)[1].split("/")[2]) == 1 || date.split("/")[2].equals("01");
+                if (newDay) {
+                    if (Integer.parseInt(date.split("/")[3]) < 2) {
+                        isSession = true;
+                    }
+                }
+            }
+
+            if (isSession && add) {
+                timeDatabase.updateValue(1, date);
+                varchievements[2] = varchievements[2] + 1;
+                database.updateValue(3, varchievements[2]);
+
+                if (varchievements[2] == 5 && alkchievementsDatabase.getItems().get(3)[2].equals("false")) {
+                    alkchievementsDatabase.changeStatusForItem(3, "true");
+                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            if (isSession && !add) {
+                varchievements[2] = varchievements[2] - 1;
+                database.updateValue(3, varchievements[2]);
+            }
+
+            if (!isSession && add) {
+                timeDatabase.updateValue(1, date);
+                varchievements[2] = 1;
+                database.updateValue(3, varchievements[2]);
+            }
+
+            if (!isSession && !add) {
+                varchievements[2] = 0;
+                database.updateValue(3, varchievements[2]);
+            }
+        }
+    }
+
+    public void addSessionNonAlk(boolean add) {
+        if (!alkchievementsDatabase.getItems().get(4)[2].equals("true")) {
+            DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+            String date = df.format(Calendar.getInstance().getTime());
+
+            if (timeDatabase.getItem(2)[1].equals("0")) {
+                timeDatabase.updateValue(2, date);
+                varchievements[3] = varchievements[3] + 1;
+                database.updateValue(4, varchievements[3]);
+                return;
+            }
+
+            boolean isSession = timeDatabase.getItem(2)[1].split("/")[2].equals(date.split("/")[2]) && Integer.parseInt(date.split("/")[3]) - Integer.parseInt(timeDatabase.getItem(2)[1].split("/")[3]) < 2;
+            if (!isSession) {
+                boolean newDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(2)[1].split("/")[2]) == 1 || date.split("/")[2].equals("01");
+                if (newDay) {
+                    if (Integer.parseInt(date.split("/")[3]) < 2) {
+                        isSession = true;
+                    }
+                }
+            }
+
+            if (isSession && add) {
+                timeDatabase.updateValue(2, date);
+                varchievements[3] = varchievements[3] + 1;
+                database.updateValue(4, varchievements[3]);
+
+                if (varchievements[3] == 5 && alkchievementsDatabase.getItems().get(4)[2].equals("false")) {
+                    alkchievementsDatabase.changeStatusForItem(4, "true");
+                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            if (isSession && !add) {
+                varchievements[3] = varchievements[3] - 1;
+                database.updateValue(4, varchievements[3]);
+            }
+
+            if (!isSession && add) {
+                timeDatabase.updateValue(2, date);
+                varchievements[3] = 1;
+                database.updateValue(4, varchievements[3]);
+            }
+
+            if (!isSession && !add) {
+                varchievements[3] = 0;
+                database.updateValue(4, varchievements[3]);
+            }
+        }
+    }
+
+    public void addSessionShot(boolean add) {
+        if (!alkchievementsDatabase.getItems().get(5)[2].equals("true")) {
+            DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+            String date = df.format(Calendar.getInstance().getTime());
+
+            if (timeDatabase.getItem(3)[1].equals("0")) {
+                timeDatabase.updateValue(3, date);
+                varchievements[4] = varchievements[4] + 1;
+                database.updateValue(5, varchievements[4]);
+                return;
+            }
+
+            boolean isSession = timeDatabase.getItem(3)[1].split("/")[2].equals(date.split("/")[2]) && Integer.parseInt(date.split("/")[3]) - Integer.parseInt(timeDatabase.getItem(3)[1].split("/")[3]) < 2;
+            if (!isSession) {
+                boolean newDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(3)[1].split("/")[2]) == 1 || date.split("/")[2].equals("01");
+                if (newDay) {
+                    if (Integer.parseInt(date.split("/")[3]) < 2) {
+                        isSession = true;
+                    }
+                }
+            }
+
+            if (isSession && add) {
+                timeDatabase.updateValue(3, date);
+                varchievements[4] = varchievements[4] + 1;
+                database.updateValue(5, varchievements[4]);
+
+                if (varchievements[4] == 5 && alkchievementsDatabase.getItems().get(5)[2].equals("false")) {
+                    alkchievementsDatabase.changeStatusForItem(5, "true");
+                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            if (isSession && !add) {
+                varchievements[4] = varchievements[4] - 1;
+                database.updateValue(5, varchievements[4]);
+            }
+
+            if (!isSession && add) {
+                timeDatabase.updateValue(3, date);
+                varchievements[4] = 1;
+                database.updateValue(5, varchievements[4]);
+            }
+
+            if (!isSession && !add) {
+                varchievements[4] = 0;
+                database.updateValue(5, varchievements[4]);
+            }
+        }
     }
 
     public void addEverBeer(boolean add) {
