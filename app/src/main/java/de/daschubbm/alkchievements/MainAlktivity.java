@@ -38,6 +38,7 @@ public class MainAlktivity extends AppCompatActivity {
 
     private AlkchievementsDatabase alkchievementsDatabase;
     private TimeDatabase timeDatabase;
+    private LastPrizesDatabase prizesDatabase;
 
     private DatabaseReference myDrinks;
 
@@ -96,6 +97,8 @@ public class MainAlktivity extends AppCompatActivity {
         loadAlkchievementValues();
 
         setupTimeDatabase();
+        prizesDatabase = new LastPrizesDatabase(this);
+        prizesDatabase.open();
 
         setupFirebase();
     }
@@ -230,6 +233,17 @@ public class MainAlktivity extends AppCompatActivity {
         });
     }
 
+    public void checkSum(float prize) {
+        prizesDatabase.newPrize(prize);
+        if(prizesDatabase.getStatusFull()) {
+            float sum = prizesDatabase.getSum();
+            if (sum < 7 && alkchievementsDatabase.getItems().get(9)[2].equals("false")) {
+                alkchievementsDatabase.changeStatusForItem(9, "true");
+                Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     public void addSessionBeer(boolean add) {
         if (!alkchievementsDatabase.getItems().get(1)[2].equals("3")) {
             DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
@@ -292,7 +306,47 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     public void addFollowDay() {
+        if (!alkchievementsDatabase.getItems().get(2)[2].equals("3")) {
+            DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+            String date = df.format(Calendar.getInstance().getTime());
 
+            if (timeDatabase.getItem(4)[1].equals("0")) {
+                timeDatabase.updateValue(4, date);
+                varchievements[1] = varchievements[1] + 1;
+                database.updateValue(2, varchievements[1]);
+                return;
+            }
+
+            boolean nextDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(4)[1].split("/")[2]) == 1;
+            if (!nextDay) {
+                String last = timeDatabase.getItem(4)[1].split("/")[2];
+                boolean newMonth = date.split("/")[2].equals("01") && (last.equals("28") || last.equals("29") || last.equals("30") || last.equals("31"));
+                if (newMonth) {
+                    nextDay = true;
+                }
+            }
+
+            if (nextDay) {
+                timeDatabase.updateValue(4, date);
+                varchievements[1] = varchievements[1] + 1;
+                database.updateValue(2, varchievements[1]);
+
+                if (varchievements[1] == 3 && alkchievementsDatabase.getItems().get(2)[2].equals("false")) {
+                    alkchievementsDatabase.changeStatusForItem(2, "1");
+                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+                }
+                if (varchievements[1] == 5 && alkchievementsDatabase.getItems().get(2)[2].equals("1")) {
+                    alkchievementsDatabase.changeStatusForItem(2, "2");
+                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+                    alkchievementsDatabase.changeDescriptionForItem(1, "Beschließe 5 Tage in Folge eine Transaktion im Schubbm!");
+                }
+                if (varchievements[1] == 7 && alkchievementsDatabase.getItems().get(2)[2].equals("2")) {
+                    alkchievementsDatabase.changeStatusForItem(2, "3");
+                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+                    alkchievementsDatabase.changeDescriptionForItem(1, "Beschließe 7 Tage in Folge eine Transaktion im Schubbm!");
+                }
+            }
+        }
     }
 
     public void addSessionRadler(boolean add) {

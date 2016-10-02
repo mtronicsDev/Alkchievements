@@ -81,6 +81,8 @@ public class Alkdapter extends ArrayAdapter<String[]> {
                         alk[1] = String.valueOf(added);
                         num_beer.setText(alk[1]);
                         main.updateDrink((String) add_flasche.getTag(), added);
+                    main.addFollowDay();
+                    main.checkSum(Float.parseFloat(alk[0]));
                     if (alk[2].equals("Bier")) {
                         main.addEverBeer(true);
                         main.addSessionBeer(true);
