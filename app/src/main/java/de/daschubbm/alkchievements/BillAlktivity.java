@@ -82,6 +82,7 @@ public class BillAlktivity extends AppCompatActivity {
                         list.setAdapter(adapter);
 
                         checkPrize();
+                        checkHighestPrize();
 
                         findViewById(R.id.loading).setVisibility(View.GONE);
                     }
@@ -121,6 +122,30 @@ public class BillAlktivity extends AppCompatActivity {
             alkchievementsDatabase.changeStatusForItem(0, "3");
             alkchievementsDatabase.changeDescriptionForItem(0, "Erhalte eine Rechnung von über 20€!");
             Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void checkHighestPrize() {
+        String state = alkchievementsDatabase.getItems().get(7)[2];
+        if (state.equals("false")) {
+            boolean highest = true;
+            float prize = 0;
+            for (int i = 0; i < debtors.size(); i++) {
+                if (debtors.get(i)[0].equals(name)) {
+                    prize = Float.parseFloat(debtors.get(i)[1]);
+                }
+            }
+            for (int i = 0; i < debtors.size(); i++) {
+                if (!debtors.get(i)[0].equals(name)) {
+                    if (Float.parseFloat(debtors.get(i)[1]) >= prize) {
+                        highest = false;
+                    }
+                }
+            }
+            if (highest) {
+                alkchievementsDatabase.changeStatusForItem(7, "true");
+                Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
