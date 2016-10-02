@@ -40,6 +40,11 @@ public class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
         imageMap.put("Kegelsportverein", R.drawable.kegelsportverein);
         imageMap.put("Bierkenner", R.drawable.bierkenner);
         imageMap.put("0,0", R.drawable.null_komma_null);
+        imageMap.put("Kasten leer", R.drawable.kasten_leer);
+        imageMap.put("Armer Schlucker", R.drawable.armer_schlucker);
+        imageMap.put("Sparfuchs", R.drawable.sparfuchs);
+        imageMap.put("Stammgast", R.drawable.stammgast);
+        imageMap.put("Hobbylos", R.drawable.hobbylos);
     }
 
     @Override

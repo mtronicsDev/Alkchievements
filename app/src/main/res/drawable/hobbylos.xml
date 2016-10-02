@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="50dp"
+    android:height="50dp"
+    android:viewportWidth="256"
+    android:viewportHeight="256">
+
+    <path
+        android:fillColor="#908cef"
+        android:strokeWidth="24"
+        android:strokeMiterLimit="3.70000005"
+        android:pathData="M128,0 C198.692,0,256,57.3076,256,128 C256,198.692,198.692,256,128,256
+C57.3076,256,0,198.692,0,128 C0,57.3076,57.3076,0,128,0 Z" />
+    <path
+        android:fillType="evenOdd"
+        android:strokeColor="#000000"
+        android:strokeWidth="4.8"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M59.2857,189.571 C112.702,163.44,150.634,174.652,188.214,186.714" />
+    <path
+        android:fillType="evenOdd"
+        android:strokeColor="#000000"
+        android:strokeWidth="4.80000019"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M121.786,175.5 L121.429,200.5 C121.545,216.128,146.122,212.198,145.358,199.071
+L143.929,176.571" />
+    <path
+        android:fillType="evenOdd"
+        android:strokeColor="#000000"
+        android:strokeWidth="4.80000019"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M132.857,176.572 L133.214,204.788" />
+    <path
+        android:fillColor="#241d03"
+        android:strokeWidth="4.80000019"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M82.3214,87.4286 C90.5071,87.4286,97.1429,94.0643,97.1429,102.25
+C97.1429,110.436,90.5071,117.071,82.3214,117.071
+C74.1358,117.071,67.5,110.436,67.5,102.25
+C67.5,94.0643,74.1358,87.4286,82.3214,87.4286 Z" />
+    <path
+        android:fillColor="#241d03"
+        android:strokeWidth="4.80000019"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M185.536,94.9286 C195.497,94.9286,203.571,102.684,203.571,112.25
+C203.571,121.816,195.497,129.571,185.536,129.571
+C175.575,129.571,167.5,121.816,167.5,112.25
+C167.5,102.684,175.575,94.9286,185.536,94.9286 Z" />
+</vector>
