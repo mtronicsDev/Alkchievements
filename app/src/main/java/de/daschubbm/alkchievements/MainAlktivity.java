@@ -50,22 +50,23 @@ public class MainAlktivity extends AppCompatActivity {
     //Variables for the Alkchievements
     /**
      * Reihenfolge im Array wie die unten Stehenden Integers
-     *
-    private int num_beer_session = 0;
-    private int evenings_in_row = 0;
+     * <p/>
+     * private int num_beer_session = 0;
+     * private int evenings_in_row = 0;
+     * <p/>
+     * private int num_radler_session = 0;
+     * private int num_nonalk_session = 0;
+     * private int num_shots_session = 0;
+     * private int num_beer_ever = 0;
+     * <p/>
+     * private int num_storno = 0;
+     * private int num_drinks = 0;
+     * private int num_kasten_clicked = 0;
+     **/
 
-    private int num_radler_session = 0;
-    private int num_nonalk_session = 0;
-    private int num_shots_session = 0;
-    private int num_beer_ever = 0;
+    private int[] varchievements = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    private int num_storno = 0;
-    private int num_drinks = 0;
-    private int num_kasten_clicked = 0;**/
-
-    private int[] varchievements = {0,0,0,0,0,0,0,0,0};
-
-    private String[] alkchievements= {"Armer Schlucker/Erhalte eine Rechnung von über 5€!",
+    private String[] alkchievements = {"Armer Schlucker/Erhalte eine Rechnung von über 5€!",
             "Bierkenner/Trinke 2 Bier an einem Abend!",
             "Stammgast/Beschließe 3 Tage in Folge eine Transaktion im Schubbm!",
 
@@ -158,8 +159,8 @@ public class MainAlktivity extends AppCompatActivity {
 
     private void loadAlkchievementValues() {
         ArrayList<String[]> varies = database.getItems();
-        for(int i = 1; i <= varchievements.length; i++) {
-            varchievements[i-1] = Integer.parseInt(varies.get(i)[1]);
+        for (int i = 1; i <= varchievements.length; i++) {
+            varchievements[i - 1] = Integer.parseInt(varies.get(i)[1]);
         }
     }
 
@@ -209,9 +210,6 @@ public class MainAlktivity extends AppCompatActivity {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Toast.makeText(context, "Do, " + name + ", dei "
-                        + String.valueOf(dataSnapshot.getValue()) + ". "
-                        + dataSnapshot.getKey() + "!", Toast.LENGTH_SHORT).show();
                 numDrinks.put(dataSnapshot.getKey(),
                         Integer.parseInt(String.valueOf(dataSnapshot.getValue())));
             }
@@ -235,7 +233,7 @@ public class MainAlktivity extends AppCompatActivity {
 
     public void checkSum(float prize) {
         prizesDatabase.newPrize(prize);
-        if(prizesDatabase.getStatusFull()) {
+        if (prizesDatabase.getStatusFull()) {
             float sum = prizesDatabase.getSum();
             if (sum < 7 && alkchievementsDatabase.getItems().get(9)[2].equals("false")) {
                 alkchievementsDatabase.changeStatusForItem(9, "true");
@@ -536,7 +534,7 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     public void updateDrink(String drink, int count) {
-            myDrinks.child(drink).setValue(count);
+        myDrinks.child(drink).setValue(count);
     }
 
     private void setupViews() {

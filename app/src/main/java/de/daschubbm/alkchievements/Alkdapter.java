@@ -35,13 +35,14 @@ public class Alkdapter extends ArrayAdapter<String[]> {
         this.context = alk;
         alks = data;
 
-        images.put("Bier", R.drawable.karsten_bier);
-        images.put("Radler", R.drawable.karsten_radler);
-        images.put("Weizen", R.drawable.karsten_weizen);
-        images.put("Almdudler", R.drawable.karsten_almdudler);
-        images.put("Spezi", R.drawable.karsten_spezi);
-        images.put("Wasser", R.drawable.karsten_wasser);
-        images.put("Schnaps", R.drawable.karsten_schnaps);
+        images.put("Bier", R.drawable.kasten_bier);
+        images.put("Radler", R.drawable.kasten_radler);
+        images.put("Weizen", R.drawable.kasten_weizen);
+        images.put("Almdudler", R.drawable.kasten_almdudler);
+        images.put("Apfelschorle", R.drawable.kasten_apfelschorle);
+        images.put("Spezi", R.drawable.kasten_spezi);
+        images.put("Wasser", R.drawable.kasten_wasser);
+        images.put("Schnaps", R.drawable.kasten_schnaps);
     }
 
     @Override
@@ -58,7 +59,7 @@ public class Alkdapter extends ArrayAdapter<String[]> {
 
         if(alk != null) {
             TextView preis = (TextView) v.findViewById(R.id.preis);
-            final TextView num_beer = (TextView) v.findViewById(R.id.num_beer);
+            final TextView num_beer = (TextView) v.findViewById(R.id.anzahl);
             ImageView kasten = (ImageView) v.findViewById(R.id.kasten);
             TextView name = (TextView) v.findViewById(R.id.name);
             name.setText(alk[2]);
@@ -71,15 +72,15 @@ public class Alkdapter extends ArrayAdapter<String[]> {
             final ImageView add_flasche = (ImageView) v.findViewById(R.id.add_flasche);
 
             add_flasche.setTag(alk[2]);
-            preis.setText(alk[0] + " €");
-            num_beer.setText(alk[1]);
+            preis.setText("Preis: " + alk[0] + " €");
+            num_beer.setText("G'schwoabt: " + alk[1]);
 
             add_flasche.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int added = Integer.parseInt(alk[1]) + 1;
                         alk[1] = String.valueOf(added);
-                        num_beer.setText(alk[1]);
+                        num_beer.setText("G'schwoabt: " + alk[1]);
                         main.updateDrink((String) add_flasche.getTag(), added);
                     main.addFollowDay();
                     main.checkSum(Float.parseFloat(alk[0]));
@@ -109,10 +110,10 @@ public class Alkdapter extends ArrayAdapter<String[]> {
                     if (Integer.parseInt(alk[1]) > 0) {
                         int taken = Integer.parseInt(alk[1]) - 1;
                         alk[1] = String.valueOf(taken);
-                        num_beer.setText(alk[1]);
+                        num_beer.setText("G'schwoabt: " + alk[1]);
                         main.updateDrink((String) add_flasche.getTag(), taken);
                         main.addStorno();
-                        Toast.makeText(context, "Storniert :/ Fettfinger!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Storniert \ud83d\ude12 Fettfinger!", Toast.LENGTH_SHORT).show();
                         if (alk[2].equals("Bier")) {
                             main.addEverBeer(false);
                             main.addSessionBeer(false);
