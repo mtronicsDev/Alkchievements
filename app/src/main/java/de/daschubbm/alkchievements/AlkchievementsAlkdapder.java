@@ -11,7 +11,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * Created by Jonathan on 30.09.2016.
@@ -73,6 +72,10 @@ public class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
 
                 image.setImageResource(res == null ? R.mipmap.achievement_solved : res);
                 description.setVisibility(View.VISIBLE);
+            }
+
+            if (goal[2].equals("false")) {
+                image.setImageResource(R.drawable.nicht_freigeschaltet);
             }
         }
         return v;
