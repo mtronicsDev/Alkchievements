@@ -1,19 +1,12 @@
 package de.daschubbm.alkchievements;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.NumberPicker;
-import android.widget.Switch;
-import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,7 +20,7 @@ import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class SettingsAlktivity extends AppCompatActivity {
 
-    private static final int UNIMPORTANT_VARIABLE = 1;
+    //private static final int UNIMPORTANT_VARIABLE = 1;
 
     private SettingsAlkdapter alkdapter;
     private ListView drinks;
@@ -68,10 +61,19 @@ public class SettingsAlktivity extends AppCompatActivity {
     public void onBackPressed() {
         Intent hansl = new Intent(context, MainAlktivity.class);
         startActivity(hansl);
+        finish();
     }
 
     public void launchPasswordCheck(final View view) {
-        final Dialog dialog = new Dialog(this);
+        switch ((String) view.getTag()) {
+            case "billing":
+                launchBilling();
+                break;
+            case "add_drink":
+                addDrink();
+                break;
+        }
+        /*final Dialog dialog = new Dialog(this);
         dialog.setTitle("Passwort eingeben");
         dialog.setContentView(R.layout.dialog_password_checker);
 
@@ -120,7 +122,7 @@ public class SettingsAlktivity extends AppCompatActivity {
             }
         });
 
-        dialog.show();
+        dialog.show();*/
     }
 
     public void launchBilling() {

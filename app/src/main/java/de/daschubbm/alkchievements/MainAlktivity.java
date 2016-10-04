@@ -1,5 +1,6 @@
 package de.daschubbm.alkchievements;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
@@ -28,6 +30,8 @@ import java.util.Map;
 import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class MainAlktivity extends AppCompatActivity {
+
+    private static final int UNIMPORTANT_VARIABLE = 9318;
 
     private ListView list;
     private Alkdapter adapter;
@@ -569,7 +573,54 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     public void launchSettings(MenuItem item) {
-        Intent hansl = new Intent(context, SettingsAlktivity.class);
-        startActivity(hansl);
+        launchPasswordCheck();
+    }
+
+    public void launchPasswordCheck() {
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle("Passwort eingeben");
+        dialog.setContentView(R.layout.dialog_password_checker);
+
+        final NumberPicker p1 = (NumberPicker) dialog.findViewById(R.id.num_lock_1);
+        p1.setMinValue(0);
+        p1.setValue(1);
+        p1.setMaxValue(9);
+        p1.setWrapSelectorWheel(true);
+
+        final NumberPicker p2 = (NumberPicker) dialog.findViewById(R.id.num_lock_2);
+        p2.setMinValue(0);
+        p2.setValue(1);
+        p2.setMaxValue(9);
+        p2.setWrapSelectorWheel(true);
+
+        final NumberPicker p3 = (NumberPicker) dialog.findViewById(R.id.num_lock_3);
+        p3.setMinValue(0);
+        p3.setValue(1);
+        p3.setMaxValue(9);
+        p3.setWrapSelectorWheel(true);
+
+        NumberPicker p4 = (NumberPicker) dialog.findViewById(R.id.num_lock_4);
+        p4.setMinValue(0);
+        p4.setValue(1);
+        p4.setMaxValue(9);
+        p4.setWrapSelectorWheel(true);
+        p4.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+                if (((p1.getValue() * 1000)
+                        + (p2.getValue() * 100)
+                        + (p3.getValue() * 10)
+                        + numberPicker.getValue()) == UNIMPORTANT_VARIABLE) {
+                    dialog.dismiss();
+                    Toast.makeText(getApplication(), "Subba Hansl!", Toast.LENGTH_SHORT).show();
+
+                    Intent hansl = new Intent(context, SettingsAlktivity.class);
+                    startActivity(hansl);
+                    finish();
+                }
+            }
+        });
+
+        dialog.show();
     }
 }
