@@ -149,6 +149,7 @@ public class MainAlktivity extends AppCompatActivity {
         if (!database.getStatus()) {
             Intent hansl = new Intent(context, LoginAlktivity.class);
             startActivity(hansl);
+            finish();
         } else {
             name = database.getItem(0)[1];
             getSupportActionBar().setTitle(name);
