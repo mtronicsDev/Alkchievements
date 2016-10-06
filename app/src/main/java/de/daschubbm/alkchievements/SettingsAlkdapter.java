@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -74,8 +73,7 @@ public class SettingsAlkdapter extends ArrayAdapter<String[]> {
 
                                     Toast.makeText(context, drinkName + " wurde entfernt!",
                                             Toast.LENGTH_SHORT).show();
-                                }
-                                else throw new ApplicationFuckedUpError("Listenindex stimmt " +
+                                } else throw new ApplicationFuckedUpError("Listenindex stimmt " +
                                         "nicht mit Adapterindex überein!");
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
@@ -88,10 +86,10 @@ public class SettingsAlkdapter extends ArrayAdapter<String[]> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setPositiveButton("Weg damit!", deleteDialogListener)
                         .setNegativeButton("B'hoidn!", deleteDialogListener)
-                .setTitle("\"" + drinkName + "\" löschen?")
-                .setMessage("Das Getränk und alle damit verbundenen Rechnungen werden gelöscht! \n\n" +
-                        "Falls nur der Preis geändert werden soll, einfach neues Getränk " +
-                        "mit selbem Namen und neuem Preis hinzufügen aber NICHT LÖSCHEN!");
+                        .setTitle("\"" + drinkName + "\" löschen?")
+                        .setMessage("Das Getränk und alle damit verbundenen Rechnungen werden gelöscht! \n\n" +
+                                "Falls nur der Preis geändert werden soll, einfach neues Getränk " +
+                                "mit selbem Namen und neuem Preis hinzufügen aber NICHT LÖSCHEN!");
                 AlertDialog dialog = builder.show();
 
                 dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.RED);

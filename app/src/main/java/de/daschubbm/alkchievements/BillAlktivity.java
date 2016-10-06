@@ -1,11 +1,9 @@
 package de.daschubbm.alkchievements;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -93,7 +90,8 @@ public class BillAlktivity extends AppCompatActivity {
 
                         list = (ListView) findViewById(R.id.bill);
 
-                        if (debtors.size() == 0) debtors.add(new String[]{"Es had g'wies koana ebs gsuffa!", "-1"});
+                        if (debtors.size() == 0)
+                            debtors.add(new String[]{"Es had g'wies koana ebs gsuffa!", "-1"});
 
                         adapter = new BillAlkdapter(context, R.layout.bill_item, debtors);
                         list.setAdapter(adapter);
@@ -197,7 +195,7 @@ public class BillAlktivity extends AppCompatActivity {
         if (prize > 5 && state.equals("false")) {
             alkchievementsDatabase.changeStatusForItem(0, "1");
             Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
-            }
+        }
         if (prize > 10 && (state.equals("false") || state.equals("1"))) {
             alkchievementsDatabase.changeStatusForItem(0, "2");
             alkchievementsDatabase.changeDescriptionForItem(0, "Erhalte eine Rechnung von über 10€!");

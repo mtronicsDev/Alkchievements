@@ -71,7 +71,7 @@ public class LastPrizesDatabase {
     public float getSum() {
         float[] save = getItems();
         float sum = 0;
-        for(int i = 0; i < save.length; i++) {
+        for (int i = 0; i < save.length; i++) {
             sum = sum + save[i];
         }
         return sum;
@@ -99,7 +99,7 @@ public class LastPrizesDatabase {
 
         float[] items = new float[length];
         results.moveToFirst();
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             items[i] = Float.parseFloat(results.getString(iName));
             results.moveToNext();
         }

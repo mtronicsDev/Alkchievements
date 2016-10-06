@@ -57,17 +57,15 @@ public class Alkdapter extends ArrayAdapter<String[]> {
 
         final String[] alk = alks.get(position);
 
-        if(alk != null) {
+        if (alk != null) {
             TextView preis = (TextView) v.findViewById(R.id.preis);
             final TextView num_beer = (TextView) v.findViewById(R.id.anzahl);
             ImageView kasten = (ImageView) v.findViewById(R.id.kasten);
             TextView name = (TextView) v.findViewById(R.id.name);
             name.setText(alk[2]);
-            kasten.setVisibility(View.INVISIBLE);
-            if(images.containsKey(alk[2])) {
-                kasten.setImageResource(images.get(alk[2]));
-                kasten.setVisibility(View.VISIBLE);
-            }
+
+            if (images.containsKey(alk[2])) kasten.setImageResource(images.get(alk[2]));
+            else kasten.setImageResource(R.drawable.kasten_sonstige);
 
             final ImageView add_flasche = (ImageView) v.findViewById(R.id.add_flasche);
 
@@ -79,9 +77,9 @@ public class Alkdapter extends ArrayAdapter<String[]> {
                 @Override
                 public void onClick(View v) {
                     int added = Integer.parseInt(alk[1]) + 1;
-                        alk[1] = String.valueOf(added);
-                        num_beer.setText("G'schwoabt: " + alk[1]);
-                        main.updateDrink((String) add_flasche.getTag(), added);
+                    alk[1] = String.valueOf(added);
+                    num_beer.setText("G'schwoabt: " + alk[1]);
+                    main.updateDrink((String) add_flasche.getTag(), added);
                     main.addFollowDay();
                     main.checkSum(Float.parseFloat(alk[0]));
                     if (alk[2].equals("Bier")) {

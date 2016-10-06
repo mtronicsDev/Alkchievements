@@ -41,7 +41,6 @@ public class AlkchievementsDatabase {
     }
 
 
-
     public boolean getStatus() {
         Cursor results = getCursorForAllItemsFromDatabase();
         return results.moveToFirst();
@@ -69,10 +68,10 @@ public class AlkchievementsDatabase {
         Cursor results = getCursorForAllItemsFromDatabase();
 
         int iName = results.getColumnIndex(KEY_NAME);
-        int iDes= results.getColumnIndex(KEY_DESCRIPTION);
+        int iDes = results.getColumnIndex(KEY_DESCRIPTION);
         int iState = results.getColumnIndex(KEY_STATE);
 
-        if(results.moveToFirst()) do{
+        if (results.moveToFirst()) do {
             item = new String[3];
             item[0] = results.getString(iName);
             item[1] = results.getString(iDes);
@@ -86,7 +85,7 @@ public class AlkchievementsDatabase {
     public void changeStatusForItem(int id, String status) {
         ArrayList<String[]> tempo = getItems();
         removeAllItemsFromDatabase();
-        for(int i = 0; i < tempo.size(); i++) {
+        for (int i = 0; i < tempo.size(); i++) {
             if (i != id) {
                 insertItemIntoDataBase(tempo.get(i)[0], tempo.get(i)[1], tempo.get(i)[2]);
             }
@@ -99,7 +98,7 @@ public class AlkchievementsDatabase {
     public void changeDescriptionForItem(int id, String status) {
         ArrayList<String[]> tempo = getItems();
         removeAllItemsFromDatabase();
-        for(int i = 0; i < tempo.size(); i++) {
+        for (int i = 0; i < tempo.size(); i++) {
             if (i != id) {
                 insertItemIntoDataBase(tempo.get(i)[0], tempo.get(i)[1], tempo.get(i)[2]);
             }

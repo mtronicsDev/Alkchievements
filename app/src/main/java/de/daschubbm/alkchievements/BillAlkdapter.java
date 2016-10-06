@@ -50,8 +50,7 @@ public class BillAlkdapter extends ArrayAdapter<String[]> {
                 debt.setVisibility(View.GONE);
 
                 v.findViewById(R.id.geld).setVisibility(View.GONE);
-            }
-            else debt.setText(debtor[1]);
+            } else debt.setText(debtor[1]);
         }
         return v;
     }

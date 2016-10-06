@@ -24,6 +24,34 @@
             android:tag="billing"
             android:onClick="launchPasswordCheck"/>
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@color/colorPrimary">
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/pinText"
+                android:layout_weight="1"
+                android:hint="PIN (4-stellig)"
+                android:maxLength="4" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Pin ändern"
+                android:id="@+id/pinButton"
+                android:layout_gravity="right"
+                android:layout_weight="1"
+                android:tag="change_pin"
+                android:onClick="launchPasswordCheck"/>
+        </LinearLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

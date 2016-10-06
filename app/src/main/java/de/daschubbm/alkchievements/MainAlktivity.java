@@ -1,10 +1,15 @@
 package de.daschubbm.alkchievements;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,7 +36,8 @@ import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class MainAlktivity extends AppCompatActivity {
 
-    private static final int UNIMPORTANT_VARIABLE = 9318;
+    private static int UNIMPORTANT_VARIABLE = -1;
+    private static final int[] BUILD_NUMBER = {1, 0, 1, 1};
 
     private ListView list;
     private Alkdapter adapter;
@@ -94,18 +100,95 @@ public class MainAlktivity extends AppCompatActivity {
         drinks = new HashMap<>();
         numDrinks = new HashMap<>();
 
-        setupDatabase();
-        if (database.getStatus() && !database.getStatusSecond()) {
-            setupAlkchievementValues();
-        }
-        setupAlkchivements();
-        loadAlkchievementValues();
+        checkForUpdates();
 
-        setupTimeDatabase();
-        prizesDatabase = new LastPrizesDatabase(this);
-        prizesDatabase.open();
+        retrieveAdminPassword();
+
+        if (!setupDatabase()) {
+            if (database.getStatus() && !database.getStatusSecond()) {
+                setupAlkchievementValues();
+            }
+            setupAlkchivements();
+            loadAlkchievementValues();
+
+            setupTimeDatabase();
+            prizesDatabase = new LastPrizesDatabase(this);
+            prizesDatabase.open();
+        }
 
         setupFirebase();
+    }
+
+    private void retrieveAdminPassword() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("adminPassword");
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                UNIMPORTANT_VARIABLE = Integer.parseInt(String.valueOf(dataSnapshot.getValue()));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void checkForUpdates() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED
+                && UpdateDialogProcedure.DOWNLOAD_FILE.exists())
+            UpdateDialogProcedure.DOWNLOAD_FILE.delete();
+
+        final DatabaseReference newestVersion = FirebaseDatabase.getInstance().getReference("currentVersion");
+        newestVersion.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String buildNumber = (String) dataSnapshot.child("build").getValue();
+
+                Log.d("UPDATE", "Calling database...");
+
+                if (buildNumber.matches("([0-9]+\\.){3}[0-9]+")) {
+
+                    Log.d("UPDATE", "Build-nr. valid: " + buildNumber);
+
+                    String[] split = buildNumber.split("\\.");
+
+                    int[] newestBuild = new int[4];
+
+                    for (int i = 0; i < 4; i++) {
+                        newestBuild[i] = Integer.parseInt(split[i]);
+                    }
+
+                    Log.d("UPDATE", "Integerized build nr.: "
+                            + newestBuild[0] + "."
+                            + newestBuild[1] + "."
+                            + newestBuild[2] + "."
+                            + newestBuild[3]);
+
+                    if (isLocalBuildOutOfDate(BUILD_NUMBER, newestBuild)) {
+                        Log.d("UPDATE", "New update available");
+
+                        final String changelog = (String) dataSnapshot.child("changelog").getValue();
+                        String downloadURL = (String) dataSnapshot.child("downloadURL").getValue();
+
+                        UpdateDialogProcedure.showUpdateDialog(context, buildNumber, changelog, downloadURL);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private boolean isLocalBuildOutOfDate(int[] localBuild, int[] newestBuild) {
+        if (newestBuild[0] > localBuild[0]) return true;
+        if (newestBuild[1] > localBuild[1]) return true;
+        if (newestBuild[2] > localBuild[2]) return true;
+        return newestBuild[3] > localBuild[3];
     }
 
     @Override
@@ -120,7 +203,7 @@ public class MainAlktivity extends AppCompatActivity {
         alkchievementsDatabase = new AlkchievementsDatabase(this);
         alkchievementsDatabase.open();
         if (!alkchievementsDatabase.getStatus()) {
-            ArrayList<String[]> alkis = new ArrayList<String[]>();
+            ArrayList<String[]> alkis = new ArrayList<>();
             for (int i = 0; i < alkchievements.length; i++) {
                 alkis.add(alkchievements[i].split("/"));
             }
@@ -142,17 +225,18 @@ public class MainAlktivity extends AppCompatActivity {
         }
     }
 
-    private void setupDatabase() {
+    private boolean setupDatabase() {
         database = new Database(context);
         database.open();
 
         if (!database.getStatus()) {
             Intent hansl = new Intent(context, LoginAlktivity.class);
             startActivity(hansl);
-            finish();
+            return true;
         } else {
             name = database.getItem(0)[1];
             getSupportActionBar().setTitle(name);
+            return false;
         }
     }
 
@@ -349,6 +433,14 @@ public class MainAlktivity extends AppCompatActivity {
                     alkchievementsDatabase.changeDescriptionForItem(1, "Beschließe 7 Tage in Folge eine Transaktion im Schubbm!");
                 }
             }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 69:
+                UpdateDialogProcedure.checkPermissionsAndDownload(this);
         }
     }
 
@@ -623,5 +715,9 @@ public class MainAlktivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    public void go(Intent hansl) {
+        startActivity(hansl);
     }
 }

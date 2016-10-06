@@ -66,7 +66,7 @@ public class TimeDatabase {
         int iName = results.getColumnIndex(KEY_NAME);
         int iState = results.getColumnIndex(KEY_DATE);
 
-        if(results.moveToPosition(pos)) {
+        if (results.moveToPosition(pos)) {
             item[0] = results.getString(iName);
             item[1] = results.getString(iState);
         }
@@ -82,7 +82,7 @@ public class TimeDatabase {
         int iName = results.getColumnIndex(KEY_NAME);
         int iState = results.getColumnIndex(KEY_DATE);
 
-        if(results.moveToFirst()) do{
+        if (results.moveToFirst()) do {
             item = new String[2];
             item[0] = results.getString(iName);
             item[1] = results.getString(iState);
@@ -95,7 +95,7 @@ public class TimeDatabase {
     public void updateValue(int id, String value) {
         ArrayList<String[]> tempo = getItems();
         removeAllItemsFromDatabase();
-        for(int i = 0; i < tempo.size(); i++) {
+        for (int i = 0; i < tempo.size(); i++) {
             if (i != id) {
                 insertItemIntoDataBase(tempo.get(i)[0], tempo.get(i)[1]);
             }

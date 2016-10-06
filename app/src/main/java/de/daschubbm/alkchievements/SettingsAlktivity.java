@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -72,6 +73,9 @@ public class SettingsAlktivity extends AppCompatActivity {
             case "add_drink":
                 addDrink();
                 break;
+            case "change_pin":
+                changePin();
+                break;
         }
         /*final Dialog dialog = new Dialog(this);
         dialog.setTitle("Passwort eingeben");
@@ -125,6 +129,22 @@ public class SettingsAlktivity extends AppCompatActivity {
         dialog.show();*/
     }
 
+    private void changePin() {
+        EditText pinField = (EditText) findViewById(R.id.pinText);
+        String newPin = pinField.getText().toString();
+        if (!newPin.matches("[0-9]{4}")) {
+            Toast.makeText(context, "Die PIN muss genau 4 Stellen haben!", Toast.LENGTH_SHORT).show();
+        } else {
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("adminPassword");
+            reference.setValue(Integer.parseInt(newPin));
+
+            Toast.makeText(context, "Die PIN wurde zu \"" + newPin + "\" geändert. Gut merken!",
+                    Toast.LENGTH_SHORT).show();
+        }
+
+        pinField.setText("");
+    }
+
     public void launchBilling() {
         Intent hansl = new Intent(this, BillAlktivity.class);
         hansl.putExtra("ADMIN", true);
@@ -132,8 +152,11 @@ public class SettingsAlktivity extends AppCompatActivity {
     }
 
     public void addDrink() {
-        String drinkName = ((EditText) findViewById(R.id.add_drink_name)).getText().toString();
-        String drinkPrice = ((EditText) findViewById(R.id.add_drink_price)).getText().toString();
+        EditText drinkNameField = (EditText) findViewById(R.id.add_drink_name);
+        EditText drinkPriceField = (EditText) findViewById(R.id.add_drink_price);
+
+        String drinkName = drinkNameField.getText().toString();
+        String drinkPrice = drinkPriceField.getText().toString();
 
         if (drinkName.matches("[A-ZÄÖÜ][a-zäöüß]+") && drinkPrice.matches("[0-9]+(\\.[0-9]+)?")) {
             String[] newDrink = new String[]{drinkName, formatPrice(drinkPrice)};
@@ -145,6 +168,9 @@ public class SettingsAlktivity extends AppCompatActivity {
 
             alkdapter.add(newDrink);
             drinks.setAdapter(alkdapter);
+
+            drinkNameField.setText("");
+            drinkPriceField.setText("");
 
             DatabaseReference drinks = FirebaseDatabase.getInstance().getReference("beverages");
             drinks.child(drinkName).setValue(Float.valueOf(drinkPrice));
