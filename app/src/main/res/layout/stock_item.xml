@@ -32,6 +32,8 @@
         android:hint="Anzahl"
         android:inputType="number"
         android:id="@+id/stock_add"
+        android:background="@color/colorPrimary"
+        android:textColor="@android:color/black"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"/>

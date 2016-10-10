@@ -1,5 +1,6 @@
 package de.daschubbm.alkchievements;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -7,11 +8,23 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class StockAlktivity extends AppCompatActivity {
+
+    private static int UNIMPORTANT_VARIABLE = 9318;
+
+    /*
+    ToDo
+    * Download the password form firebase
+    * Download the stock from firebase and replace the dummy ArrayList
+    * Update firebase when drinks are added to the stock
+    * Reduce stock of drink if one is ordered (other Alktivities)
+    * */
 
     private ListView stock_list;
     private Button button_stock;
@@ -45,10 +58,7 @@ public class StockAlktivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (button_stock.getText().equals("BESTAND AUFSTOCKEN")) {
-                    button_stock.setText("HINZUFÜGEN");
-                    visibility_header.setVisibility(View.VISIBLE);
-                    adapter = new StockAlkdapter(true, context, R.layout.stock_item, stock);
-                    stock_list.setAdapter(adapter);
+                    launchPasswordCheck();
                     return;
                 }
 
@@ -61,6 +71,13 @@ public class StockAlktivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void doAdmin() {
+        button_stock.setText("HINZUFÜGEN");
+        visibility_header.setVisibility(View.VISIBLE);
+        adapter = new StockAlkdapter(true, context, R.layout.stock_item, stock);
+        stock_list.setAdapter(adapter);
     }
 
     private void addStock(int pos, int num) {
@@ -83,9 +100,55 @@ public class StockAlktivity extends AppCompatActivity {
             View view = stock_list.getChildAt(i);
             EditText editText = (EditText) view.findViewById(R.id.stock_add);
             String string = editText.getText().toString();
-            if (string.matches("[0-9]")) {
+            if (string.matches("[0-9][0-9]") || string.matches("[0-9]")) {
                 addStock(i, Integer.parseInt(string));
             }
         }
+    }
+
+    private void launchPasswordCheck() {
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle("Passwort eingeben");
+        dialog.setContentView(R.layout.dialog_password_checker);
+
+        final NumberPicker p1 = (NumberPicker) dialog.findViewById(R.id.num_lock_1);
+        p1.setMinValue(0);
+        p1.setValue(1);
+        p1.setMaxValue(9);
+        p1.setWrapSelectorWheel(true);
+
+        final NumberPicker p2 = (NumberPicker) dialog.findViewById(R.id.num_lock_2);
+        p2.setMinValue(0);
+        p2.setValue(1);
+        p2.setMaxValue(9);
+        p2.setWrapSelectorWheel(true);
+
+        final NumberPicker p3 = (NumberPicker) dialog.findViewById(R.id.num_lock_3);
+        p3.setMinValue(0);
+        p3.setValue(1);
+        p3.setMaxValue(9);
+        p3.setWrapSelectorWheel(true);
+
+        NumberPicker p4 = (NumberPicker) dialog.findViewById(R.id.num_lock_4);
+        p4.setMinValue(0);
+        p4.setValue(1);
+        p4.setMaxValue(9);
+        p4.setWrapSelectorWheel(true);
+        p4.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+                if (((p1.getValue() * 1000)
+                        + (p2.getValue() * 100)
+                        + (p3.getValue() * 10)
+                        + numberPicker.getValue()) == UNIMPORTANT_VARIABLE) {
+                    dialog.dismiss();
+                    Toast.makeText(getApplication(), "Subba Hansl!", Toast.LENGTH_SHORT).show();
+
+                    doAdmin();
+                }
+            }
+        });
+
+        dialog.show();
     }
 }
