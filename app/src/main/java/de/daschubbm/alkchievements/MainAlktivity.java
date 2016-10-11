@@ -100,9 +100,6 @@ public class MainAlktivity extends AppCompatActivity {
         drinks = new HashMap<>();
         numDrinks = new HashMap<>();
 
-        //Intent hansl = new Intent(context, StockAlktivity.class);
-        //startActivity(hansl);
-
         checkForUpdates();
 
         retrieveAdminPassword();

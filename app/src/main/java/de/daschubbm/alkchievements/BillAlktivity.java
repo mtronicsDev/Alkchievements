@@ -8,6 +8,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -115,6 +118,14 @@ public class BillAlktivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater flatuleur = getMenuInflater();
+        flatuleur.inflate(R.menu.menu_bill, menu);
+
+        return true;
     }
 
     private void addAdminTools() {
@@ -230,5 +241,10 @@ public class BillAlktivity extends AppCompatActivity {
                 Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public void launchStock(MenuItem item) {
+        Intent hansl = new Intent(context, StockAlktivity.class);
+        startActivity(hansl);
     }
 }
