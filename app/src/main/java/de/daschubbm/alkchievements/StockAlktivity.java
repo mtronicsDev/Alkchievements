@@ -2,15 +2,17 @@ package de.daschubbm.alkchievements;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -72,6 +74,31 @@ public class StockAlktivity extends AppCompatActivity {
             }
         });
     }
+
+    //don't mind this method or any of the sources mentioned here... there's nothing to see
+    private void nothingSpecial() {
+        final ImageView dontMindMe = (ImageView) findViewById(R.id.olaf);
+        final MediaPlayer mp = MediaPlayer.create(this, R.raw.olaf_hugs);
+
+        TranslateAnimation animation = new TranslateAnimation(-300, 700, 0, 0);
+        animation.setDuration(4500);
+        animation.setFillAfter(false);
+
+        dontMindMe.bringToFront();
+        dontMindMe.setVisibility(View.VISIBLE);
+
+        dontMindMe.startAnimation(animation);
+        mp.start();
+
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        dontMindMe.setVisibility(View.GONE);
+                    }
+                },
+                4500);
+    }
+    //as I said... NOTHING!!!
 
     private void doAdmin() {
         button_stock.setText("HINZUFÜGEN");
@@ -142,7 +169,7 @@ public class StockAlktivity extends AppCompatActivity {
                         + (p3.getValue() * 10)
                         + numberPicker.getValue()) == UNIMPORTANT_VARIABLE) {
                     dialog.dismiss();
-                    Toast.makeText(getApplication(), "Subba Hansl!", Toast.LENGTH_SHORT).show();
+                    nothingSpecial();
 
                     doAdmin();
                 }
