@@ -65,10 +65,15 @@ public class SettingsAlkdapter extends ArrayAdapter<String[]> {
                             case DialogInterface.BUTTON_POSITIVE:
                                 if (drinkName.equals(drinks.get(position)[0])) {
                                     drinks.remove(position);
+
                                     DatabaseReference drink = FirebaseDatabase.getInstance()
                                             .getReference("beverages/" + drinkName);
-
                                     drink.removeValue();
+
+                                    drink = FirebaseDatabase.getInstance()
+                                            .getReference("drinks/" + drinkName + "/stock");
+                                    drink.removeValue();
+
                                     parentList.setAdapter(SettingsAlkdapter.this);
 
                                     Toast.makeText(context, drinkName + " wurde entfernt!",

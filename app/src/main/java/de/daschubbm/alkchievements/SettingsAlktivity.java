@@ -1,12 +1,16 @@
 package de.daschubbm.alkchievements;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.NumberPicker;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -65,7 +69,7 @@ public class SettingsAlktivity extends AppCompatActivity {
         finish();
     }
 
-    public void launchPasswordCheck(final View view) {
+    public void performRequestedAction(final View view) {
         switch ((String) view.getTag()) {
             case "billing":
                 launchBilling();
@@ -77,56 +81,6 @@ public class SettingsAlktivity extends AppCompatActivity {
                 changePin();
                 break;
         }
-        /*final Dialog dialog = new Dialog(this);
-        dialog.setTitle("Passwort eingeben");
-        dialog.setContentView(R.layout.dialog_password_checker);
-
-        final NumberPicker p1 = (NumberPicker) dialog.findViewById(R.id.num_lock_1);
-        p1.setMinValue(0);
-        p1.setValue(1);
-        p1.setMaxValue(9);
-        p1.setWrapSelectorWheel(true);
-
-        final NumberPicker p2 = (NumberPicker) dialog.findViewById(R.id.num_lock_2);
-        p2.setMinValue(0);
-        p2.setValue(1);
-        p2.setMaxValue(9);
-        p2.setWrapSelectorWheel(true);
-
-        final NumberPicker p3 = (NumberPicker) dialog.findViewById(R.id.num_lock_3);
-        p3.setMinValue(0);
-        p3.setValue(1);
-        p3.setMaxValue(9);
-        p3.setWrapSelectorWheel(true);
-
-        NumberPicker p4 = (NumberPicker) dialog.findViewById(R.id.num_lock_4);
-        p4.setMinValue(0);
-        p4.setValue(1);
-        p4.setMaxValue(9);
-        p4.setWrapSelectorWheel(true);
-        p4.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-                if (((p1.getValue() * 1000)
-                        + (p2.getValue() * 100)
-                        + (p3.getValue() * 10)
-                        + numberPicker.getValue()) == UNIMPORTANT_VARIABLE) {
-                    dialog.dismiss();
-                    Toast.makeText(getApplication(), "Subba Hansl!", Toast.LENGTH_SHORT).show();
-
-                    switch ((String) view.getTag()) {
-                        case "billing":
-                            launchBilling();
-                            break;
-                        case "add_drink":
-                            addDrink();
-                            break;
-                    }
-                }
-            }
-        });
-
-        dialog.show();*/
     }
 
     private void changePin() {
@@ -155,7 +109,7 @@ public class SettingsAlktivity extends AppCompatActivity {
         EditText drinkNameField = (EditText) findViewById(R.id.add_drink_name);
         EditText drinkPriceField = (EditText) findViewById(R.id.add_drink_price);
 
-        String drinkName = drinkNameField.getText().toString();
+        final String drinkName = drinkNameField.getText().toString();
         String drinkPrice = drinkPriceField.getText().toString();
 
         if (drinkName.matches("[A-ZÄÖÜ][a-zäöüß]+") && drinkPrice.matches("[0-9]+(\\.[0-9]+)?")) {
@@ -174,6 +128,40 @@ public class SettingsAlktivity extends AppCompatActivity {
 
             DatabaseReference drinks = FirebaseDatabase.getInstance().getReference("beverages");
             drinks.child(drinkName).setValue(Float.valueOf(drinkPrice));
+
+            final Dialog dialog = new Dialog(context);
+            dialog.setContentView(R.layout.dialog_add_new_drink_stock);
+
+            TextView drinkNameText = (TextView) dialog.findViewById(R.id.drink_name);
+            drinkNameText.setText(((String) drinkNameText.getText()).replace("%drink%", drinkName));
+
+            final NumberPicker picker = (NumberPicker) dialog.findViewById(R.id.stock_number);
+            picker.setMinValue(0);
+            picker.setMaxValue(50);
+            picker.setValue(20);
+
+            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialogInterface) {
+                    FirebaseDatabase.getInstance()
+                            .getReference("drinks/" + drinkName + "/stock")
+                            .setValue(picker.getValue());
+                    Toast.makeText(context, "Der Bestand von " + drinkName
+                            + " wurde auf " + picker.getValue()
+                            + " erhöht.", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            View.OnClickListener listener = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            };
+
+            dialog.findViewById(R.id.accept_button).setOnClickListener(listener);
+
+            dialog.show();
         }
     }
 }

@@ -22,7 +22,7 @@
             android:text="Abrechnung"
             android:id="@+id/button"
             android:tag="billing"
-            android:onClick="launchPasswordCheck"/>
+            android:onClick="performRequestedAction"/>
 
         <LinearLayout
             android:orientation="horizontal"
@@ -49,7 +49,7 @@
                 android:layout_gravity="right"
                 android:layout_weight="1"
                 android:tag="change_pin"
-                android:onClick="launchPasswordCheck"/>
+                android:onClick="performRequestedAction"/>
         </LinearLayout>
 
         <TextView
@@ -88,7 +88,7 @@
                 android:id="@+id/add_drink_button"
                 android:layout_weight="3"
                 android:tag="add_drink"
-                android:onClick="launchPasswordCheck"/>
+                android:onClick="performRequestedAction"/>
         </LinearLayout>
 
         <ProgressBar

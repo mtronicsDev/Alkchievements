@@ -9,9 +9,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import de.daschubbm.alkchievements.firebase.FirebaseActions;
 
 /**
  * Created by Jonathan on 28.09.2016.
@@ -22,11 +26,12 @@ public class Alkdapter extends ArrayAdapter<String[]> {
     private Context context;
     private int layoutResourceId;
     private ArrayList<String[]> alks = new ArrayList<>();
+    private Map<String, Integer> stock;
     private MainAlktivity main;
 
     private Map<String, Integer> images = new HashMap<>();
 
-    public Alkdapter(MainAlktivity alk, int layoutResourceId, ArrayList<String[]> data) {
+    public Alkdapter(MainAlktivity alk, int layoutResourceId, ArrayList<String[]> data, Map<String, Integer> stock) {
 
         super(alk, layoutResourceId, data);
 
@@ -34,6 +39,7 @@ public class Alkdapter extends ArrayAdapter<String[]> {
         this.layoutResourceId = layoutResourceId;
         this.context = alk;
         alks = data;
+        this.stock = stock;
 
         images.put("Bier", R.drawable.kasten_bier);
         images.put("Radler", R.drawable.kasten_radler);
@@ -79,6 +85,10 @@ public class Alkdapter extends ArrayAdapter<String[]> {
                     int added = Integer.parseInt(alk[1]) + 1;
                     alk[1] = String.valueOf(added);
                     num_beer.setText("G'schwoabt: " + alk[1]);
+
+                    FirebaseDatabase.getInstance().getReference("drinks/" + alk[2] + "/stock")
+                            .setValue(stock.get(alk[2]) - 1);
+
                     main.updateDrink((String) add_flasche.getTag(), added);
                     main.addFollowDay();
                     main.checkSum(Float.parseFloat(alk[0]));
@@ -109,6 +119,10 @@ public class Alkdapter extends ArrayAdapter<String[]> {
                         int taken = Integer.parseInt(alk[1]) - 1;
                         alk[1] = String.valueOf(taken);
                         num_beer.setText("G'schwoabt: " + alk[1]);
+
+                        FirebaseDatabase.getInstance().getReference("drinks/" + alk[2] + "/stock")
+                                .setValue(stock.get(alk[2]) + 1);
+
                         main.updateDrink((String) add_flasche.getTag(), taken);
                         main.addStorno();
                         Toast.makeText(context, "Storniert \ud83d\ude12 Fettfinger!", Toast.LENGTH_SHORT).show();

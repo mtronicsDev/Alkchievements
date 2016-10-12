@@ -9,8 +9,7 @@
         android:layout_weight="3"
         android:text="Getränkename"
         android:id="@+id/stock_drink"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:paddingLeft="10dp"
         android:textColor="@android:color/black"/>
 
@@ -20,8 +19,7 @@
         android:layout_weight="3"
         android:text="Getränkeanzahl"
         android:id="@+id/stock_number"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:paddingLeft="10dp"
         android:textColor="@android:color/black"/>
 

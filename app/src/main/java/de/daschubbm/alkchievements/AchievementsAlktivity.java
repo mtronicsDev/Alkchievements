@@ -10,7 +10,7 @@ public class AchievementsAlktivity extends AppCompatActivity {
 
     private ListView list;
     private AlkchievementsAlkdapder adapter;
-    private ArrayList<String[]> alkchievements = new ArrayList<String[]>();
+    private ArrayList<String[]> alkchievements = new ArrayList<>();
 
     private AlkchievementsDatabase database;
 

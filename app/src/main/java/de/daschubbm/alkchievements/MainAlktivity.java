@@ -37,7 +37,7 @@ import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 public class MainAlktivity extends AppCompatActivity {
 
     private static int UNIMPORTANT_VARIABLE = -1;
-    private static final int[] BUILD_NUMBER = {1, 0, 1, 1};
+    private static final int[] BUILD_NUMBER = {1, 1, 0, 0};
 
     private ListView list;
     private Alkdapter adapter;
@@ -54,8 +54,9 @@ public class MainAlktivity extends AppCompatActivity {
 
     private Map<String, Float> drinks;
     private Map<String, Integer> numDrinks;
+    private Map<String, Integer> stock = new HashMap<>();
 
-    private boolean drinksLoaded = false, numsLoaded = false;
+    private boolean drinksLoaded = false, numsLoaded = false, stockLoaded = false;
 
     //Variables for the Alkchievements
     /**
@@ -264,6 +265,51 @@ public class MainAlktivity extends AppCompatActivity {
 
                 drinksLoaded = true;
                 if (numsLoaded) setupViews();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        DatabaseReference stockReference = FirebaseDatabase.getInstance().getReference("drinks");
+        stockReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    stock.put(child.getKey(),
+                            Integer.parseInt(String.valueOf(child.child("stock").getValue())));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        stockReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                stock.put(dataSnapshot.getKey(),
+                        Integer.parseInt(String.valueOf(dataSnapshot.child("stock").getValue())));
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                stock.put(dataSnapshot.getKey(),
+                        Integer.parseInt(String.valueOf(dataSnapshot.child("stock").getValue())));
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                stock.remove(dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
             }
 
             @Override
@@ -648,7 +694,7 @@ public class MainAlktivity extends AppCompatActivity {
             beverages.add(new String[]{price, count, name});
         }
 
-        adapter = new Alkdapter(this, R.layout.alk_item, beverages);
+        adapter = new Alkdapter(this, R.layout.alk_item, beverages, stock);
         list.setAdapter(adapter);
 
         findViewById(R.id.loading).setVisibility(View.GONE);
