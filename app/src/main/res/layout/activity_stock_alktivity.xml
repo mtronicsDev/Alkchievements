@@ -7,9 +7,9 @@
     tools:context="de.daschubbm.alkchievements.StockAlktivity">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/olaf"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/olaf"
         android:id="@+id/olaf"
         android:layout_centerVertical="true"
         android:visibility="gone"/>

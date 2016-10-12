@@ -70,7 +70,7 @@ public class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
             if (goal[2].equals("true") || goal[2].equals("1") || goal[2].equals("2") || goal[2].equals("3")) {
                 Integer res = imageMap.get(goal[0]);
 
-                image.setImageResource(res == null ? R.mipmap.achievement_solved : res);
+                image.setImageResource(res == null ? R.drawable.freigeschaltet : res);
                 description.setVisibility(View.VISIBLE);
             }
 
