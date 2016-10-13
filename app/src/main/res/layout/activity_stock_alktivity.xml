@@ -62,11 +62,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/stock_list"
-        android:layout_below="@+id/table_header" />
+        android:layout_below="@+id/table_header"
+        android:paddingBottom="50dp"/>
 
     <Button
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:text="Bestand aufstocken"
         android:id="@+id/button_add_stock"
         android:background="@color/colorAccent"
