@@ -20,6 +20,7 @@ public class StockAlkdapter extends ArrayAdapter<String[]> {
     private int layoutResourceId;
     private ArrayList<String[]> stock = new ArrayList<>();
     private boolean admin;
+    ViewHolder viewHolder;
 
 
     public StockAlkdapter(boolean admin, Context context, int layoutResourceId, ArrayList<String[]> data) {
@@ -32,6 +33,12 @@ public class StockAlkdapter extends ArrayAdapter<String[]> {
         stock = data;
     }
 
+    private class ViewHolder {
+        TextView name;
+        TextView num;
+        EditText add;
+    }
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
 
@@ -39,22 +46,29 @@ public class StockAlkdapter extends ArrayAdapter<String[]> {
 
         if (v == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = inflater.inflate(layoutResourceId, null);
+            v = inflater.inflate(layoutResourceId, parent, false);
+
+            viewHolder = new ViewHolder();
+            viewHolder.name = (TextView) v.findViewById(R.id.stock_drink);
+            viewHolder.num = (TextView) v.findViewById(R.id.stock_number);
+            viewHolder.add = (EditText) v.findViewById(R.id.stock_add);
         }
 
         final String[] item = stock.get(position);
 
         if (item != null) {
-            TextView name = (TextView) v.findViewById(R.id.stock_drink);
-            TextView num = (TextView) v.findViewById(R.id.stock_number);
-            EditText add = (EditText) v.findViewById(R.id.stock_add);
 
-            name.setText(item[0]);
-            num.setText(item[1]);
-            add.setVisibility(View.INVISIBLE);
+            viewHolder.name = (TextView) v.findViewById(R.id.stock_drink);
+            viewHolder.num = (TextView) v.findViewById(R.id.stock_number);
+            viewHolder.add = (EditText) v.findViewById(R.id.stock_add);
+
+            viewHolder.name.setText(item[0]);
+            viewHolder.num.setText(item[1]);
+            viewHolder.add.setVisibility(View.INVISIBLE);
             if (admin) {
-                add.setVisibility(View.VISIBLE);
+                viewHolder.add.setVisibility(View.VISIBLE);
             }
+            v.setTag(item[0]);
         }
         return v;
     }

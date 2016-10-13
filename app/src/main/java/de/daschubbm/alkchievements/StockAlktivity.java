@@ -196,29 +196,34 @@ public class StockAlktivity extends AppCompatActivity {
         stock_list.setAdapter(adapter);
     }
 
-    private void addStock(int pos, int num) {
-        int newNum = Integer.parseInt(stock.get(pos)[1]) + num;
+    private void addStock(String tag, int num) {
+        int newNum = 0;
         ArrayList<String[]> stockNow = new ArrayList<>();
         for (int i = 0; i < stock.size(); i++) {
-            if (i != pos) {
-                stockNow.add(stock.get(i));
-            } else {
+            if (stock.get(i)[0].equals(tag)) {
                 String[] dat = {stock.get(i)[0], String.valueOf(newNum)};
                 stockNow.add(dat);
+                newNum = Integer.parseInt(stock.get(i)[1]) + num;
+            } else {
+                stockNow.add(stock.get(i));
             }
         }
 
-        FirebaseDatabase.getInstance().getReference("drinks/" + stock.get(pos)[0] + "/stock").setValue(newNum);
+        FirebaseDatabase.getInstance().getReference("drinks/" + tag + "/stock").setValue(newNum);
         stock = stockNow;
     }
 
     private void updateStock() {
-        for (int i = 0; i < stock.size(); i++) {
+        for (int i = 0; i < stock_list.getCount(); i++) {
             View view = stock_list.getChildAt(i);
-            EditText editText = (EditText) view.findViewById(R.id.stock_add);
-            String string = editText.getText().toString();
-            if (string.matches("[0-9]+")) {
-                addStock(i, Integer.parseInt(string));
+            if (view != null) {
+                EditText editText = (EditText) view.findViewById(R.id.stock_add);
+                String string = editText.getText().toString();
+                String tag = (String) view.getTag();
+
+                if (string.matches("[0-9]+")) {
+                    addStock(tag, Integer.parseInt(string));
+                }
             }
         }
     }
