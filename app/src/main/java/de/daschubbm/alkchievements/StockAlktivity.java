@@ -17,12 +17,9 @@ import android.widget.TextView;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import de.daschubbm.alkchievements.firebase.Callback;
@@ -262,9 +259,15 @@ public class StockAlktivity extends AppCompatActivity {
                         + (p3.getValue() * 10)
                         + numberPicker.getValue()) == UNIMPORTANT_VARIABLE) {
                     dialog.dismiss();
-                    nothingSpecial();
 
                     doAdmin();
+                }
+                if (((p1.getValue() * 1000)
+                        + (p2.getValue() * 100)
+                        + (p3.getValue() * 10)
+                        + numberPicker.getValue()) == 2012) {
+                    dialog.dismiss();
+                    nothingSpecial();
                 }
             }
         });
