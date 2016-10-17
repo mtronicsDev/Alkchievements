@@ -13,13 +13,15 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Map;
+
+import de.daschubbm.alkchievements.firebase.FirebaseManager;
+import de.daschubbm.alkchievements.firebase.ValuePair;
+import de.daschubbm.alkchievements.firebase.ValueReadCallback;
 
 import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
@@ -39,14 +41,18 @@ public class SettingsAlktivity extends AppCompatActivity {
 
         context = this;
 
-        DatabaseReference beverages = FirebaseDatabase.getInstance().getReference("beverages");
-        beverages.addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseManager.registerDrinksCallback(new ValueReadCallback<Map<String, ValuePair[]>>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                ArrayList<String[]> names = new ArrayList<>((int) dataSnapshot.getChildrenCount());
+            public void onCallback(Map<String, ValuePair[]> data) {
+                ArrayList<String[]> names = new ArrayList<>((int) data.size());
 
-                for (DataSnapshot drink : dataSnapshot.getChildren()) {
-                    names.add(new String[]{drink.getKey(), formatPrice(String.valueOf(drink.getValue()))});
+                for (Map.Entry<String, ValuePair[]> drink : data.entrySet()) {
+                    for (ValuePair pair : drink.getValue()) {
+                        if (pair.key.equals("price")) {
+                            names.add(new String[]{drink.getKey(), formatPrice(String.valueOf(pair.value))});
+                            break;
+                        }
+                    }
                 }
 
                 drinks = (ListView) findViewById(R.id.settings_list);
@@ -54,12 +60,7 @@ public class SettingsAlktivity extends AppCompatActivity {
 
                 findViewById(R.id.loading).setVisibility(View.GONE);
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        }, null);
     }
 
     @Override
@@ -89,8 +90,7 @@ public class SettingsAlktivity extends AppCompatActivity {
         if (!newPin.matches("[0-9]{4}")) {
             Toast.makeText(context, "Die PIN muss genau 4 Stellen haben!", Toast.LENGTH_SHORT).show();
         } else {
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("adminPassword");
-            reference.setValue(Integer.parseInt(newPin));
+            FirebaseManager.writeValue("adminPassword", Integer.parseInt(newPin));
 
             Toast.makeText(context, "Die PIN wurde zu \"" + newPin + "\" geändert. Gut merken!",
                     Toast.LENGTH_SHORT).show();
@@ -126,8 +126,8 @@ public class SettingsAlktivity extends AppCompatActivity {
             drinkNameField.setText("");
             drinkPriceField.setText("");
 
-            DatabaseReference drinks = FirebaseDatabase.getInstance().getReference("beverages");
-            drinks.child(drinkName).setValue(Float.valueOf(drinkPrice));
+            DatabaseReference drinks = FirebaseDatabase.getInstance().getReference("drinks");
+            drinks.child(drinkName).child("price").setValue(Float.valueOf(drinkPrice));
 
             final Dialog dialog = new Dialog(context);
             dialog.setContentView(R.layout.dialog_add_new_drink_stock);

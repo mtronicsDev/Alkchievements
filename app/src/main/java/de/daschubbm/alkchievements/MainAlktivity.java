@@ -21,9 +21,7 @@ import android.widget.Toast;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -32,13 +30,18 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.daschubbm.alkchievements.firebase.ChangeType;
+import de.daschubbm.alkchievements.firebase.FirebaseManager;
+import de.daschubbm.alkchievements.firebase.ValueChangedCallback;
+import de.daschubbm.alkchievements.firebase.ValuePair;
+import de.daschubbm.alkchievements.firebase.ValueReadCallback;
+
 import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class MainAlktivity extends AppCompatActivity {
 
+    private static final int[] BUILD_NUMBER = {1, 1, 1, 0};
     private static int UNIMPORTANT_VARIABLE = -1;
-    private static final int[] BUILD_NUMBER = {1, 1, 0, 0};
-
     private ListView list;
     private Alkdapter adapter;
 
@@ -50,26 +53,22 @@ public class MainAlktivity extends AppCompatActivity {
     private TimeDatabase timeDatabase;
     private LastPrizesDatabase prizesDatabase;
 
-    private DatabaseReference myDrinks;
-
     private Map<String, Float> drinks;
     private Map<String, Integer> numDrinks;
     private Map<String, Integer> stock = new HashMap<>();
 
-    private boolean drinksLoaded = false, numsLoaded = false, stockLoaded = false;
-
     //Variables for the Alkchievements
     /**
      * Reihenfolge im Array wie die unten Stehenden Integers
-     * <p/>
+     * <p>
      * private int num_beer_session = 0;
      * private int evenings_in_row = 0;
-     * <p/>
+     * <p>
      * private int num_radler_session = 0;
      * private int num_nonalk_session = 0;
      * private int num_shots_session = 0;
      * private int num_beer_ever = 0;
-     * <p/>
+     * <p>
      * private int num_storno = 0;
      * private int num_drinks = 0;
      * private int num_kasten_clicked = 0;
@@ -90,6 +89,8 @@ public class MainAlktivity extends AppCompatActivity {
             "Hobbylos/Drücke 100 mal auf einen Kasten!",
             "Sparfuchs/Bleibe bei 10 Getränken bei unter 7 €!",
             "Wurschtfinger/Storniere 5 Getränkbestellungen!"};
+
+    private boolean drinksLoaded = false, numsLoaded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,16 +122,16 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     private void retrieveAdminPassword() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("adminPassword");
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseManager.registerAdminPasswordCallback(new ValueReadCallback<Integer>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                UNIMPORTANT_VARIABLE = Integer.parseInt(String.valueOf(dataSnapshot.getValue()));
+            public void onCallback(Integer data) {
+                UNIMPORTANT_VARIABLE = data;
             }
-
+        }, new ValueChangedCallback() {
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+            public void onCallback(DataSnapshot changedNode, ChangeType changeType) {
+                Integer newPassword = Integer.valueOf(String.valueOf(changedNode.getValue()));
+                if (newPassword != null) UNIMPORTANT_VARIABLE = newPassword;
             }
         });
     }
@@ -141,48 +142,70 @@ public class MainAlktivity extends AppCompatActivity {
                 && UpdateDialogProcedure.DOWNLOAD_FILE.exists())
             UpdateDialogProcedure.DOWNLOAD_FILE.delete();
 
-        final DatabaseReference newestVersion = FirebaseDatabase.getInstance().getReference("currentVersion");
-        newestVersion.addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseManager.registerCurrentVersionCallback(new ValueReadCallback<ValuePair[]>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String buildNumber = (String) dataSnapshot.child("build").getValue();
-
-                Log.d("UPDATE", "Calling database...");
-
-                if (buildNumber.matches("([0-9]+\\.){3}[0-9]+")) {
-
-                    Log.d("UPDATE", "Build-nr. valid: " + buildNumber);
-
-                    String[] split = buildNumber.split("\\.");
-
-                    int[] newestBuild = new int[4];
-
-                    for (int i = 0; i < 4; i++) {
-                        newestBuild[i] = Integer.parseInt(split[i]);
-                    }
-
-                    Log.d("UPDATE", "Integerized build nr.: "
-                            + newestBuild[0] + "."
-                            + newestBuild[1] + "."
-                            + newestBuild[2] + "."
-                            + newestBuild[3]);
-
-                    if (isLocalBuildOutOfDate(BUILD_NUMBER, newestBuild)) {
-                        Log.d("UPDATE", "New update available");
-
-                        final String changelog = (String) dataSnapshot.child("changelog").getValue();
-                        String downloadURL = (String) dataSnapshot.child("downloadURL").getValue();
-
-                        UpdateDialogProcedure.showUpdateDialog(context, buildNumber, changelog, downloadURL);
-                    }
-                }
+            public void onCallback(ValuePair[] data) {
+                checkForUpdates(data);
             }
-
+        }, new ValueChangedCallback() {
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCallback(DataSnapshot changedNode, ChangeType changeType) {
+                ValuePair[] data = new ValuePair[(int) changedNode.getChildrenCount()];
 
+                int i = 0;
+                for (DataSnapshot child : changedNode.getChildren()) {
+                    data[i] = new ValuePair(child.getKey(), child.getValue());
+                    i++;
+                }
+
+                checkForUpdates(data);
             }
         });
+    }
+
+    private void checkForUpdates(ValuePair[] values) {
+        String buildNumber = "";
+        String changelog = null;
+        String downloadURL = null;
+
+        for (ValuePair pair : values) {
+            switch (pair.key) {
+                case "build":
+                    buildNumber = String.valueOf(pair.value);
+                    break;
+                case "changelog":
+                    changelog = String.valueOf(pair.value);
+                    break;
+                case "downloadURL":
+                    downloadURL = String.valueOf(pair.value);
+                    break;
+            }
+
+            if (buildNumber.matches("([0-9]+\\.){3}[0-9]+")
+                    && changelog != null
+                    && downloadURL != null) {
+                Log.d("UPDATE", "Build-nr. valid: " + buildNumber);
+
+                String[] split = buildNumber.split("\\.");
+
+                int[] newestBuild = new int[4];
+
+                for (int i = 0; i < 4; i++) {
+                    newestBuild[i] = Integer.parseInt(split[i]);
+                }
+
+                Log.d("UPDATE", "Integerized build nr.: "
+                        + newestBuild[0] + "."
+                        + newestBuild[1] + "."
+                        + newestBuild[2] + "."
+                        + newestBuild[3]);
+
+                if (isLocalBuildOutOfDate(BUILD_NUMBER, newestBuild)) {
+                    Log.d("UPDATE", "New update available");
+                    UpdateDialogProcedure.showUpdateDialog(context, buildNumber, changelog, downloadURL);
+                }
+            }
+        }
     }
 
     private boolean isLocalBuildOutOfDate(int[] localBuild, int[] newestBuild) {
@@ -201,7 +224,7 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     private void setupAlkchivements() {
-        alkchievementsDatabase = new AlkchievementsDatabase(this);
+        alkchievementsDatabase = new AlkchievementsLocalDatabase(this);
         alkchievementsDatabase.open();
         if (!alkchievementsDatabase.getStatus()) {
             ArrayList<String[]> alkis = new ArrayList<>();
@@ -255,88 +278,66 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     private void setupFirebase() {
-        final DatabaseReference beverages = FirebaseDatabase.getInstance().getReference("beverages");
-        beverages.addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseManager.registerDrinksCallback(new ValueReadCallback<Map<String, ValuePair[]>>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    drinks.put(child.getKey(), Float.parseFloat(String.valueOf(child.getValue())));
+            public void onCallback(Map<String, ValuePair[]> data) {
+                for (Map.Entry<String, ValuePair[]> child : data.entrySet()) {
+                    for (ValuePair pair : child.getValue()) {
+                        switch (pair.key) {
+                            case "price":
+                                drinks.put(child.getKey(), Float.valueOf(String.valueOf(pair.value)));
+                                break;
+                            case "stock":
+                                stock.put(child.getKey(), Integer.valueOf(String.valueOf(pair.value)));
+                                break;
+                        }
+                    }
                 }
 
                 drinksLoaded = true;
                 if (numsLoaded) setupViews();
             }
-
+        }, new ValueChangedCallback() {
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCallback(DataSnapshot changedNode, ChangeType changeType) {
+                switch (changeType) {
+                    case ADDED:
+                    case CHANGED:
+                        if (changedNode.child("stock").getValue() != null) {
+                            stock.put(changedNode.getKey(),
+                                    Integer.valueOf(String.valueOf(changedNode.child("stock").getValue())));
 
-            }
-        });
+                            if (!drinks.containsKey(changedNode.getKey())) {
+                                drinks.put(changedNode.getKey(),
+                                        Float.valueOf(String.valueOf(changedNode.child("price").getValue())));
+                                setupViews();
+                            }
+                        }
 
-        DatabaseReference stockReference = FirebaseDatabase.getInstance().getReference("drinks");
-        stockReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    stock.put(child.getKey(),
-                            Integer.parseInt(String.valueOf(child.child("stock").getValue())));
+                        break;
+                    case REMOVED:
+                        stock.remove(changedNode.getKey());
+                        drinks.remove(changedNode.getKey());
+                        setupViews();
+                        break;
                 }
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
         });
 
-        stockReference.addChildEventListener(new ChildEventListener() {
+        FirebaseManager.registerPersonCallback(new ValueReadCallback<Map<String, ValuePair[]>>() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                stock.put(dataSnapshot.getKey(),
-                        Integer.parseInt(String.valueOf(dataSnapshot.child("stock").getValue())));
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                stock.put(dataSnapshot.getKey(),
-                        Integer.parseInt(String.valueOf(dataSnapshot.child("stock").getValue())));
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                stock.remove(dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        myDrinks = FirebaseDatabase.getInstance().getReference("people/" + name);
-        myDrinks.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    numDrinks.put(child.getKey(), Integer.parseInt(String.valueOf(child.getValue())));
+            public void onCallback(Map<String, ValuePair[]> data) {
+                for (ValuePair pair : data.get("drinks")) {
+                    numDrinks.put(pair.key, Integer.valueOf(String.valueOf(pair.value)));
                 }
 
                 numsLoaded = true;
                 if (drinksLoaded) setupViews();
             }
+        }, null);
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        myDrinks.addChildEventListener(new ChildEventListener() {
+        FirebaseDatabase.getInstance().getReference("people/" + name + "/drinks")
+                .addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 numDrinks.put(dataSnapshot.getKey(),
@@ -359,10 +360,10 @@ public class MainAlktivity extends AppCompatActivity {
 
             }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-            }
+                    }
         });
     }
 
@@ -677,7 +678,7 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     public void updateDrink(String drink, int count) {
-        myDrinks.child(drink).setValue(count);
+        FirebaseManager.writeValue("people/" + name + "/drinks/" + drink, count);
     }
 
     private void setupViews() {

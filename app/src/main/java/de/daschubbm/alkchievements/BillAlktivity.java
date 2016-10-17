@@ -30,6 +30,10 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.daschubbm.alkchievements.firebase.FirebaseManager;
+import de.daschubbm.alkchievements.firebase.ValuePair;
+import de.daschubbm.alkchievements.firebase.ValueReadCallback;
+
 import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class BillAlktivity extends AppCompatActivity {
@@ -56,32 +60,38 @@ public class BillAlktivity extends AppCompatActivity {
         context = this;
         Log.d("ALKI", "Started bill");
 
-        alkchievementsDatabase = new AlkchievementsDatabase(this);
+        alkchievementsDatabase = new AlkchievementsLocalDatabase(this);
         alkchievementsDatabase.open();
         name = getIntent().getStringExtra("NAME");
 
         adminBilling = getIntent().getBooleanExtra("ADMIN", false);
 
-        final DatabaseReference all = FirebaseDatabase.getInstance().getReference();
-        all.child("beverages").addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseManager.registerDrinksCallback(new ValueReadCallback<Map<String, ValuePair[]>>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onCallback(Map<String, ValuePair[]> data) {
                 Log.d("ALKI", "Starting beverage loading");
-                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    beverages.put(child.getKey(),
-                            Float.parseFloat(String.valueOf(child.getValue())));
+                for (Map.Entry<String, ValuePair[]> child : data.entrySet()) {
+                    Float price = null;
+                    for (ValuePair pair : child.getValue()) {
+                        if (pair.key.equals("price")) {
+                            price = Float.valueOf(String.valueOf(pair.value));
+                            break;
+                        }
+                    }
+
+                    beverages.put(child.getKey(), price);
                 }
 
-                Log.d("ALKI", "Stopped beverage loading");
+                Log.d("ALKI", "Finished beverage loading");
 
-                all.child("people").addListenerForSingleValueEvent(new ValueEventListener() {
+                FirebaseDatabase.getInstance().getReference("people").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot person : dataSnapshot.getChildren()) {
                             String name = person.getKey();
                             float moneyToPay = 0;
 
-                            for (DataSnapshot drink : person.getChildren()) {
+                            for (DataSnapshot drink : person.child("drinks").getChildren()) {
                                 moneyToPay += Integer.parseInt(String.valueOf(drink.getValue()))
                                         * beverages.get(drink.getKey());
                             }
@@ -99,8 +109,8 @@ public class BillAlktivity extends AppCompatActivity {
                         adapter = new BillAlkdapter(context, R.layout.bill_item, debtors);
                         list.setAdapter(adapter);
 
-                        checkPrize();
-                        checkHighestPrize();
+                        checkPrice();
+                        checkHighestPrice();
                         if (adminBilling) addAdminTools();
 
                         findViewById(R.id.loading).setVisibility(View.GONE);
@@ -112,12 +122,7 @@ public class BillAlktivity extends AppCompatActivity {
                     }
                 });
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        }, null);
     }
 
     @Override
@@ -195,43 +200,45 @@ public class BillAlktivity extends AppCompatActivity {
         });
     }
 
-    private void checkPrize() {
-        float prize = 0;
+    private void checkPrice() {
+        float price = 0;
         for (int i = 0; i < debtors.size(); i++) {
             if (debtors.get(i)[0].equals(name)) {
-                prize = Float.parseFloat(debtors.get(i)[1]);
+                price = Float.parseFloat(debtors.get(i)[1]);
             }
         }
         String state = alkchievementsDatabase.getItems().get(0)[2];
-        if (prize > 5 && state.equals("false")) {
+        if (price > 5 && state.equals("false")) {
             alkchievementsDatabase.changeStatusForItem(0, "1");
             Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
         }
-        if (prize > 10 && (state.equals("false") || state.equals("1"))) {
+        if (price > 10 && (state.equals("false") || state.equals("1"))) {
             alkchievementsDatabase.changeStatusForItem(0, "2");
             alkchievementsDatabase.changeDescriptionForItem(0, "Erhalte eine Rechnung von über 10€!");
             Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
         }
-        if (prize > 20 && (state.equals("false") || state.equals("1") || state.equals("2"))) {
+        if (price > 20 && (state.equals("false") || state.equals("1") || state.equals("2"))) {
             alkchievementsDatabase.changeStatusForItem(0, "3");
             alkchievementsDatabase.changeDescriptionForItem(0, "Erhalte eine Rechnung von über 20€!");
             Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void checkHighestPrize() {
+    private void checkHighestPrice() {
+        if (debtors.get(0)[1].equals("-1")) return;
+
         String state = alkchievementsDatabase.getItems().get(7)[2];
         if (state.equals("false")) {
             boolean highest = true;
-            float prize = 0;
+            float price = 0;
             for (int i = 0; i < debtors.size(); i++) {
                 if (debtors.get(i)[0].equals(name)) {
-                    prize = Float.parseFloat(debtors.get(i)[1]);
+                    price = Float.parseFloat(debtors.get(i)[1]);
                 }
             }
             for (int i = 0; i < debtors.size(); i++) {
                 if (!debtors.get(i)[0].equals(name)) {
-                    if (Float.parseFloat(debtors.get(i)[1]) >= prize) {
+                    if (Float.parseFloat(debtors.get(i)[1]) >= price) {
                         highest = false;
                     }
                 }

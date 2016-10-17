@@ -14,17 +14,17 @@ import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-import de.daschubbm.alkchievements.firebase.Callback;
-import de.daschubbm.alkchievements.firebase.FirebaseActions;
+import de.daschubbm.alkchievements.firebase.ChangeType;
+import de.daschubbm.alkchievements.firebase.FirebaseManager;
+import de.daschubbm.alkchievements.firebase.ValueChangedCallback;
 import de.daschubbm.alkchievements.firebase.ValuePair;
+import de.daschubbm.alkchievements.firebase.ValueReadCallback;
 
 public class StockAlktivity extends AppCompatActivity {
 
@@ -45,13 +45,13 @@ public class StockAlktivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Bestand");
         context = this;
 
-        retrieveAdminPassword();
-        retrieveStock();
-
         stock_list = (ListView) findViewById(R.id.stock_list);
         button_stock = (Button) findViewById(R.id.button_add_stock);
         visibility_header = (TextView) findViewById(R.id.stock_add_header);
         visibility_header.setVisibility(View.INVISIBLE);
+
+        retrieveAdminPassword();
+        retrieveStock();
 
         button_stock.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,7 +73,7 @@ public class StockAlktivity extends AppCompatActivity {
     }
 
     private void retrieveStock() {
-        FirebaseActions.getDrinks(new Callback<Map<String, ValuePair[]>>() {
+        FirebaseManager.registerDrinksCallback(new ValueReadCallback<Map<String, ValuePair[]>>() {
             @Override
             public void onCallback(Map<String, ValuePair[]> data) {
                 stock = new ArrayList<>(data.size());
@@ -95,69 +95,59 @@ public class StockAlktivity extends AppCompatActivity {
                 findViewById(R.id.loading).setVisibility(View.GONE);
                 findViewById(R.id.table_header).setVisibility(View.VISIBLE);
             }
-        }).addChildEventListener(new ChildEventListener() {
+        }, new ValueChangedCallback() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                for (String[] drink : stock) {
-                    if (drink[0].equals(dataSnapshot.getKey())) {
-                        stock.set(stock.indexOf(drink),
-                                new String[]{dataSnapshot.getKey(),
-                                        String.valueOf(dataSnapshot.child("stock").getValue())});
+            public void onCallback(DataSnapshot changedNode, ChangeType changeType) {
+                switch (changeType) {
+                    case ADDED:
+                        for (String[] drink : stock) {
+                            if (drink[0].equals(changedNode.getKey())) {
+                                stock.set(stock.indexOf(drink),
+                                        new String[]{changedNode.getKey(),
+                                                String.valueOf(changedNode.child("stock").getValue())});
+                                break;
+                            }
+                        }
+
+                        adapter = new StockAlkdapter(false, context, R.layout.stock_item, stock);
+                        stock_list.setAdapter(adapter);
                         break;
-                    }
-                }
+                    case CHANGED:
+                        for (String[] drink : stock) {
+                            if (drink[0].equals(changedNode.getKey())) {
+                                stock.set(stock.indexOf(drink),
+                                        new String[]{changedNode.getKey(),
+                                                String.valueOf(changedNode.child("stock").getValue())});
+                                break;
+                            }
+                        }
 
-                adapter = new StockAlkdapter(false, context, R.layout.stock_item, stock);
-                stock_list.setAdapter(adapter);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                for (String[] drink : stock) {
-                    if (drink[0].equals(dataSnapshot.getKey())) {
-                        stock.set(stock.indexOf(drink),
-                                new String[]{dataSnapshot.getKey(),
-                                        String.valueOf(dataSnapshot.child("stock").getValue())});
+                        adapter = new StockAlkdapter(false, context, R.layout.stock_item, stock);
+                        stock_list.setAdapter(adapter);
                         break;
-                    }
-                }
+                    case REMOVED:
+                        for (String[] drink : stock) {
+                            if (drink[0].equals(changedNode.getKey())) {
+                                stock.remove(drink);
+                                break;
+                            }
+                        }
 
-                adapter = new StockAlkdapter(false, context, R.layout.stock_item, stock);
-                stock_list.setAdapter(adapter);
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                for (String[] drink : stock) {
-                    if (drink[0].equals(dataSnapshot.getKey())) {
-                        stock.remove(drink);
+                        adapter = new StockAlkdapter(false, context, R.layout.stock_item, stock);
+                        stock_list.setAdapter(adapter);
                         break;
-                    }
                 }
-
-                adapter = new StockAlkdapter(false, context, R.layout.stock_item, stock);
-                stock_list.setAdapter(adapter);
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
             }
         });
     }
 
     private void retrieveAdminPassword() {
-        FirebaseActions.getAdminPassword(new Callback<Integer>() {
+        FirebaseManager.registerAdminPasswordCallback(new ValueReadCallback<Integer>() {
             @Override
             public void onCallback(Integer data) {
-                if (data != null) UNIMPORTANT_VARIABLE = data;
+                UNIMPORTANT_VARIABLE = data;
             }
-        });
+        }, null);
     }
 
     //don't mind this method or any of the sources mentioned here... there's nothing to see

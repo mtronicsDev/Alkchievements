@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.daschubbm.alkchievements.firebase.FirebaseActions;
-
 /**
  * Created by Jonathan on 28.09.2016.
  */

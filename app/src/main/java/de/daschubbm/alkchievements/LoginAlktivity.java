@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import de.daschubbm.alkchievements.firebase.FirebaseManager;
+
 public class LoginAlktivity extends AppCompatActivity {
 
     private EditText nameTextField;
@@ -39,6 +41,8 @@ public class LoginAlktivity extends AppCompatActivity {
                     database.insertItemIntoDataBase("name", name);
 
                     Toast.makeText(context, "Habedere " + database.getItem(0)[1] + ", du bist ja aa do!", Toast.LENGTH_SHORT).show();
+
+                    FirebaseManager.supplyPersonName(name);
 
                     Intent hansl = new Intent(context, MainAlktivity.class);
                     startActivity(hansl);

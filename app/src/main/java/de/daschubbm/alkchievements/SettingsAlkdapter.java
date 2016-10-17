@@ -67,7 +67,7 @@ public class SettingsAlkdapter extends ArrayAdapter<String[]> {
                                     drinks.remove(position);
 
                                     DatabaseReference drink = FirebaseDatabase.getInstance()
-                                            .getReference("beverages/" + drinkName);
+                                            .getReference("drinks/" + drinkName + "/price");
                                     drink.removeValue();
 
                                     drink = FirebaseDatabase.getInstance()
