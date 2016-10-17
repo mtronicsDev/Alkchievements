@@ -22,6 +22,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -40,7 +41,7 @@ import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class MainAlktivity extends AppCompatActivity {
 
-    private static final int[] BUILD_NUMBER = {1, 1, 1, 0};
+    private static final int[] BUILD_NUMBER = {1, 2, 0, 0};
     private static int UNIMPORTANT_VARIABLE = -1;
     private ListView list;
     private Alkdapter adapter;
@@ -119,6 +120,36 @@ public class MainAlktivity extends AppCompatActivity {
         }
 
         setupFirebase();
+        performUpdateCleanup();
+    }
+
+    private void performUpdateCleanup() {
+        FirebaseDatabase.getInstance().getReference("people/" + name)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        boolean cleanedUp = false;
+
+                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                            String key = child.getKey();
+                            if (!key.equals("drinks") && !key.equals("achievements") && !key.equals("appVersion")) {
+                                //Needs cleanup
+                                FirebaseManager.writeValue("people/" + name + "/drinks/" + key, child.getValue());
+                                child.getRef().removeValue();
+
+                                numDrinks.put(key, Integer.valueOf(String.valueOf(child.getValue())));
+                                cleanedUp = true;
+                            }
+                        }
+
+                        if (cleanedUp) setupViews();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     private void retrieveAdminPassword() {
@@ -365,6 +396,15 @@ public class MainAlktivity extends AppCompatActivity {
 
                     }
         });
+
+        FirebaseManager.writeValue("people/" + name + "/appVersion", assembleBuildNumber());
+    }
+
+    private String assembleBuildNumber() {
+        return BUILD_NUMBER[0]
+                + "." + BUILD_NUMBER[1]
+                + "." + BUILD_NUMBER[2]
+                + "." + BUILD_NUMBER[3];
     }
 
     public void checkSum(float prize) {
