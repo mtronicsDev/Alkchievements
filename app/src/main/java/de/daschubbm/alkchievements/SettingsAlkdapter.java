@@ -13,8 +13,11 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -73,6 +76,21 @@ public class SettingsAlkdapter extends ArrayAdapter<String[]> {
                                     drink = FirebaseDatabase.getInstance()
                                             .getReference("drinks/" + drinkName + "/stock");
                                     drink.removeValue();
+
+                                    FirebaseDatabase.getInstance().getReference("people")
+                                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                    for (DataSnapshot user : dataSnapshot.getChildren()) {
+                                                        user.child("drinks").child(drinkName).getRef().removeValue();
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(DatabaseError databaseError) {
+
+                                                }
+                                            });
 
                                     parentList.setAdapter(SettingsAlkdapter.this);
 
