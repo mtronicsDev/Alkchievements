@@ -14,6 +14,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by Jonathan on 28.09.2016.
@@ -27,6 +28,8 @@ public class Alkdapter extends ArrayAdapter<String[]> {
     private Map<String, Integer> stock;
     private MainAlktivity main;
 
+    private Random random;
+
     private Map<String, Integer> images = new HashMap<>();
 
     public Alkdapter(MainAlktivity alk, int layoutResourceId, ArrayList<String[]> data, Map<String, Integer> stock) {
@@ -38,6 +41,7 @@ public class Alkdapter extends ArrayAdapter<String[]> {
         this.context = alk;
         alks = data;
         this.stock = stock;
+        random = new Random();
 
         images.put("Bier", R.drawable.kasten_bier);
         images.put("Radler", R.drawable.kasten_radler);
@@ -150,6 +154,10 @@ public class Alkdapter extends ArrayAdapter<String[]> {
                 @Override
                 public void onClick(View v) {
                     main.addClickKasten();
+                    if (random.nextInt(30) == 1) {
+                        main.fassl();
+                    }
+
                 }
             });
         }

@@ -38,6 +38,9 @@ public class StockAlktivity extends AppCompatActivity {
     private StockAlkdapter adapter;
     private Context context;
 
+    private ImageView dontMindMe;
+    private MediaPlayer mp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +52,10 @@ public class StockAlktivity extends AppCompatActivity {
         button_stock = (Button) findViewById(R.id.button_add_stock);
         visibility_header = (TextView) findViewById(R.id.stock_add_header);
         visibility_header.setVisibility(View.INVISIBLE);
+
+        //not important
+        dontMindMe = (ImageView) findViewById(R.id.olaf);
+        mp = MediaPlayer.create(this, R.raw.olaf_hugs);
 
         retrieveAdminPassword();
         retrieveStock();
@@ -152,9 +159,6 @@ public class StockAlktivity extends AppCompatActivity {
 
     //don't mind this method or any of the sources mentioned here... there's nothing to see
     private void nothingSpecial() {
-        final ImageView dontMindMe = (ImageView) findViewById(R.id.olaf);
-        final MediaPlayer mp = MediaPlayer.create(this, R.raw.olaf_hugs);
-
         int layoutWidth = findViewById(R.id.activity_stock_alktivity).getMeasuredWidth();
         int olafWidth = dontMindMe.getMeasuredWidth();
 

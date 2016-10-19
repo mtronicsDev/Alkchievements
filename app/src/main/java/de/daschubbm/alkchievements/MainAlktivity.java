@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -14,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.Toast;
@@ -30,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import de.daschubbm.alkchievements.firebase.ChangeType;
 import de.daschubbm.alkchievements.firebase.FirebaseManager;
@@ -57,6 +60,10 @@ public class MainAlktivity extends AppCompatActivity {
     private Map<String, Float> drinks;
     private Map<String, Integer> numDrinks;
     private Map<String, Integer> stock = new HashMap<>();
+
+    private MediaPlayer mp;
+    private ImageView fassl;
+    private ImageView explosion;
 
     //Variables for the Alkchievements
     /**
@@ -121,6 +128,10 @@ public class MainAlktivity extends AppCompatActivity {
 
         setupFirebase();
         performUpdateCleanup();
+
+        mp = MediaPlayer.create(context, R.raw.explosion);
+        fassl = (ImageView) findViewById(R.id.fassl);
+        explosion = (ImageView) findViewById(R.id.explosion);
     }
 
     private void performUpdateCleanup() {
@@ -806,5 +817,65 @@ public class MainAlktivity extends AppCompatActivity {
 
     public void go(Intent hansl) {
         startActivity(hansl);
+    }
+
+    public void fassl() {
+        Random random = new Random();
+
+        int layoutWidth = findViewById(R.id.activity_main_alktivity).getMeasuredWidth();
+        int layoutHeight = findViewById(R.id.activity_main_alktivity).getMeasuredHeight();
+        int fasslWidth = fassl.getMeasuredWidth();
+        int fasslHeight = fassl.getMeasuredHeight();
+
+        fassl.setX(random.nextInt(layoutWidth - fasslWidth));
+        fassl.setY(random.nextInt(layoutHeight - fasslHeight));
+        fassl.setVisibility(View.VISIBLE);
+        fassl.bringToFront();
+
+        fassl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mp.start();
+                explode((int) fassl.getX(), (int) fassl.getY());
+                fassl.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    public void explode(int posX, int posY) {
+        explosion.setImageResource(R.drawable.ex1);
+        explosion.setX(posX-80);
+        explosion.setY(posY-80);
+        explosion.setVisibility(View.VISIBLE);
+        explosion.bringToFront();
+
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        explosion.setImageResource(R.drawable.ex2);
+                    }
+                },
+                100);
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        explosion.setImageResource(R.drawable.ex3);
+                    }
+                },
+                200);
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        explosion.setImageResource(R.drawable.ex4);
+                    }
+                },
+                300);
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        explosion.setVisibility(View.GONE);
+                    }
+                },
+                400);
     }
 }

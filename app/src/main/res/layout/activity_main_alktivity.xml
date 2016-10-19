@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main_alktivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="de.daschubbm.alkchievements.MainAlktivity"
     android:background="@android:color/white">
+
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/ex1"
+        android:id="@+id/explosion"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/oelfass"
+        android:id="@+id/fassl"
+        android:visibility="gone"/>
 
     <ProgressBar
         android:layout_width="wrap_content"
