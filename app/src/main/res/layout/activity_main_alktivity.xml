@@ -12,15 +12,13 @@
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:src="@drawable/ex1"
-        android:id="@+id/explosion"
-        android:visibility="gone"/>
+        android:id="@+id/explosion" />
 
     <ImageView
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:src="@drawable/oelfass"
-        android:id="@+id/fassl"
-        android:visibility="gone"/>
+        android:id="@+id/fassl" />
 
     <ProgressBar
         android:layout_width="wrap_content"

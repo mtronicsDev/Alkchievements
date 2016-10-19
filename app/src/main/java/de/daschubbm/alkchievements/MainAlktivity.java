@@ -61,6 +61,7 @@ public class MainAlktivity extends AppCompatActivity {
     private Map<String, Integer> numDrinks;
     private Map<String, Integer> stock = new HashMap<>();
 
+    //just for shitty explosion
     private MediaPlayer mp;
     private ImageView fassl;
     private ImageView explosion;
@@ -129,9 +130,7 @@ public class MainAlktivity extends AppCompatActivity {
         setupFirebase();
         performUpdateCleanup();
 
-        mp = MediaPlayer.create(context, R.raw.explosion);
-        fassl = (ImageView) findViewById(R.id.fassl);
-        explosion = (ImageView) findViewById(R.id.explosion);
+        setupExplosion();
     }
 
     private void performUpdateCleanup() {
@@ -844,10 +843,13 @@ public class MainAlktivity extends AppCompatActivity {
 
     public void explode(int posX, int posY) {
         explosion.setImageResource(R.drawable.ex1);
-        explosion.setX(posX-80);
-        explosion.setY(posY-80);
         explosion.setVisibility(View.VISIBLE);
         explosion.bringToFront();
+
+        float explosionWidth = explosion.getMeasuredWidth() - fassl.getMeasuredWidth();
+        float explosionHeight = explosion.getMeasuredHeight() - fassl.getMeasuredHeight();
+        explosion.setX(posX - explosionWidth/2);
+        explosion.setY(posY - explosionHeight/2);
 
         new android.os.Handler().postDelayed(
                 new Runnable() {
@@ -877,5 +879,13 @@ public class MainAlktivity extends AppCompatActivity {
                     }
                 },
                 400);
+    }
+
+    private void setupExplosion() {
+        mp = MediaPlayer.create(context, R.raw.explosion);
+        fassl = (ImageView) findViewById(R.id.fassl);
+        explosion = (ImageView) findViewById(R.id.explosion);
+        fassl.setVisibility(View.INVISIBLE);
+        explosion.setVisibility(View.INVISIBLE);
     }
 }
