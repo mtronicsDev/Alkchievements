@@ -60,8 +60,7 @@ public class BillAlktivity extends AppCompatActivity {
         context = this;
         Log.d("ALKI", "Started bill");
 
-        alkchievementsDatabase = new AlkchievementsLocalDatabase(this);
-        alkchievementsDatabase.open();
+        alkchievementsDatabase = AlkchievementsDatabase.getInstance();
         name = getIntent().getStringExtra("NAME");
 
         adminBilling = getIntent().getBooleanExtra("ADMIN", false);
@@ -202,33 +201,37 @@ public class BillAlktivity extends AppCompatActivity {
 
     private void checkPrice() {
         float price = 0;
+
         for (int i = 0; i < debtors.size(); i++) {
             if (debtors.get(i)[0].equals(name)) {
                 price = Float.parseFloat(debtors.get(i)[1]);
+                break;
             }
         }
-        String state = alkchievementsDatabase.getItems().get(0)[2];
-        if (price > 5 && state.equals("false")) {
-            alkchievementsDatabase.changeStatusForItem(0, "1");
-            Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+
+        int state = alkchievementsDatabase.getState("armerSchlucker");
+        if (price > 5 && state == 0) {
+            alkchievementsDatabase.setState("armerSchlucker", 1);
+            Roast.showToast(this, R.drawable.armer_schlucker, "Alkchievement Stufe 1/3 erhalten!",
+                    alkchievementsDatabase.getName("armerSchlucker"));
         }
-        if (price > 10 && (state.equals("false") || state.equals("1"))) {
-            alkchievementsDatabase.changeStatusForItem(0, "2");
-            alkchievementsDatabase.changeDescriptionForItem(0, "Erhalte eine Rechnung von über 10€!");
-            Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+        if (price > 10 && state < 2) {
+            alkchievementsDatabase.setState("armerSchlucker", 2);
+            Roast.showToast(this, R.drawable.armer_schlucker, "Alkchievement Stufe 2/3 erhalten!",
+                    alkchievementsDatabase.getName("armerSchlucker"));
         }
-        if (price > 20 && (state.equals("false") || state.equals("1") || state.equals("2"))) {
-            alkchievementsDatabase.changeStatusForItem(0, "3");
-            alkchievementsDatabase.changeDescriptionForItem(0, "Erhalte eine Rechnung von über 20€!");
-            Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+        if (price > 20 && state < 3) {
+            alkchievementsDatabase.setState("armerSchlucker", 3);
+            Roast.showToast(this, R.drawable.armer_schlucker, "Alkchievement Stufe 3/3 erhalten!",
+                    alkchievementsDatabase.getName("armerSchlucker"));
         }
     }
 
     private void checkHighestPrice() {
         if (debtors.get(0)[1].equals("-1")) return;
 
-        String state = alkchievementsDatabase.getItems().get(7)[2];
-        if (state.equals("false")) {
+        int state = alkchievementsDatabase.getState("schuldnerNummerEins");
+        if (state == 0) {
             boolean highest = true;
             float price = 0;
             for (int i = 0; i < debtors.size(); i++) {
@@ -244,8 +247,9 @@ public class BillAlktivity extends AppCompatActivity {
                 }
             }
             if (highest) {
-                alkchievementsDatabase.changeStatusForItem(7, "true");
-                Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+                alkchievementsDatabase.setState("schuldnerNummerEins", 1);
+                Roast.showToast(this, R.drawable.schuldner_nr_1, "Alkchievement erhalten!",
+                        alkchievementsDatabase.getName("schuldnerNummerEins"));
             }
         }
     }

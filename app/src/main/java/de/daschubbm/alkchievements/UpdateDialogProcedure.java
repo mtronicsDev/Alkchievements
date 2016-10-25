@@ -1,6 +1,5 @@
 package de.daschubbm.alkchievements;
 
-import android.*;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
@@ -20,15 +19,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
-import java.net.URI;
 
 /**
  * Created by Maxi on 06.10.2016.
  */
 public class UpdateDialogProcedure {
-    private static String url;
-
     public static final File DOWNLOAD_FILE = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/app-release.apk");
+    private static String url;
 
     static void showUpdateDialog(final Context context, String buildNumber, final String changelog, final String url) {
         UpdateDialogProcedure.url = url;
@@ -108,7 +105,7 @@ public class UpdateDialogProcedure {
                             hansl.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             hansl.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             hansl.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                            ((MainAlktivity) context).go(hansl);
+                            context.startActivity(hansl);
                         }
                     }
                 }

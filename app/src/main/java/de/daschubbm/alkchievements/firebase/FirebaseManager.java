@@ -252,7 +252,7 @@ public final class FirebaseManager {
 
     public static void registerCurrentVersionCallback(ValueReadCallback<ValuePair[]> callback,
                                                       ValueChangedCallback changedCallback) {
-        if (drinks == null) currentVersionCallbacks.add(callback);
+        if (currentVersion == null) currentVersionCallbacks.add(callback);
         else callback.onCallback(currentVersion);
 
         if (changedCallback != null) currentVersionChangedCallbacks.add(changedCallback);
@@ -260,7 +260,7 @@ public final class FirebaseManager {
 
     public static void registerPersonCallback(ValueReadCallback<Map<String, ValuePair[]>> callback,
                                               ValueChangedCallback changedCallback) {
-        if (drinks == null) personCallbacks.add(callback);
+        if (person == null) personCallbacks.add(callback);
         else callback.onCallback(person);
 
         if (changedCallback != null) personChangedCallbacks.add(changedCallback);
@@ -268,7 +268,7 @@ public final class FirebaseManager {
 
     public static void registerAdminPasswordCallback(ValueReadCallback<Integer> callback,
                                                      ValueChangedCallback changedCallback) {
-        if (drinks == null) adminPasswordCallbacks.add(callback);
+        if (adminPassword == -1) adminPasswordCallbacks.add(callback);
         else callback.onCallback(adminPassword);
 
         if (changedCallback != null) adminPasswordChangedCallbacks.add(changedCallback);

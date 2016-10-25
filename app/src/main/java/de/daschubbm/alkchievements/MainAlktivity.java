@@ -1,6 +1,7 @@
 package de.daschubbm.alkchievements;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +19,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.NumberPicker;
-import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -44,7 +44,7 @@ import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class MainAlktivity extends AppCompatActivity {
 
-    private static final int[] BUILD_NUMBER = {1, 2, 0, 0};
+    private static final int[] BUILD_NUMBER = {1, 3, 0, 1};
     private static int UNIMPORTANT_VARIABLE = -1;
     private ListView list;
     private Alkdapter adapter;
@@ -66,39 +66,6 @@ public class MainAlktivity extends AppCompatActivity {
     private ImageView fassl;
     private ImageView explosion;
 
-    //Variables for the Alkchievements
-    /**
-     * Reihenfolge im Array wie die unten Stehenden Integers
-     * <p>
-     * private int num_beer_session = 0;
-     * private int evenings_in_row = 0;
-     * <p>
-     * private int num_radler_session = 0;
-     * private int num_nonalk_session = 0;
-     * private int num_shots_session = 0;
-     * private int num_beer_ever = 0;
-     * <p>
-     * private int num_storno = 0;
-     * private int num_drinks = 0;
-     * private int num_kasten_clicked = 0;
-     **/
-
-    private int[] varchievements = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-    private String[] alkchievements = {"Armer Schlucker/Erhalte eine Rechnung von über 5€!",
-            "Bierkenner/Trinke 2 Bier an einem Abend!",
-            "Stammgast/Beschließe 3 Tage in Folge eine Transaktion im Schubbm!",
-
-            "Kegelsportverein/Trinke 5 Radler an einem Abend!",
-            "0,0/Trinke 5 antialkoholische Getränke an einem Abend!",
-            "Blau wie das Meer/Trinke 5 Shots an einem Abend!",
-            "Kasten leer/Trinke insgesamt 20 Bier",
-
-            "Schuldner Nr. 1/Erreiche die höchste Summe auf der gesamten Rechnung!",
-            "Hobbylos/Drücke 100 mal auf einen Kasten!",
-            "Sparfuchs/Bleibe bei 10 Getränken bei unter 7 €!",
-            "Wurschtfinger/Storniere 5 Getränkbestellungen!"};
-
     private boolean drinksLoaded = false, numsLoaded = false;
 
     @Override
@@ -116,21 +83,17 @@ public class MainAlktivity extends AppCompatActivity {
         retrieveAdminPassword();
 
         if (!setupDatabase()) {
-            if (database.getStatus() && !database.getStatusSecond()) {
-                setupAlkchievementValues();
-            }
             setupAlkchivements();
-            loadAlkchievementValues();
 
             setupTimeDatabase();
             prizesDatabase = new LastPrizesDatabase(this);
             prizesDatabase.open();
+
+            setupFirebase();
+            performUpdateCleanup();
+
+            setupExplosion();
         }
-
-        setupFirebase();
-        performUpdateCleanup();
-
-        setupExplosion();
     }
 
     private void performUpdateCleanup() {
@@ -265,17 +228,15 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     private void setupAlkchivements() {
-        alkchievementsDatabase = new AlkchievementsLocalDatabase(this);
-        alkchievementsDatabase.open();
-        if (!alkchievementsDatabase.getStatus()) {
-            ArrayList<String[]> alkis = new ArrayList<>();
-            for (int i = 0; i < alkchievements.length; i++) {
-                alkis.add(alkchievements[i].split("/"));
-            }
-            for (int i = 0; i < alkis.size(); i++) {
-                alkchievementsDatabase.insertItemIntoDataBase(alkis.get(i)[0], alkis.get(i)[1], "false");
-            }
-        }
+        alkchievementsDatabase = new AlkchievementsDatabase(name);
+
+        database.insertItemIntoDataBase("dummy", "-1"); //1
+        database.insertItemIntoDataBase("stammgast", "0"); //2
+        database.insertItemIntoDataBase("kegelsportverein", "0"); //3
+        database.insertItemIntoDataBase("nullKommaNull", "0"); //4
+        database.insertItemIntoDataBase("blauWieDasMeer", "0"); //5
+        database.insertItemIntoDataBase("kastenLeer", "0"); //6
+        database.insertItemIntoDataBase("wurstfinger", "0"); //7
     }
 
     private void setupTimeDatabase() {
@@ -297,24 +258,12 @@ public class MainAlktivity extends AppCompatActivity {
         if (!database.getStatus()) {
             Intent hansl = new Intent(context, LoginAlktivity.class);
             startActivity(hansl);
+            finish();
             return true;
         } else {
             name = database.getItem(0)[1];
             getSupportActionBar().setTitle(name);
             return false;
-        }
-    }
-
-    private void setupAlkchievementValues() {
-        for (int i = 0; i < varchievements.length; i++) {
-            database.insertItemIntoDataBase(String.valueOf(i), String.valueOf(varchievements[i]));
-        }
-    }
-
-    private void loadAlkchievementValues() {
-        ArrayList<String[]> varies = database.getItems();
-        for (int i = 1; i <= varchievements.length; i++) {
-            varchievements[i - 1] = Integer.parseInt(varies.get(i)[1]);
         }
     }
 
@@ -368,6 +317,12 @@ public class MainAlktivity extends AppCompatActivity {
         FirebaseManager.registerPersonCallback(new ValueReadCallback<Map<String, ValuePair[]>>() {
             @Override
             public void onCallback(Map<String, ValuePair[]> data) {
+                if (data.get("drinks") == null) {
+                    data.put("drinks", new ValuePair[0]);
+                    FirebaseDatabase.getInstance()
+                            .getReference("people/" + name + "/drinks/Bier").setValue(0);
+                }
+
                 for (ValuePair pair : data.get("drinks")) {
                     numDrinks.put(pair.key, Integer.valueOf(String.valueOf(pair.value)));
                 }
@@ -379,33 +334,33 @@ public class MainAlktivity extends AppCompatActivity {
 
         FirebaseDatabase.getInstance().getReference("people/" + name + "/drinks")
                 .addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                numDrinks.put(dataSnapshot.getKey(),
-                        Integer.parseInt(String.valueOf(dataSnapshot.getValue())));
-            }
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        numDrinks.put(dataSnapshot.getKey(),
+                                Integer.parseInt(String.valueOf(dataSnapshot.getValue())));
+                    }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                numDrinks.put(dataSnapshot.getKey(),
-                        Integer.parseInt(String.valueOf(dataSnapshot.getValue())));
-            }
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                        numDrinks.put(dataSnapshot.getKey(),
+                                Integer.parseInt(String.valueOf(dataSnapshot.getValue())));
+                    }
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                numDrinks.remove(dataSnapshot.getKey());
-            }
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+                        numDrinks.remove(dataSnapshot.getKey());
+                    }
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-            }
+                    }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
 
                     }
-        });
+                });
 
         FirebaseManager.writeValue("people/" + name + "/appVersion", assembleBuildNumber());
     }
@@ -421,22 +376,22 @@ public class MainAlktivity extends AppCompatActivity {
         prizesDatabase.newPrize(prize);
         if (prizesDatabase.getStatusFull()) {
             float sum = prizesDatabase.getSum();
-            if (sum < 7 && alkchievementsDatabase.getItems().get(9)[2].equals("false")) {
-                alkchievementsDatabase.changeStatusForItem(9, "true");
-                Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+            if (sum < 7 && alkchievementsDatabase.getState("sparfuchs") == 0) {
+                alkchievementsDatabase.setState("sparfuchs", 1);
+                Roast.showToast(this, R.drawable.sparfuchs, "Alkchievement erhalten!", "Sparfuchs");
             }
         }
     }
 
     public void addSessionBeer(boolean add) {
-        if (!alkchievementsDatabase.getItems().get(1)[2].equals("3")) {
+        if (!(alkchievementsDatabase.getState("bierkenner") == 3)) {
+            @SuppressLint("SimpleDateFormat")
             DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
             String date = df.format(Calendar.getInstance().getTime());
 
             if (timeDatabase.getItem(0)[1].equals("0")) {
                 timeDatabase.updateValue(0, date);
-                varchievements[0] = varchievements[0] + 1;
-                database.updateValue(1, varchievements[0]);
+                alkchievementsDatabase.addToState("bierkenner", 1);
                 return;
             }
 
@@ -452,52 +407,47 @@ public class MainAlktivity extends AppCompatActivity {
 
             if (isSession && add) {
                 timeDatabase.updateValue(0, date);
-                varchievements[0] = varchievements[0] + 1;
-                database.updateValue(1, varchievements[0]);
 
-                if (varchievements[0] == 2 && alkchievementsDatabase.getItems().get(1)[2].equals("false")) {
-                    alkchievementsDatabase.changeStatusForItem(1, "1");
-                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
-                }
-                if (varchievements[0] == 4 && alkchievementsDatabase.getItems().get(1)[2].equals("1")) {
-                    alkchievementsDatabase.changeStatusForItem(1, "2");
-                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
-                    alkchievementsDatabase.changeDescriptionForItem(1, "Trinke 4 Bier an einem Abend!");
-                }
-                if (varchievements[0] == 6 && alkchievementsDatabase.getItems().get(1)[2].equals("2")) {
-                    alkchievementsDatabase.changeStatusForItem(1, "3");
-                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
-                    alkchievementsDatabase.changeDescriptionForItem(1, "Trinke 6 Bier an einem Abend!");
+                int state = alkchievementsDatabase.getState("bierkenner");
+
+                if (state == 0) {
+                    alkchievementsDatabase.setState("bierkenner", 1);
+                    Roast.showToast(this, R.drawable.bierkenner, "Alkchievement Stufe 1/3 erhalten!",
+                            alkchievementsDatabase.getName("bierkenner"));
+                } else if (state == 1) {
+                    alkchievementsDatabase.setState("bierkenner", 2);
+                    Roast.showToast(this, R.drawable.bierkenner, "Alkchievement Stufe 2/3 erhalten!",
+                            alkchievementsDatabase.getName("bierkenner"));
+                } else if (state == 2) {
+                    alkchievementsDatabase.setState("bierkenner", 3);
+                    Roast.showToast(this, R.drawable.bierkenner, "Alkchievement Stufe 3/3 erhalten!",
+                            alkchievementsDatabase.getName("bierkenner"));
                 }
             }
 
             if (isSession && !add) {
-                varchievements[0] = varchievements[0] - 1;
-                database.updateValue(1, varchievements[0]);
+                alkchievementsDatabase.addToState("bierkenner", -1);
             }
 
             if (!isSession && add) {
                 timeDatabase.updateValue(0, date);
-                varchievements[0] = 1;
-                database.updateValue(1, varchievements[0]);
+                alkchievementsDatabase.setState("bierkenner", 1);
             }
 
             if (!isSession && !add) {
-                varchievements[0] = 0;
-                database.updateValue(1, varchievements[0]);
+                alkchievementsDatabase.setState("bierkenner", 0);
             }
         }
     }
 
     public void addFollowDay() {
-        if (!alkchievementsDatabase.getItems().get(2)[2].equals("3")) {
+        if (!(alkchievementsDatabase.getState("stammgast") == 3)) {
             DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
             String date = df.format(Calendar.getInstance().getTime());
 
             if (timeDatabase.getItem(4)[1].equals("0")) {
                 timeDatabase.updateValue(4, date);
-                varchievements[1] = varchievements[1] + 1;
-                database.updateValue(2, varchievements[1]);
+                database.updateValue(2, 1);
                 return;
             }
 
@@ -512,22 +462,22 @@ public class MainAlktivity extends AppCompatActivity {
 
             if (nextDay) {
                 timeDatabase.updateValue(4, date);
-                varchievements[1] = varchievements[1] + 1;
-                database.updateValue(2, varchievements[1]);
+                int dayStreak = Integer.parseInt(database.getItem(2)[1]) + 1;
+                database.updateValue(2, dayStreak);
 
-                if (varchievements[1] == 3 && alkchievementsDatabase.getItems().get(2)[2].equals("false")) {
-                    alkchievementsDatabase.changeStatusForItem(2, "1");
-                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
-                }
-                if (varchievements[1] == 5 && alkchievementsDatabase.getItems().get(2)[2].equals("1")) {
-                    alkchievementsDatabase.changeStatusForItem(2, "2");
-                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
-                    alkchievementsDatabase.changeDescriptionForItem(1, "Beschließe 5 Tage in Folge eine Transaktion im Schubbm!");
-                }
-                if (varchievements[1] == 7 && alkchievementsDatabase.getItems().get(2)[2].equals("2")) {
-                    alkchievementsDatabase.changeStatusForItem(2, "3");
-                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
-                    alkchievementsDatabase.changeDescriptionForItem(1, "Beschließe 7 Tage in Folge eine Transaktion im Schubbm!");
+                int state = alkchievementsDatabase.getState("stammgast");
+                if (dayStreak >= 3 && state == 0) {
+                    alkchievementsDatabase.setState("stammgast", 1);
+                    Roast.showToast(this, R.drawable.stammgast, "Alkchievement Stufe 1/3 erhalten!",
+                            alkchievementsDatabase.getName("stammgast"));
+                } else if (dayStreak >= 5 && state == 1) {
+                    alkchievementsDatabase.setState("stammgast", 2);
+                    Roast.showToast(this, R.drawable.stammgast, "Alkchievement Stufe 2/3 erhalten!",
+                            alkchievementsDatabase.getName("stammgast"));
+                } else if (dayStreak >= 7 && state == 2) {
+                    alkchievementsDatabase.setState("stammgast", 3);
+                    Roast.showToast(this, R.drawable.stammgast, "Alkchievement Stufe 3/3 erhalten!",
+                            alkchievementsDatabase.getName("stammgast"));
                 }
             }
         }
@@ -542,14 +492,15 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     public void addSessionRadler(boolean add) {
-        if (!alkchievementsDatabase.getItems().get(3)[2].equals("true")) {
+        if (!(alkchievementsDatabase.getState("kegelsportverein") == 1)) {
             DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
             String date = df.format(Calendar.getInstance().getTime());
 
+            int radlerStreak = Integer.parseInt(database.getItem(3)[1]) + 1;
+
             if (timeDatabase.getItem(1)[1].equals("0")) {
                 timeDatabase.updateValue(1, date);
-                varchievements[2] = varchievements[2] + 1;
-                database.updateValue(3, varchievements[2]);
+                database.updateValue(3, radlerStreak);
                 return;
             }
 
@@ -565,42 +516,40 @@ public class MainAlktivity extends AppCompatActivity {
 
             if (isSession && add) {
                 timeDatabase.updateValue(1, date);
-                varchievements[2] = varchievements[2] + 1;
-                database.updateValue(3, varchievements[2]);
+                database.updateValue(3, radlerStreak);
 
-                if (varchievements[2] == 5 && alkchievementsDatabase.getItems().get(3)[2].equals("false")) {
-                    alkchievementsDatabase.changeStatusForItem(3, "true");
-                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+                if (radlerStreak == 5 && alkchievementsDatabase.getState("kegelsportverein") == 0) {
+                    alkchievementsDatabase.setState("kegelsportverein", 1);
+                    Roast.showToast(this, R.drawable.kegelsportverein, "Alkchievement erhalten!",
+                            alkchievementsDatabase.getName("kegelsportverein"));
                 }
             }
 
             if (isSession && !add) {
-                varchievements[2] = varchievements[2] - 1;
-                database.updateValue(3, varchievements[2]);
+                database.updateValue(3, radlerStreak - 2); //-2, da schon 1 hinzugefügt wurde
             }
 
             if (!isSession && add) {
                 timeDatabase.updateValue(1, date);
-                varchievements[2] = 1;
-                database.updateValue(3, varchievements[2]);
+                database.updateValue(3, 1);
             }
 
             if (!isSession && !add) {
-                varchievements[2] = 0;
-                database.updateValue(3, varchievements[2]);
+                database.updateValue(3, 0);
             }
         }
     }
 
     public void addSessionNonAlk(boolean add) {
-        if (!alkchievementsDatabase.getItems().get(4)[2].equals("true")) {
+        if (!(alkchievementsDatabase.getState("nullKommaNull") == 1)) {
             DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
             String date = df.format(Calendar.getInstance().getTime());
 
+            int noAlkStreak = Integer.parseInt(database.getItem(4)[1]) + 1;
+
             if (timeDatabase.getItem(2)[1].equals("0")) {
                 timeDatabase.updateValue(2, date);
-                varchievements[3] = varchievements[3] + 1;
-                database.updateValue(4, varchievements[3]);
+                database.updateValue(4, noAlkStreak);
                 return;
             }
 
@@ -616,42 +565,40 @@ public class MainAlktivity extends AppCompatActivity {
 
             if (isSession && add) {
                 timeDatabase.updateValue(2, date);
-                varchievements[3] = varchievements[3] + 1;
-                database.updateValue(4, varchievements[3]);
+                database.updateValue(4, noAlkStreak);
 
-                if (varchievements[3] == 5 && alkchievementsDatabase.getItems().get(4)[2].equals("false")) {
-                    alkchievementsDatabase.changeStatusForItem(4, "true");
-                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+                if (noAlkStreak == 5 && alkchievementsDatabase.getState("nullKommaNull") == 0) {
+                    alkchievementsDatabase.setState("nullKommaNull", 1);
+                    Roast.showToast(this, R.drawable.null_komma_null, "Alkchievement erhalten!",
+                            alkchievementsDatabase.getName("nullKommaNull"));
                 }
             }
 
             if (isSession && !add) {
-                varchievements[3] = varchievements[3] - 1;
-                database.updateValue(4, varchievements[3]);
+                database.updateValue(4, noAlkStreak - 2);
             }
 
             if (!isSession && add) {
                 timeDatabase.updateValue(2, date);
-                varchievements[3] = 1;
-                database.updateValue(4, varchievements[3]);
+                database.updateValue(4, 1);
             }
 
             if (!isSession && !add) {
-                varchievements[3] = 0;
-                database.updateValue(4, varchievements[3]);
+                database.updateValue(4, 0);
             }
         }
     }
 
     public void addSessionShot(boolean add) {
-        if (!alkchievementsDatabase.getItems().get(5)[2].equals("true")) {
+        if (!(alkchievementsDatabase.getState("blauWieDasMeer") == 1)) {
             DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
             String date = df.format(Calendar.getInstance().getTime());
 
+            int killStreak = Integer.parseInt(database.getItem(5)[1]) + 1;
+
             if (timeDatabase.getItem(3)[1].equals("0")) {
                 timeDatabase.updateValue(3, date);
-                varchievements[4] = varchievements[4] + 1;
-                database.updateValue(5, varchievements[4]);
+                database.updateValue(5, killStreak);
                 return;
             }
 
@@ -667,63 +614,64 @@ public class MainAlktivity extends AppCompatActivity {
 
             if (isSession && add) {
                 timeDatabase.updateValue(3, date);
-                varchievements[4] = varchievements[4] + 1;
-                database.updateValue(5, varchievements[4]);
+                database.updateValue(5, killStreak);
 
-                if (varchievements[4] == 5 && alkchievementsDatabase.getItems().get(5)[2].equals("false")) {
-                    alkchievementsDatabase.changeStatusForItem(5, "true");
-                    Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+                if (killStreak >= 5 && alkchievementsDatabase.getState("blauWieDasMeer") == 0) {
+                    alkchievementsDatabase.setState("blauWieDasMeer", 1);
+                    Roast.showToast(this, R.drawable.blau_wie_das_meer, "Alkchievement erhalten!",
+                            alkchievementsDatabase.getName("blauWieDasMeer"));
                 }
             }
 
             if (isSession && !add) {
-                varchievements[4] = varchievements[4] - 1;
-                database.updateValue(5, varchievements[4]);
+                database.updateValue(5, killStreak - 2);
             }
 
             if (!isSession && add) {
                 timeDatabase.updateValue(3, date);
-                varchievements[4] = 1;
-                database.updateValue(5, varchievements[4]);
+                database.updateValue(5, 1);
             }
 
             if (!isSession && !add) {
-                varchievements[4] = 0;
-                database.updateValue(5, varchievements[4]);
+                database.updateValue(5, 0);
             }
         }
     }
 
     public void addEverBeer(boolean add) {
+        int beerStreak = Integer.parseInt(database.getItem(6)[1]) + 1;
+
         if (add) {
-            varchievements[5] = varchievements[5] + 1;
-            database.updateValue(6, varchievements[5]);
-            if (varchievements[5] == 20 && alkchievementsDatabase.getItems().get(6)[2].equals("false")) {
-                alkchievementsDatabase.changeStatusForItem(6, "true");
-                Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+            database.updateValue(6, beerStreak);
+            if (beerStreak >= 20 && alkchievementsDatabase.getState("kastenLeer") == 0) {
+                alkchievementsDatabase.setState("kastenLeer", 1);
+                Roast.showToast(this, R.drawable.kasten_leer, "Alkchievement erhalten!",
+                        alkchievementsDatabase.getName("kastenLeer"));
             }
         }
         if (!add) {
-            varchievements[5] = varchievements[5] - 1;
-            database.updateValue(6, varchievements[5]);
+            database.updateValue(6, beerStreak - 2);
         }
     }
 
     public void addStorno() {
-        varchievements[6] = varchievements[6] + 1;
-        database.updateValue(7, varchievements[6]);
-        if (varchievements[6] == 5) {
-            alkchievementsDatabase.changeStatusForItem(10, "true");
-            Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+        int stornoCount = Integer.parseInt(database.getItem(7)[1]) + 1;
+        database.updateValue(7, stornoCount);
+        if (stornoCount >= 5 && alkchievementsDatabase.getState("wurstfinger") == 0) {
+            alkchievementsDatabase.setState("wurstfinger", 1);
+            Roast.showToast(this, R.drawable.wurstfinger, "Alkchievement erhalten!",
+                    alkchievementsDatabase.getName("wurstfinger"));
         }
     }
 
     public void addClickKasten() {
-        varchievements[8] = varchievements[8] + 1;
-        database.updateValue(9, varchievements[8]);
-        if (varchievements[8] == 100) {
-            alkchievementsDatabase.changeStatusForItem(8, "true");
-            Toast.makeText(context, "Alkchievement erhalten!", Toast.LENGTH_SHORT).show();
+        int kastenClicks = Integer.parseInt(database.getItem(9)[1]) + 1;
+        Log.d("ALKI", String.valueOf(kastenClicks));
+        database.updateValue(9, kastenClicks);
+        if (kastenClicks >= 100 && alkchievementsDatabase.getState("hobbylos") == 0) {
+            alkchievementsDatabase.setState("hobbylos", 1);
+            Roast.showToast(this, R.drawable.hobbylos, "Alkchievement erhalten!",
+                    alkchievementsDatabase.getName("hobbylos"));
         }
     }
 
@@ -802,7 +750,6 @@ public class MainAlktivity extends AppCompatActivity {
                         + (p3.getValue() * 10)
                         + numberPicker.getValue()) == UNIMPORTANT_VARIABLE) {
                     dialog.dismiss();
-                    Toast.makeText(getApplication(), "Subba Hansl!", Toast.LENGTH_SHORT).show();
 
                     Intent hansl = new Intent(context, SettingsAlktivity.class);
                     startActivity(hansl);
@@ -812,10 +759,6 @@ public class MainAlktivity extends AppCompatActivity {
         });
 
         dialog.show();
-    }
-
-    public void go(Intent hansl) {
-        startActivity(hansl);
     }
 
     public void fassl() {
@@ -839,6 +782,16 @@ public class MainAlktivity extends AppCompatActivity {
                 fassl.setVisibility(View.GONE);
             }
         });
+
+        fassl.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                deleteDatabase("alk.db");
+                deleteDatabase("time.db");
+                deleteDatabase("prize.db");
+                return true;
+            }
+        });
     }
 
     public void explode(int posX, int posY) {
@@ -848,8 +801,8 @@ public class MainAlktivity extends AppCompatActivity {
 
         float explosionWidth = explosion.getMeasuredWidth() - fassl.getMeasuredWidth();
         float explosionHeight = explosion.getMeasuredHeight() - fassl.getMeasuredHeight();
-        explosion.setX(posX - explosionWidth/2);
-        explosion.setY(posY - explosionHeight/2);
+        explosion.setX(posX - explosionWidth / 2);
+        explosion.setY(posY - explosionHeight / 2);
 
         new android.os.Handler().postDelayed(
                 new Runnable() {
@@ -879,6 +832,12 @@ public class MainAlktivity extends AppCompatActivity {
                     }
                 },
                 400);
+
+        if (alkchievementsDatabase.getState("sprengmeister") == 0) {
+            alkchievementsDatabase.setState("sprengmeister", 1);
+            Roast.showToast(this, R.drawable.sprengmeister, "Alkchievement erhalten!",
+                    alkchievementsDatabase.getName("sprengmeister"));
+        }
     }
 
     private void setupExplosion() {

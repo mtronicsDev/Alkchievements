@@ -44,6 +44,7 @@ public class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
         imageMap.put("Sparfuchs", R.drawable.sparfuchs);
         imageMap.put("Stammgast", R.drawable.stammgast);
         imageMap.put("Hobbylos", R.drawable.hobbylos);
+        imageMap.put("Sprengmeister", R.drawable.sprengmeister);
     }
 
     @Override
