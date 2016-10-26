@@ -75,7 +75,7 @@ public class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
                 description.setVisibility(View.VISIBLE);
             }
 
-            if (goal[2].equals("false")) {
+            if (goal[2].equals("0")) {
                 image.setImageResource(R.drawable.nicht_freigeschaltet);
             }
         }

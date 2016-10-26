@@ -7,7 +7,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/nicht_freigeschaltet"
+        android:src="@drawable/nicht_freigeschaltet"
         android:paddingLeft="10dp"
         android:paddingTop="15dp"
         android:paddingBottom="15dp"
