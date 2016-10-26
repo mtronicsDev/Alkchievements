@@ -67,6 +67,7 @@ public class MainAlktivity extends AppCompatActivity {
     private ImageView explosion;
 
     private boolean drinksLoaded = false, numsLoaded = false;
+    int kastenClicks = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +94,7 @@ public class MainAlktivity extends AppCompatActivity {
             performUpdateCleanup();
 
             setupExplosion();
+            kastenClicks = Integer.parseInt(database.getItem(8)[1]);
         }
     }
 
@@ -237,6 +239,7 @@ public class MainAlktivity extends AppCompatActivity {
         database.insertItemIntoDataBase("blauWieDasMeer", "0"); //5
         database.insertItemIntoDataBase("kastenLeer", "0"); //6
         database.insertItemIntoDataBase("wurstfinger", "0"); //7
+        database.insertItemIntoDataBase("hobbylos", "0"); //8
     }
 
     private void setupTimeDatabase() {
@@ -665,13 +668,14 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     public void addClickKasten() {
-        int kastenClicks = Integer.parseInt(database.getItem(9)[1]) + 1;
-        Log.d("ALKI", String.valueOf(kastenClicks));
-        database.updateValue(9, kastenClicks);
-        if (kastenClicks >= 100 && alkchievementsDatabase.getState("hobbylos") == 0) {
-            alkchievementsDatabase.setState("hobbylos", 1);
-            Roast.showToast(this, R.drawable.hobbylos, "Alkchievement erhalten!",
-                    alkchievementsDatabase.getName("hobbylos"));
+        if (kastenClicks < 100 && alkchievementsDatabase.getState("hobbylos") == 0) {
+            kastenClicks = kastenClicks + 1;
+            database.updateValue(8, kastenClicks);
+            if (kastenClicks >= 100 && alkchievementsDatabase.getState("hobbylos") == 0) {
+                alkchievementsDatabase.setState("hobbylos", 1);
+                Roast.showToast(this, R.drawable.hobbylos, "Alkchievement erhalten!",
+                        alkchievementsDatabase.getName("hobbylos"));
+            }
         }
     }
 
@@ -780,16 +784,6 @@ public class MainAlktivity extends AppCompatActivity {
                 mp.start();
                 explode((int) fassl.getX(), (int) fassl.getY());
                 fassl.setVisibility(View.GONE);
-            }
-        });
-
-        fassl.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                deleteDatabase("alk.db");
-                deleteDatabase("time.db");
-                deleteDatabase("prize.db");
-                return true;
             }
         });
     }
