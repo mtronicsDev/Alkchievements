@@ -97,7 +97,8 @@ public class BillAlktivity extends AppCompatActivity {
                                         * beverages.get(drink.getKey());
                             }
 
-                            debtors.add(new String[]{name, formatPrice(moneyToPay)});
+                            if (moneyToPay > 0)
+                                debtors.add(new String[]{name, formatPrice(moneyToPay)});
                         }
 
                         Log.d("ALKI", "Done with people");
@@ -176,7 +177,10 @@ public class BillAlktivity extends AppCompatActivity {
                                 }
 
                                 DatabaseReference people = FirebaseDatabase.getInstance().getReference("people");
-                                people.removeValue();
+
+                                for (String[] debtor : debtors) {
+                                    people.child(debtor[0] + "/drinks").removeValue();
+                                }
 
                                 Intent hansl = new Intent(context, SettingsAlktivity.class);
                                 startActivity(hansl);

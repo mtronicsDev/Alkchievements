@@ -44,7 +44,7 @@ import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class MainAlktivity extends AppCompatActivity {
 
-    private static final int[] BUILD_NUMBER = {1, 3, 0, 2};
+    private static final int[] BUILD_NUMBER = {1, 3, 0, 3};
     private static int UNIMPORTANT_VARIABLE = -1;
     int kastenClicks = 0;
     private ListView list;
