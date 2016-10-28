@@ -21,6 +21,9 @@ public class AchievementsAlktivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_achievements_alktivity);
         getSupportActionBar().setTitle("Errungen safteln");
+
+        ConnectivityChecker.checkConnectivity(this);
+
         database = AlkchievementsDatabase.getInstance();
 
         list = (ListView) findViewById(R.id.achievements_list);

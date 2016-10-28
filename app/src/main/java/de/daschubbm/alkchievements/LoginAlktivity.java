@@ -26,6 +26,8 @@ public class LoginAlktivity extends AppCompatActivity {
 
         context = this;
 
+        ConnectivityChecker.checkConnectivity(context);
+
         nameTextField = (EditText) findViewById(R.id.name_text_field);
         goButton = (Button) findViewById(R.id.go_button);
 

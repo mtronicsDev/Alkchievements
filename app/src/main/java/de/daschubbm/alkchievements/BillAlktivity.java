@@ -60,6 +60,8 @@ public class BillAlktivity extends AppCompatActivity {
         context = this;
         Log.d("ALKI", "Started bill");
 
+        ConnectivityChecker.checkConnectivity(context);
+
         alkchievementsDatabase = AlkchievementsDatabase.getInstance();
         name = getIntent().getStringExtra("NAME");
 

@@ -44,30 +44,25 @@ import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class MainAlktivity extends AppCompatActivity {
 
-    private static final int[] BUILD_NUMBER = {1, 3, 0, 1};
+    private static final int[] BUILD_NUMBER = {1, 3, 0, 2};
     private static int UNIMPORTANT_VARIABLE = -1;
+    int kastenClicks = 0;
     private ListView list;
     private Alkdapter adapter;
-
     private Context context;
     private Database database;
     private String name;
-
     private AlkchievementsDatabase alkchievementsDatabase;
     private TimeDatabase timeDatabase;
     private LastPrizesDatabase prizesDatabase;
-
     private Map<String, Float> drinks;
     private Map<String, Integer> numDrinks;
     private Map<String, Integer> stock = new HashMap<>();
-
     //just for shitty explosion
     private MediaPlayer mp;
     private ImageView fassl;
     private ImageView explosion;
-
     private boolean drinksLoaded = false, numsLoaded = false;
-    int kastenClicks = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +70,8 @@ public class MainAlktivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_alktivity);
 
         context = this;
+
+        ConnectivityChecker.checkConnectivity(context);
 
         drinks = new HashMap<>();
         numDrinks = new HashMap<>();

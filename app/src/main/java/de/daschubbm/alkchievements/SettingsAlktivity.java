@@ -41,10 +41,12 @@ public class SettingsAlktivity extends AppCompatActivity {
 
         context = this;
 
+        ConnectivityChecker.checkConnectivity(context);
+
         FirebaseManager.registerDrinksCallback(new ValueReadCallback<Map<String, ValuePair[]>>() {
             @Override
             public void onCallback(Map<String, ValuePair[]> data) {
-                ArrayList<String[]> names = new ArrayList<>((int) data.size());
+                ArrayList<String[]> names = new ArrayList<>(data.size());
 
                 for (Map.Entry<String, ValuePair[]> drink : data.entrySet()) {
                     for (ValuePair pair : drink.getValue()) {

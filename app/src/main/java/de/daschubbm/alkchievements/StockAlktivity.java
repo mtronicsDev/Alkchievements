@@ -48,6 +48,8 @@ public class StockAlktivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Bestand");
         context = this;
 
+        ConnectivityChecker.checkConnectivity(context);
+
         stock_list = (ListView) findViewById(R.id.stock_list);
         button_stock = (Button) findViewById(R.id.button_add_stock);
         visibility_header = (TextView) findViewById(R.id.stock_add_header);
