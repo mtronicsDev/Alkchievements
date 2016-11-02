@@ -14,7 +14,7 @@ import de.daschubbm.alkchievements.firebase.ValueReadCallback;
 /**
  * Created by Maxi on 17.10.2016.
  */
-public class AlkchievementsDatabase {
+class AlkchievementsDatabase {
     private static final Map<String, String[]> alkchievementDescriptions;
     private static AlkchievementsDatabase currentInstance;
 
@@ -47,10 +47,10 @@ public class AlkchievementsDatabase {
                 new String[]{"Sprengmeister", "Sprenge ein rotes Fass!"});
     }
 
-    private Map<String, Integer> alkchievementStates;
-    private DatabaseReference baseRef;
+    private final Map<String, Integer> alkchievementStates;
+    private final DatabaseReference baseRef;
 
-    public AlkchievementsDatabase(final String person) {
+    AlkchievementsDatabase(final String person) {
         alkchievementStates = new HashMap<>(alkchievementDescriptions.size());
 
         baseRef = FirebaseDatabase.getInstance().getReference("people/" + person + "/achievements");
@@ -84,36 +84,37 @@ public class AlkchievementsDatabase {
         currentInstance = this;
     }
 
-    public static AlkchievementsDatabase getInstance() {
+    static AlkchievementsDatabase getInstance() {
         return currentInstance;
     }
 
-    public int getState(String alkchievement) {
+    int getState(String alkchievement) {
         Integer re = alkchievementStates.get(alkchievement);
         return re != null ? re : 0;
     }
 
-    public void setState(String alkchievement, int state) {
+    void setState(String alkchievement, int state) {
         alkchievementStates.put(alkchievement, state);
         baseRef.child(alkchievement).setValue(state);
     }
 
-    public void addToState(String alkchievement, int deltaState) {
+    void addToState(@SuppressWarnings("SameParameterValue") String alkchievement, int deltaState) {
         int newState = getState(alkchievement) + deltaState;
 
         alkchievementStates.put(alkchievement, newState);
         baseRef.child(alkchievement).setValue(newState);
     }
 
-    public boolean isReady() {
+    boolean isReady() {
         return alkchievementStates.size() == alkchievementDescriptions.size();
     }
 
+    @SuppressWarnings("unused")
     public void resetAchievementStates() {
         baseRef.removeValue();
     }
 
-    public String[] getNameAndDescription(String alkchievement) {
+    String[] getNameAndDescription(String alkchievement) {
         String[] re = new String[2];
         String[] desc = alkchievementDescriptions.get(alkchievement);
 
@@ -137,15 +138,15 @@ public class AlkchievementsDatabase {
         return re;
     }
 
-    public Map<String, Integer> getAlkchievementStates() {
+    Map<String, Integer> getAlkchievementStates() {
         return Collections.unmodifiableMap(alkchievementStates);
     }
 
-    public Map<String, String[]> getAlkchievementDescriptions() {
+    Map<String, String[]> getAlkchievementDescriptions() {
         return Collections.unmodifiableMap(alkchievementDescriptions);
     }
 
-    public String getName(String alkchievement) {
+    String getName(String alkchievement) {
         return alkchievementDescriptions.get(alkchievement)[0];
     }
 }

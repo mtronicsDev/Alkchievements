@@ -38,12 +38,10 @@ import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class BillAlktivity extends AppCompatActivity {
 
+    private final ArrayList<String[]> debtors = new ArrayList<>();
+    private final Map<String, Float> beverages = new HashMap<>();
     private ListView list;
     private BillAlkdapter adapter;
-    private ArrayList<String[]> debtors = new ArrayList<>();
-
-    private Map<String, Float> beverages = new HashMap<>();
-
     private AlkchievementsDatabase alkchievementsDatabase;
 
     private Context context;
@@ -55,6 +53,7 @@ public class BillAlktivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill_alktivity);
 
+        //noinspection ConstantConditions
         getSupportActionBar().setTitle(getString(R.string.rechnung_title));
 
         context = this;
@@ -108,7 +107,7 @@ public class BillAlktivity extends AppCompatActivity {
                         if (debtors.size() == 0)
                             debtors.add(new String[]{"Es had g'wies koana ebs gsuffa!", "-1"});
 
-                        adapter = new BillAlkdapter(context, R.layout.bill_item, debtors);
+                        adapter = new BillAlkdapter(context, debtors);
                         list.setAdapter(adapter);
 
                         checkPrice();
@@ -260,7 +259,7 @@ public class BillAlktivity extends AppCompatActivity {
         }
     }
 
-    public void launchStock(MenuItem item) {
+    public void launchStock(@SuppressWarnings("UnusedParameters") MenuItem item) {
         Intent hansl = new Intent(context, StockAlktivity.class);
         startActivity(hansl);
     }

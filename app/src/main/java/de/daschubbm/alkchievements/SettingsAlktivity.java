@@ -37,6 +37,7 @@ public class SettingsAlktivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_alktivity);
+        //noinspection ConstantConditions
         getSupportActionBar().setTitle("Einstellungen");
 
         context = this;
@@ -101,13 +102,13 @@ public class SettingsAlktivity extends AppCompatActivity {
         pinField.setText("");
     }
 
-    public void launchBilling() {
+    private void launchBilling() {
         Intent hansl = new Intent(this, BillAlktivity.class);
         hansl.putExtra("ADMIN", true);
         startActivity(hansl);
     }
 
-    public void addDrink() {
+    private void addDrink() {
         EditText drinkNameField = (EditText) findViewById(R.id.add_drink_name);
         EditText drinkPriceField = (EditText) findViewById(R.id.add_drink_price);
 
@@ -119,7 +120,7 @@ public class SettingsAlktivity extends AppCompatActivity {
 
             for (int i = 0; i < alkdapter.getCount(); i++) {
                 String[] item = alkdapter.getItem(0);
-                if (drinkName.equals(item[0])) alkdapter.remove(item);
+                if (item != null && drinkName.equals(item[0])) alkdapter.remove(item);
             }
 
             alkdapter.add(newDrink);

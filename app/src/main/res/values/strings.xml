@@ -4,7 +4,4 @@
     <string name="rechnung_title">Rechnung</string>
     <string name="trophaeen_anzeigen">Trophäen anzeigen</string>
     <string name="einstellungen_oeffnen">Einstellungen öffnen</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

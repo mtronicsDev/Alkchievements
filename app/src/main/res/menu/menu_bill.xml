@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <item
-        android:id="@+id/stock"
         android:icon="@drawable/stock"
+        android:onClick="launchStock"
         android:orderInCategory="50"
-        app:showAsAction="ifRoom"
         android:title="Vorrat anzeigen"
-        android:onClick="launchStock"/>
+        app:showAsAction="ifRoom"
+        tools:ignore="HardcodedText" />
 
 </menu>

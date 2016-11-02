@@ -1,36 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="20dp"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
     android:paddingRight="20dp"
-    android:paddingLeft="20dp">
+    android:paddingTop="20dp">
 
     <TextView
-        android:text="TextView"
-        android:textSize="20dp"
+        android:id="@+id/schuldner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/schuldner"
-        android:textColor="@android:color/black"/>
+        android:text="TextView"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        tools:ignore="HardcodedText" />
 
     <TextView
-        android:text=" €"
-        android:textSize="20dp"
+        android:id="@+id/geld"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:id="@+id/geld"
-        android:textColor="@android:color/black"/>
+        android:layout_alignParentTop="true"
+        android:text=" €"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        tools:ignore="HardcodedText" />
 
     <TextView
-        android:text="0"
-        android:textSize="20dp"
+        android:id="@+id/zu_zahlen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@+id/geld"
-        android:id="@+id/zu_zahlen"
-        android:textColor="@android:color/black"/>
+        android:text="0"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        tools:ignore="HardcodedText" />
 </RelativeLayout>

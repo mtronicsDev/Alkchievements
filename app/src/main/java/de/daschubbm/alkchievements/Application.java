@@ -1,11 +1,13 @@
 package de.daschubbm.alkchievements;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 /**
  * Created by Maxi on 17.10.2016.
  */
 public class Application extends android.app.Application {
+    @SuppressLint("StaticFieldLeak")
     private static Context context;
 
     public static Context getContext() {

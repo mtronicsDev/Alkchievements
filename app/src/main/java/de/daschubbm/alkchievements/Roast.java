@@ -11,11 +11,11 @@ import android.widget.RemoteViews;
 /**
  * Created by Maxi on 25.10.2016.
  */
-public final class Roast {
+final class Roast {
     private Roast() {
     }
 
-    public static void showToast(final Activity activity, @DrawableRes int icon, String heading, String message) {
+    static void showToast(final Activity activity, @DrawableRes int icon, String heading, String message) {
         RemoteViews view = new RemoteViews(activity.getPackageName(), R.layout.roast);
         view.setImageViewResource(R.id.icon, icon);
         view.setTextViewText(R.id.heading, heading);

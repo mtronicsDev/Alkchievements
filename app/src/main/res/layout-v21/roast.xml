@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
@@ -22,14 +23,16 @@
             style="@android:style/TextAppearance.Material.Notification.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Heading" />
+            android:text="Heading"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/message"
             style="@android:style/TextAppearance.Material.Notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Message" />
+            android:text="Message"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
 </LinearLayout>

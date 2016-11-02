@@ -1,6 +1,7 @@
 package de.daschubbm.alkchievements;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,33 +15,28 @@ import java.util.ArrayList;
  * Created by Jonathan on 09.10.2016.
  */
 
-public class StockAlkdapter extends ArrayAdapter<String[]> {
+class StockAlkdapter extends ArrayAdapter<String[]> {
 
-    private Context context;
-    private int layoutResourceId;
+    private final Context context;
+    private final int layoutResourceId;
+    private final boolean admin;
     private ArrayList<String[]> stock = new ArrayList<>();
-    private boolean admin;
-    ViewHolder viewHolder;
+    private ViewHolder viewHolder;
 
 
-    public StockAlkdapter(boolean admin, Context context, int layoutResourceId, ArrayList<String[]> data) {
+    StockAlkdapter(boolean admin, Context context, ArrayList<String[]> data) {
 
-        super(context, layoutResourceId, data);
+        super(context, R.layout.stock_item, data);
 
         this.admin = admin;
-        this.layoutResourceId = layoutResourceId;
+        this.layoutResourceId = R.layout.stock_item;
         this.context = context;
         stock = data;
     }
 
-    private class ViewHolder {
-        TextView name;
-        TextView num;
-        EditText add;
-    }
-
+    @NonNull
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
 
         View v = convertView;
 
@@ -71,5 +67,11 @@ public class StockAlkdapter extends ArrayAdapter<String[]> {
             v.setTag(item[0]);
         }
         return v;
+    }
+
+    private class ViewHolder {
+        TextView name;
+        TextView num;
+        EditText add;
     }
 }

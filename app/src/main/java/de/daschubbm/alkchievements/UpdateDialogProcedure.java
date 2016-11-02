@@ -23,15 +23,15 @@ import java.io.File;
 /**
  * Created by Maxi on 06.10.2016.
  */
-public class UpdateDialogProcedure {
-    public static final File DOWNLOAD_FILE = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/app-release.apk");
+class UpdateDialogProcedure {
+    static final File DOWNLOAD_FILE = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/app-release.apk");
     private static String url;
 
     static void showUpdateDialog(final Context context, String buildNumber, final String changelog, final String url) {
         UpdateDialogProcedure.url = url;
 
         DialogInterface.OnClickListener updateDialogListener = new DialogInterface.OnClickListener() {
-            public int negativeButtonPresses = 0;
+            int negativeButtonPresses = 0;
 
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {

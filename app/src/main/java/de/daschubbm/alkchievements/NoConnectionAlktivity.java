@@ -7,13 +7,14 @@ import android.support.v7.app.AppCompatActivity;
 
 public class NoConnectionAlktivity extends AppCompatActivity {
 
-    Class<Activity> origin;
+    private Class<Activity> origin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_no_connection_alktivity);
 
+        //noinspection ConstantConditions
         getSupportActionBar().hide();
 
         try {

@@ -7,70 +7,74 @@
     tools:context="de.daschubbm.alkchievements.StockAlktivity">
 
     <ProgressBar
+        android:id="@+id/loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:id="@+id/loading"
+        android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:indeterminate="true" />
 
     <ImageView
+        android:id="@+id/olaf"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:src="@drawable/olaf"
-        android:id="@+id/olaf"
-        android:visibility="invisible"
         android:layout_above="@+id/button_add_stock"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:src="@drawable/olaf"
+        android:visibility="invisible" />
 
     <LinearLayout
+        android:id="@+id/table_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="gone"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:id="@+id/table_header">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
+            android:paddingStart="10dp"
             android:text="Getränk"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingLeft="10dp"/>
+            tools:ignore="HardcodedText,RtlSymmetry" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
+            android:paddingStart="10dp"
             android:text="Vorrat"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingLeft="10dp"/>
+            tools:ignore="HardcodedText,RtlSymmetry" />
 
         <TextView
+            android:id="@+id/stock_add_header"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
+            android:paddingStart="10dp"
             android:text="Hinzufügen"
-            android:id="@+id/stock_add_header"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingLeft="10dp"/>
+            tools:ignore="HardcodedText,RtlSymmetry" />
 
     </LinearLayout>
 
     <ListView
+        android:id="@+id/stock_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/stock_list"
         android:layout_below="@+id/table_header"
-        android:paddingBottom="50dp"/>
+        android:paddingBottom="50dp" />
 
     <Button
+        android:id="@+id/button_add_stock"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="Bestand aufstocken"
-        android:id="@+id/button_add_stock"
+        android:layout_alignParentBottom="true"
         android:background="@color/colorAccent"
-        android:layout_alignParentBottom="true"/>
+        android:text="Bestand aufstocken"
+        tools:ignore="HardcodedText" />
 
 </RelativeLayout>

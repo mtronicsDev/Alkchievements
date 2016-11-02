@@ -2,7 +2,6 @@ package de.daschubbm.alkchievements;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.NumberPicker;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -31,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -45,23 +44,23 @@ import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 public class MainAlktivity extends AppCompatActivity {
 
     private static final int[] BUILD_NUMBER = {1, 3, 0, 3};
-    private static int UNIMPORTANT_VARIABLE = -1;
-    int kastenClicks = 0;
-    private ListView list;
-    private Alkdapter adapter;
+    private final Map<String, Integer> stock = new HashMap<>();
+    private int kastenClicks = 0;
     private Context context;
-    private Database database;
     private String name;
+    private Database database;
     private AlkchievementsDatabase alkchievementsDatabase;
     private TimeDatabase timeDatabase;
     private LastPrizesDatabase prizesDatabase;
     private Map<String, Float> drinks;
     private Map<String, Integer> numDrinks;
-    private Map<String, Integer> stock = new HashMap<>();
     //just for shitty explosion
     private MediaPlayer mp;
     private ImageView fassl;
     private ImageView explosion;
+
+    private Alkdapter adapter;
+
     private boolean drinksLoaded = false, numsLoaded = false;
 
     @Override
@@ -78,8 +77,6 @@ public class MainAlktivity extends AppCompatActivity {
 
         checkForUpdates();
 
-        retrieveAdminPassword();
-
         if (!setupDatabase()) {
             setupAlkchivements();
 
@@ -90,7 +87,7 @@ public class MainAlktivity extends AppCompatActivity {
             setupFirebase();
             performUpdateCleanup();
 
-            setupExplosion();
+            setupFassl();
             kastenClicks = Integer.parseInt(database.getItem(8)[1]);
         }
     }
@@ -124,25 +121,11 @@ public class MainAlktivity extends AppCompatActivity {
                 });
     }
 
-    private void retrieveAdminPassword() {
-        FirebaseManager.registerAdminPasswordCallback(new ValueReadCallback<Integer>() {
-            @Override
-            public void onCallback(Integer data) {
-                UNIMPORTANT_VARIABLE = data;
-            }
-        }, new ValueChangedCallback() {
-            @Override
-            public void onCallback(DataSnapshot changedNode, ChangeType changeType) {
-                Integer newPassword = Integer.valueOf(String.valueOf(changedNode.getValue()));
-                if (newPassword != null) UNIMPORTANT_VARIABLE = newPassword;
-            }
-        });
-    }
-
     private void checkForUpdates() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED
                 && UpdateDialogProcedure.DOWNLOAD_FILE.exists())
+            //noinspection ResultOfMethodCallIgnored
             UpdateDialogProcedure.DOWNLOAD_FILE.delete();
 
         FirebaseManager.registerCurrentVersionCallback(new ValueReadCallback<ValuePair[]>() {
@@ -203,7 +186,7 @@ public class MainAlktivity extends AppCompatActivity {
                         + newestBuild[2] + "."
                         + newestBuild[3]);
 
-                if (isLocalBuildOutOfDate(BUILD_NUMBER, newestBuild)) {
+                if (isLocalBuildOutOfDate(newestBuild)) {
                     Log.d("UPDATE", "New update available");
                     UpdateDialogProcedure.showUpdateDialog(context, buildNumber, changelog, downloadURL);
                 }
@@ -211,11 +194,11 @@ public class MainAlktivity extends AppCompatActivity {
         }
     }
 
-    private boolean isLocalBuildOutOfDate(int[] localBuild, int[] newestBuild) {
-        if (newestBuild[0] > localBuild[0]) return true;
-        if (newestBuild[1] > localBuild[1]) return true;
-        if (newestBuild[2] > localBuild[2]) return true;
-        return newestBuild[3] > localBuild[3];
+    private boolean isLocalBuildOutOfDate(int[] newestBuild) {
+        return newestBuild[0] > MainAlktivity.BUILD_NUMBER[0]
+                || newestBuild[1] > MainAlktivity.BUILD_NUMBER[1]
+                || newestBuild[2] > MainAlktivity.BUILD_NUMBER[2]
+                || newestBuild[3] > MainAlktivity.BUILD_NUMBER[3];
     }
 
     @Override
@@ -262,6 +245,7 @@ public class MainAlktivity extends AppCompatActivity {
             return true;
         } else {
             name = database.getItem(0)[1];
+            //noinspection ConstantConditions
             getSupportActionBar().setTitle(name);
             return false;
         }
@@ -311,6 +295,8 @@ public class MainAlktivity extends AppCompatActivity {
                         setupViews();
                         break;
                 }
+
+                adapter.updateDrink(changedNode);
             }
         });
 
@@ -442,7 +428,7 @@ public class MainAlktivity extends AppCompatActivity {
 
     public void addFollowDay() {
         if (!(alkchievementsDatabase.getState("stammgast") == 3)) {
-            DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+            @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
             String date = df.format(Calendar.getInstance().getTime());
 
             if (timeDatabase.getItem(4)[1].equals("0")) {
@@ -493,7 +479,7 @@ public class MainAlktivity extends AppCompatActivity {
 
     public void addSessionRadler(boolean add) {
         if (!(alkchievementsDatabase.getState("kegelsportverein") == 1)) {
-            DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+            @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
             String date = df.format(Calendar.getInstance().getTime());
 
             int radlerStreak = Integer.parseInt(database.getItem(3)[1]) + 1;
@@ -542,7 +528,7 @@ public class MainAlktivity extends AppCompatActivity {
 
     public void addSessionNonAlk(boolean add) {
         if (!(alkchievementsDatabase.getState("nullKommaNull") == 1)) {
-            DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+            @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
             String date = df.format(Calendar.getInstance().getTime());
 
             int noAlkStreak = Integer.parseInt(database.getItem(4)[1]) + 1;
@@ -591,7 +577,7 @@ public class MainAlktivity extends AppCompatActivity {
 
     public void addSessionShot(boolean add) {
         if (!(alkchievementsDatabase.getState("blauWieDasMeer") == 1)) {
-            DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+            @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
             String date = df.format(Calendar.getInstance().getTime());
 
             int killStreak = Integer.parseInt(database.getItem(5)[1]) + 1;
@@ -666,7 +652,7 @@ public class MainAlktivity extends AppCompatActivity {
 
     public void addClickKasten() {
         if (kastenClicks < 100 && alkchievementsDatabase.getState("hobbylos") == 0) {
-            kastenClicks = kastenClicks + 1;
+            kastenClicks += 1;
             database.updateValue(8, kastenClicks);
             if (kastenClicks >= 100 && alkchievementsDatabase.getState("hobbylos") == 0) {
                 alkchievementsDatabase.setState("hobbylos", 1);
@@ -681,88 +667,51 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     private void setupViews() {
-        list = (ListView) findViewById(R.id.alkList);
-        ArrayList<String[]> beverages = new ArrayList<>(drinks.size());
+        List<String[]> drinksData = new ArrayList<>(drinks.size());
 
-        for (Map.Entry<String, Float> drink : drinks.entrySet()) {
-            String price = formatPrice(String.valueOf(drink.getValue()));
-            String name = drink.getKey();
-            String count = String.valueOf(numDrinks.get(drink.getKey()));
+        for (String drinkId : drinks.keySet()) {
+            Float price = drinks.get(drinkId);
+            Integer gschwoabt = numDrinks.get(drinkId);
+            Integer stock = this.stock.get(drinkId);
 
-            if (count.equals("null")) count = "0";
+            if (price == null)
+                throw new ApplicationFuckedUpError("Preis eines Getränks existiert nicht!");
+            if (gschwoabt == null) gschwoabt = 0;
+            if (stock == null) stock = 0;
 
-            beverages.add(new String[]{price, count, name});
+            drinksData.add(new String[]{drinkId, formatPrice(price),
+                    String.valueOf(gschwoabt), String.valueOf(stock)});
         }
 
-        adapter = new Alkdapter(this, R.layout.alk_item, beverages, stock);
+        ListView list = (ListView) findViewById(R.id.alkList);
+        adapter = new Alkdapter(this, drinksData);
         list.setAdapter(adapter);
 
         findViewById(R.id.loading).setVisibility(View.GONE);
     }
 
-    public void launchBilling(MenuItem item) {
+    public void launchBilling(@SuppressWarnings("UnusedParameters") MenuItem item) {
         Intent hansl = new Intent(context, BillAlktivity.class);
         hansl.putExtra("NAME", name);
         startActivity(hansl);
     }
 
-    public void launchAchievements(MenuItem item) {
+    public void launchAchievements(@SuppressWarnings("UnusedParameters") MenuItem item) {
         Intent hansl = new Intent(context, AchievementsAlktivity.class);
         startActivity(hansl);
     }
 
-    public void launchSettings(MenuItem item) {
-        launchPasswordCheck();
-    }
-
-    public void launchPasswordCheck() {
-        final Dialog dialog = new Dialog(this);
-        dialog.setTitle("Passwort eingeben");
-        dialog.setContentView(R.layout.dialog_password_checker);
-
-        final NumberPicker p1 = (NumberPicker) dialog.findViewById(R.id.num_lock_1);
-        p1.setMinValue(0);
-        p1.setValue(1);
-        p1.setMaxValue(9);
-        p1.setWrapSelectorWheel(true);
-
-        final NumberPicker p2 = (NumberPicker) dialog.findViewById(R.id.num_lock_2);
-        p2.setMinValue(0);
-        p2.setValue(1);
-        p2.setMaxValue(9);
-        p2.setWrapSelectorWheel(true);
-
-        final NumberPicker p3 = (NumberPicker) dialog.findViewById(R.id.num_lock_3);
-        p3.setMinValue(0);
-        p3.setValue(1);
-        p3.setMaxValue(9);
-        p3.setWrapSelectorWheel(true);
-
-        NumberPicker p4 = (NumberPicker) dialog.findViewById(R.id.num_lock_4);
-        p4.setMinValue(0);
-        p4.setValue(1);
-        p4.setMaxValue(9);
-        p4.setWrapSelectorWheel(true);
-        p4.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+    public void launchSettings(@SuppressWarnings("UnusedParameters") MenuItem item) {
+        PasswordChecker.checkPassword(context, new PasswordChecker.PasswordCheckCallback() {
             @Override
-            public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-                if (((p1.getValue() * 1000)
-                        + (p2.getValue() * 100)
-                        + (p3.getValue() * 10)
-                        + numberPicker.getValue()) == UNIMPORTANT_VARIABLE) {
-                    dialog.dismiss();
-
-                    Intent hansl = new Intent(context, SettingsAlktivity.class);
-                    startActivity(hansl);
-                    finish();
-                }
+            public void onCallback() {
+                Intent hansl = new Intent(context, SettingsAlktivity.class);
+                startActivity(hansl);
             }
         });
-
-        dialog.show();
     }
 
-    public void fassl() {
+    public void showFassl() {
         Random random = new Random();
 
         int layoutWidth = findViewById(R.id.activity_main_alktivity).getMeasuredWidth();
@@ -779,13 +728,13 @@ public class MainAlktivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mp.start();
-                explode((int) fassl.getX(), (int) fassl.getY());
+                explodeFassl((int) fassl.getX(), (int) fassl.getY());
                 fassl.setVisibility(View.GONE);
             }
         });
     }
 
-    public void explode(int posX, int posY) {
+    private void explodeFassl(int posX, int posY) {
         explosion.setImageResource(R.drawable.ex1);
         explosion.setVisibility(View.VISIBLE);
         explosion.bringToFront();
@@ -831,7 +780,7 @@ public class MainAlktivity extends AppCompatActivity {
         }
     }
 
-    private void setupExplosion() {
+    private void setupFassl() {
         mp = MediaPlayer.create(context, R.raw.explosion);
         fassl = (ImageView) findViewById(R.id.fassl);
         explosion = (ImageView) findViewById(R.id.explosion);

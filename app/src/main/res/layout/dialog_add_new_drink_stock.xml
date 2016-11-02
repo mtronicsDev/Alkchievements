@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -8,40 +9,41 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/linearLayout"
-        android:layout_gravity="center_horizontal">
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/drink_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="Anfangsbestand von %drink%:" />
+            android:text="Anfangsbestand von %drink%:"
+            tools:ignore="HardcodedText" />
 
         <NumberPicker
             android:id="@+id/stock_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:orientation="vertical" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_gravity="end">
+        android:layout_gravity="end"
+        android:orientation="horizontal">
 
         <Button
+            android:id="@+id/accept_button"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Jawohll!"
-            android:id="@+id/accept_button"
-            style="?android:attr/buttonBarButtonStyle" />
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
 </LinearLayout>

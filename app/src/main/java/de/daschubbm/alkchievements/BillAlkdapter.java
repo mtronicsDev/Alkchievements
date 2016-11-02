@@ -1,6 +1,7 @@
 package de.daschubbm.alkchievements;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,24 +14,25 @@ import java.util.ArrayList;
  * Created by Jonathan on 28.09.2016.
  */
 
-public class BillAlkdapter extends ArrayAdapter<String[]> {
+class BillAlkdapter extends ArrayAdapter<String[]> {
 
-    private Context context;
-    private int layoutResourceId;
+    private final Context context;
+    private final int layoutResourceId;
     private ArrayList<String[]> debtors = new ArrayList<>();
 
 
-    public BillAlkdapter(Context context, int layoutResourceId, ArrayList<String[]> data) {
+    BillAlkdapter(Context context, ArrayList<String[]> data) {
 
-        super(context, layoutResourceId, data);
+        super(context, R.layout.bill_item, data);
 
-        this.layoutResourceId = layoutResourceId;
+        this.layoutResourceId = R.layout.bill_item;
         this.context = context;
         debtors = data;
     }
 
+    @NonNull
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
 
         View v = convertView;
 

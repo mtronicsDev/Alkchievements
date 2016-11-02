@@ -1,5 +1,6 @@
 package de.daschubbm.alkchievements;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -45,6 +46,7 @@ public class StockAlktivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock_alktivity);
+        //noinspection ConstantConditions
         getSupportActionBar().setTitle("Bestand");
         context = this;
 
@@ -63,6 +65,7 @@ public class StockAlktivity extends AppCompatActivity {
         retrieveStock();
 
         button_stock.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
                 if (button_stock.getText().equals("Bestand aufstocken")) {
@@ -74,7 +77,7 @@ public class StockAlktivity extends AppCompatActivity {
                     updateStock();
                     button_stock.setText("Bestand aufstocken");
                     visibility_header.setVisibility(View.INVISIBLE);
-                    adapter = new StockAlkdapter(false, context, R.layout.stock_item, stock);
+                    adapter = new StockAlkdapter(false, context, stock);
                     stock_list.setAdapter(adapter);
                 }
             }
@@ -98,7 +101,7 @@ public class StockAlktivity extends AppCompatActivity {
                     stock.add(new String[]{drink.getKey(), drinkStock});
                 }
 
-                adapter = new StockAlkdapter(false, context, R.layout.stock_item, stock);
+                adapter = new StockAlkdapter(false, context, stock);
                 stock_list.setAdapter(adapter);
 
                 findViewById(R.id.loading).setVisibility(View.GONE);
@@ -118,7 +121,7 @@ public class StockAlktivity extends AppCompatActivity {
                             }
                         }
 
-                        adapter = new StockAlkdapter(false, context, R.layout.stock_item, stock);
+                        adapter = new StockAlkdapter(false, context, stock);
                         stock_list.setAdapter(adapter);
                         break;
                     case CHANGED:
@@ -131,7 +134,7 @@ public class StockAlktivity extends AppCompatActivity {
                             }
                         }
 
-                        adapter = new StockAlkdapter(false, context, R.layout.stock_item, stock);
+                        adapter = new StockAlkdapter(false, context, stock);
                         stock_list.setAdapter(adapter);
                         break;
                     case REMOVED:
@@ -142,7 +145,7 @@ public class StockAlktivity extends AppCompatActivity {
                             }
                         }
 
-                        adapter = new StockAlkdapter(false, context, R.layout.stock_item, stock);
+                        adapter = new StockAlkdapter(false, context, stock);
                         stock_list.setAdapter(adapter);
                         break;
                 }
@@ -185,10 +188,11 @@ public class StockAlktivity extends AppCompatActivity {
     }
     //as I said... NOTHING!!!
 
+    @SuppressLint("SetTextI18n")
     private void doAdmin() {
         button_stock.setText("Hinzufügen");
         visibility_header.setVisibility(View.VISIBLE);
-        adapter = new StockAlkdapter(true, context, R.layout.stock_item, stock);
+        adapter = new StockAlkdapter(true, context, stock);
         stock_list.setAdapter(adapter);
     }
 

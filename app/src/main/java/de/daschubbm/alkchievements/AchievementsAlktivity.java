@@ -10,16 +10,15 @@ import java.util.Map;
 
 public class AchievementsAlktivity extends AppCompatActivity {
 
+    private final ArrayList<String[]> alkchievements = new ArrayList<>();
     private ListView list;
-    private AlkchievementsAlkdapder adapter;
-    private ArrayList<String[]> alkchievements = new ArrayList<>();
-
     private AlkchievementsDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_achievements_alktivity);
+        //noinspection ConstantConditions
         getSupportActionBar().setTitle("Errungen safteln");
 
         ConnectivityChecker.checkConnectivity(this);
@@ -61,7 +60,7 @@ public class AchievementsAlktivity extends AppCompatActivity {
 
         alkchievementTable.clear();
 
-        adapter = new AlkchievementsAlkdapder(this, R.layout.alkchievement_item, alkchievements);
+        AlkchievementsAlkdapder adapter = new AlkchievementsAlkdapder(this, alkchievements);
         list.setAdapter(adapter);
     }
 }

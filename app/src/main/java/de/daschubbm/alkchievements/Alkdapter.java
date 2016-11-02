@@ -1,6 +1,8 @@
 package de.daschubbm.alkchievements;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,38 +11,38 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import static de.daschubbm.alkchievements.R.id.add_flasche;
 
 /**
  * Created by Jonathan on 28.09.2016.
  */
 
-public class Alkdapter extends ArrayAdapter<String[]> {
+class Alkdapter extends ArrayAdapter<String[]> {
+    private final MainAlktivity main;
 
-    private Context context;
-    private int layoutResourceId;
-    private ArrayList<String[]> alks = new ArrayList<>();
-    private Map<String, Integer> stock;
-    private MainAlktivity main;
+    private final Random random;
 
-    private Random random;
+    private final Map<String, Integer> images = new HashMap<>();
+    private final List<String[]> drinks;
 
-    private Map<String, Integer> images = new HashMap<>();
+    private View.OnClickListener onAddRequest;
+    private View.OnLongClickListener onRemoveRequest;
+    private View.OnClickListener onKastenTap;
 
-    public Alkdapter(MainAlktivity alk, int layoutResourceId, ArrayList<String[]> data, Map<String, Integer> stock) {
+    Alkdapter(MainAlktivity main, List<String[]> drinks) {
+        super(main, R.layout.alk_item, drinks);
 
-        super(alk, layoutResourceId, data);
+        this.main = main;
+        this.drinks = drinks;
 
-        main = alk;
-        this.layoutResourceId = layoutResourceId;
-        this.context = alk;
-        alks = data;
-        this.stock = stock;
         random = new Random();
 
         images.put("Bier", R.drawable.kasten_bier);
@@ -51,117 +53,168 @@ public class Alkdapter extends ArrayAdapter<String[]> {
         images.put("Spezi", R.drawable.kasten_spezi);
         images.put("Wasser", R.drawable.kasten_wasser);
         images.put("Schnaps", R.drawable.kasten_schnaps);
+
+        initializeListeners();
     }
 
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    private void initializeListeners() {
+        onAddRequest = new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View view) {
+                String[] drink = (String[]) view.getTag();
 
-        View v = convertView;
+                TextView gschwoabt = (TextView) ((ViewGroup) view.getParent()).findViewById(R.id.anzahl);
 
-        if (v == null) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = inflater.inflate(layoutResourceId, null);
-        }
+                int newGschwoabt = Integer.parseInt(drink[2]) + 1;
+                drink[2] = String.valueOf(newGschwoabt);
+                int newStock = Integer.parseInt(drink[3]) - 1;
+                drink[3] = String.valueOf(newStock);
 
-        final String[] alk = alks.get(position);
+                gschwoabt.setText("G'schwoabt: " + drink[2]);
 
-        if (alk != null) {
-            TextView preis = (TextView) v.findViewById(R.id.preis);
-            final TextView num_beer = (TextView) v.findViewById(R.id.anzahl);
-            ImageView kasten = (ImageView) v.findViewById(R.id.kasten);
-            TextView name = (TextView) v.findViewById(R.id.name);
-            name.setText(alk[2]);
+                FirebaseDatabase.getInstance().getReference("drinks/" + drink[0] + "/stock")
+                        .setValue(newStock);
 
-            if (images.containsKey(alk[2])) kasten.setImageResource(images.get(alk[2]));
-            else kasten.setImageResource(R.drawable.kasten_sonstige);
+                main.updateDrink(drink[0], newGschwoabt);
+                main.addFollowDay();
+                main.checkSum(Float.parseFloat(drink[1]));
 
-            final ImageView add_flasche = (ImageView) v.findViewById(R.id.add_flasche);
-
-            add_flasche.setTag(alk[2]);
-            preis.setText("Preis: " + alk[0] + " €");
-            num_beer.setText("G'schwoabt: " + alk[1]);
-
-            add_flasche.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int added = Integer.parseInt(alk[1]) + 1;
-                    alk[1] = String.valueOf(added);
-                    num_beer.setText("G'schwoabt: " + alk[1]);
-
-                    FirebaseDatabase.getInstance().getReference("drinks/" + alk[2] + "/stock")
-                            .setValue(stock.get(alk[2]) - 1);
-
-                    main.updateDrink((String) add_flasche.getTag(), added);
-                    main.addFollowDay();
-                    main.checkSum(Float.parseFloat(alk[0]));
-                    if (alk[2].equals("Bier")) {
+                switch (drink[0]) {
+                    case "Bier":
                         main.addEverBeer(true);
                         main.addSessionBeer(true);
-                    }
-                    if (alk[2].equals("Weizen")) {
+                        break;
+                    case "Weizen":
                         main.addSessionBeer(true);
-                    }
-                    if (alk[2].equals("Radler")) {
+                        break;
+                    case "Radler":
                         main.addSessionRadler(true);
                         main.addSessionNonAlk(true);
-                    }
-                    if (alk[2].equals("Wasser") || alk[2].equals("Almdudler") || alk[2].equals("Spezi")) {
+                        break;
+                    case "Wasser":
+                    case "Almdudler":
+                    case "Spezi":
+                    case "Apfelschorle":
                         main.addSessionNonAlk(true);
-                    }
-                    if (alk[2].equals("Schnaps")) {
+                        break;
+                    case "Schnaps":
                         main.addSessionShot(true);
-                    }
+                        break;
                 }
-            });
+            }
+        };
 
-            add_flasche.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if (Integer.parseInt(alk[1]) > 0) {
-                        int taken = Integer.parseInt(alk[1]) - 1;
-                        alk[1] = String.valueOf(taken);
-                        num_beer.setText("G'schwoabt: " + alk[1]);
+        onRemoveRequest = new View.OnLongClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public boolean onLongClick(View view) {
+                String[] drink = (String[]) view.getTag();
 
-                        FirebaseDatabase.getInstance().getReference("drinks/" + alk[2] + "/stock")
-                                .setValue(stock.get(alk[2]) + 1);
+                int gschwoabtCount = Integer.parseInt(drink[2]);
 
-                        main.updateDrink((String) add_flasche.getTag(), taken);
-                        main.addStorno();
-                        Toast.makeText(context, "Storniert \ud83d\ude12 Fettfinger!", Toast.LENGTH_SHORT).show();
-                        if (alk[2].equals("Bier")) {
+                if (gschwoabtCount > 0) {
+                    TextView gschwoabt = (TextView) ((ViewGroup) view.getParent()).findViewById(R.id.anzahl);
+
+                    gschwoabtCount = Integer.parseInt(drink[2]) - 1;
+                    drink[2] = String.valueOf(gschwoabtCount);
+
+                    gschwoabt.setText("G'schwoabt: " + drink[2]);
+
+                    int newStock = Integer.parseInt(drink[3]);
+                    newStock += 1;
+                    drink[3] = String.valueOf(newStock);
+                    FirebaseDatabase.getInstance().getReference("drinks/" + drink[0] + "/stock")
+                            .setValue(newStock);
+
+                    main.updateDrink(drink[0], gschwoabtCount);
+                    main.addStorno();
+
+                    Toast.makeText(main, "Storniert \ud83d\ude12 Fettfinger!", Toast.LENGTH_SHORT).show();
+
+                    switch (drink[0]) {
+                        case "Bier":
                             main.addEverBeer(false);
                             main.addSessionBeer(false);
-                        }
-                        if (alk[2].equals("Weizen")) {
+                            break;
+                        case "Weizen":
                             main.addSessionBeer(false);
-                        }
-                        if (alk[2].equals("Radler")) {
+                            break;
+                        case "Radler":
                             main.addSessionRadler(false);
                             main.addSessionNonAlk(false);
-                        }
-                        if (alk[2].equals("Wasser") || alk[2].equals("Almdudler") || alk[2].equals("Spezi")) {
+                            break;
+                        case "Wasser":
+                        case "Almdudler":
+                        case "Spezi":
+                        case "Apfelschorle":
                             main.addSessionNonAlk(false);
-                        }
-                        if (alk[2].equals("Schnaps")) {
+                            break;
+                        case "Schnaps":
                             main.addSessionShot(false);
-                        }
+                            break;
                     }
-                    return true;
                 }
-            });
 
-            kasten.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    main.addClickKasten();
-                    if (random.nextInt(30) == 1) {
-                        main.fassl();
-                    }
+                return true;
+            }
+        };
 
+        onKastenTap = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                main.addClickKasten();
+                if (random.nextInt(30) == 1) {
+                    main.showFassl();
                 }
-            });
+            }
+        };
+    }
+
+    @SuppressLint({"SetTextI18n", "InflateParams"})
+    @NonNull
+    @Override
+    public View getView(final int position, View v, @NonNull ViewGroup parent) {
+        if (v == null) {
+            LayoutInflater inflater = (LayoutInflater) main.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            v = inflater.inflate(R.layout.alk_item, null);
         }
 
+        TextView preis = (TextView) v.findViewById(R.id.preis);
+        TextView gschwoabt = (TextView) v.findViewById(R.id.anzahl);
+        TextView name = (TextView) v.findViewById(R.id.name);
+        ImageView kasten = (ImageView) v.findViewById(R.id.kasten);
+        ImageView addButton = (ImageView) v.findViewById(add_flasche);
+
+        String[] drink = drinks.get(position);
+
+        name.setText(drink[0]);
+        addButton.setTag(drink);
+        preis.setText("Preis: " + drink[1] + " €");
+        gschwoabt.setText("G'schwoabt: " + drink[2]);
+
+        if (images.containsKey(drink[0])) kasten.setImageResource(images.get(drink[0]));
+        else kasten.setImageResource(R.drawable.kasten_sonstige);
+
+        addButton.setOnClickListener(onAddRequest);
+        addButton.setOnLongClickListener(onRemoveRequest);
+        kasten.setOnClickListener(onKastenTap);
+
         return v;
+    }
+
+    void updateDrink(DataSnapshot changedNode) {
+        String drinkName = changedNode.getKey();
+        String stock = String.valueOf(changedNode.child("stock").getValue());
+
+        for (String[] drink : drinks) {
+            if (drink[0].equals(drinkName)) {
+                if (!drink[3].equals(stock)) {
+                    drink[3] = stock;
+                }
+
+                return;
+            }
+        }
     }
 }

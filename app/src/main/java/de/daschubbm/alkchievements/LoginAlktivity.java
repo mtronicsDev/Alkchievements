@@ -14,7 +14,6 @@ import de.daschubbm.alkchievements.firebase.FirebaseManager;
 public class LoginAlktivity extends AppCompatActivity {
 
     private EditText nameTextField;
-    private Button goButton;
 
     private Context context;
     private Database database;
@@ -29,7 +28,7 @@ public class LoginAlktivity extends AppCompatActivity {
         ConnectivityChecker.checkConnectivity(context);
 
         nameTextField = (EditText) findViewById(R.id.name_text_field);
-        goButton = (Button) findViewById(R.id.go_button);
+        Button goButton = (Button) findViewById(R.id.go_button);
 
         database = new Database(this);
         database.open();

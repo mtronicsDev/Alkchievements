@@ -21,20 +21,18 @@ import de.daschubbm.alkchievements.Database;
  * Created by Maxi on 17.10.2016.
  */
 public final class FirebaseManager {
+    private static final List<ValueChangedCallback> drinksChangedCallbacks;
+    private static final List<ValueChangedCallback> currentVersionChangedCallbacks;
+    private static final List<ValueChangedCallback> personChangedCallbacks;
+    private static final List<ValueChangedCallback> adminPasswordChangedCallbacks;
     private static Map<String, ValuePair[]> drinks = null;
     private static ValuePair[] currentVersion = null;
     private static Map<String, ValuePair[]> person = null;
     private static int adminPassword = -1;
-
     private static List<ValueReadCallback<Map<String, ValuePair[]>>> drinksCallbacks;
     private static List<ValueReadCallback<ValuePair[]>> currentVersionCallbacks;
     private static List<ValueReadCallback<Map<String, ValuePair[]>>> personCallbacks;
     private static List<ValueReadCallback<Integer>> adminPasswordCallbacks;
-
-    private static List<ValueChangedCallback> drinksChangedCallbacks;
-    private static List<ValueChangedCallback> currentVersionChangedCallbacks;
-    private static List<ValueChangedCallback> personChangedCallbacks;
-    private static List<ValueChangedCallback> adminPasswordChangedCallbacks;
 
     static {
         drinksCallbacks = new LinkedList<>();
@@ -259,7 +257,7 @@ public final class FirebaseManager {
     }
 
     public static void registerPersonCallback(ValueReadCallback<Map<String, ValuePair[]>> callback,
-                                              ValueChangedCallback changedCallback) {
+                                              @SuppressWarnings("SameParameterValue") ValueChangedCallback changedCallback) {
         if (person == null) personCallbacks.add(callback);
         else callback.onCallback(person);
 

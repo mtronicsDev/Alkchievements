@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,15 +25,15 @@ import java.util.ArrayList;
 /**
  * Created by Maxi on 30.09.2016.
  */
-public class SettingsAlkdapter extends ArrayAdapter<String[]> {
+class SettingsAlkdapter extends ArrayAdapter<String[]> {
 
-    private ListView parentList;
-    private Context context;
-    private int layoutResourceId;
+    private final ListView parentList;
+    private final Context context;
+    private final int layoutResourceId;
     private ArrayList<String[]> drinks = new ArrayList<>();
 
 
-    public SettingsAlkdapter(Context context, ArrayList<String[]> data, ListView parentList) {
+    SettingsAlkdapter(Context context, ArrayList<String[]> data, ListView parentList) {
 
         super(context, R.layout.settings_drink_item, data);
         this.parentList = parentList;
@@ -42,8 +43,9 @@ public class SettingsAlkdapter extends ArrayAdapter<String[]> {
         drinks = data;
     }
 
+    @NonNull
     @Override
-    public View getView(final int position, final View convertView, final ViewGroup parent) {
+    public View getView(final int position, final View convertView, @NonNull final ViewGroup parent) {
 
         View v = convertView;
 

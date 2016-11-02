@@ -1,6 +1,7 @@
 package de.daschubbm.alkchievements;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,19 +17,19 @@ import java.util.Map;
  * Created by Jonathan on 30.09.2016.
  */
 
-public class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
+class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
 
-    private Context context;
-    private int layoutResourceId;
+    private final Context context;
+    private final int layoutResourceId;
+    private final Map<String, Integer> imageMap;
     private ArrayList<String[]> alkchievements = new ArrayList<>();
-    private Map<String, Integer> imageMap;
 
 
-    public AlkchievementsAlkdapder(Context context, int layoutResourceId, ArrayList<String[]> data) {
+    AlkchievementsAlkdapder(Context context, ArrayList<String[]> data) {
 
-        super(context, layoutResourceId, data);
+        super(context, R.layout.alkchievement_item, data);
 
-        this.layoutResourceId = layoutResourceId;
+        this.layoutResourceId = R.layout.alkchievement_item;
         this.context = context;
         alkchievements = data;
 
@@ -47,8 +48,9 @@ public class AlkchievementsAlkdapder extends ArrayAdapter<String[]> {
         imageMap.put("Sprengmeister", R.drawable.sprengmeister);
     }
 
+    @NonNull
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
 
         View v = convertView;
 

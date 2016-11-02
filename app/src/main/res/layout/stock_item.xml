@@ -1,39 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
 
     <TextView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="3"
-        android:text="Getränkename"
         android:id="@+id/stock_drink"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:paddingLeft="10dp"
-        android:textColor="@android:color/black"/>
-
-    <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="3"
-        android:text="Getränkeanzahl"
-        android:id="@+id/stock_number"
+        android:paddingStart="10dp"
+        android:text="Getränkename"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:paddingLeft="10dp"
-        android:textColor="@android:color/black"/>
+        android:textColor="@android:color/black"
+        tools:ignore="HardcodedText,RtlSymmetry" />
+
+    <TextView
+        android:id="@+id/stock_number"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:paddingStart="10dp"
+        android:text="Getränkeanzahl"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black"
+        tools:ignore="HardcodedText,RtlSymmetry" />
 
     <EditText
+        android:id="@+id/stock_add"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="3"
+        android:background="@color/colorPrimary"
         android:hint="Anzahl"
         android:inputType="number"
-        android:id="@+id/stock_add"
-        android:background="@color/colorPrimary"
-        android:textColor="@android:color/black"
-        android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:paddingLeft="10dp"/>
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:textColor="@android:color/black"
+        tools:ignore="HardcodedText,RtlSymmetry" />
 
 </LinearLayout>

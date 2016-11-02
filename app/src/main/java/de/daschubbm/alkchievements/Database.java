@@ -24,12 +24,12 @@ public class Database {
     private static final String KEY_NAME = "name";
     private static final String KEY_STATE = "state";
 
-    private ToDoDBOpenHelper dbHelper;
+    private final ToDoDBOpenHelper dbHelper;
     private SQLiteDatabase db;
 
     public Database(Context context) {
-        dbHelper = new ToDoDBOpenHelper(context, DATABASE_NAME, null,
-                DATABASE_VERSION);
+        dbHelper = new ToDoDBOpenHelper(context
+        );
     }
 
     public void open() throws SQLException {
@@ -46,20 +46,21 @@ public class Database {
         return results.moveToFirst();
     }
 
+    @SuppressWarnings("unused")
     public boolean getStatusSecond() {
         Cursor results = getCursorForAllItemsFromDatabase();
         results.moveToFirst();
         return results.moveToNext();
     }
 
-    public long insertItemIntoDataBase(String name, String state) {
+    void insertItemIntoDataBase(String name, String state) {
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, name);
         values.put(KEY_STATE, state);
-        return db.insert(DATABASE_TABLE, null, values);
+        db.insert(DATABASE_TABLE, null, values);
     }
 
-    public void removeAllItemsFromDatabase() {
+    private void removeAllItemsFromDatabase() {
         db.delete(DATABASE_TABLE, null, null);
     }
 
@@ -82,8 +83,8 @@ public class Database {
         return item;
     }
 
-    public ArrayList<String[]> getItems() {
-        ArrayList<String[]> items = new ArrayList<String[]>();
+    private ArrayList<String[]> getItems() {
+        ArrayList<String[]> items = new ArrayList<>();
         String[] item;
         Cursor results = getCursorForAllItemsFromDatabase();
 
@@ -100,7 +101,7 @@ public class Database {
         return items;
     }
 
-    public void updateValue(int id, int value) {
+    void updateValue(int id, int value) {
         ArrayList<String[]> tempo = getItems();
         removeAllItemsFromDatabase();
         for (int i = 0; i < tempo.size(); i++) {
@@ -119,9 +120,8 @@ public class Database {
                 + " integer primary key autoincrement, " + KEY_NAME
                 + " text not null, " + KEY_STATE + " text);";
 
-        public ToDoDBOpenHelper(Context c, String dbname,
-                                SQLiteDatabase.CursorFactory factory, int version) {
-            super(c, dbname, factory, version);
+        ToDoDBOpenHelper(Context c) {
+            super(c, Database.DATABASE_NAME, null, Database.DATABASE_VERSION);
         }
 
         @Override

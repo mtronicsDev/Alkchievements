@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Created by Jonathan on 02.10.2016.
  */
 
-public class LastPrizesDatabase {
+class LastPrizesDatabase {
     private static final String DATABASE_NAME = "prize.db";
     private static final int DATABASE_VERSION = 1;
 
@@ -20,12 +20,12 @@ public class LastPrizesDatabase {
     private static final String KEY_ID = "_id";
     private static final String KEY_PRIZE = "name";
 
-    private LastPrizesDatabase.ToDoDBOpenHelper dbHelper;
+    private final LastPrizesDatabase.ToDoDBOpenHelper dbHelper;
     private SQLiteDatabase db;
 
-    public LastPrizesDatabase(Context context) {
-        dbHelper = new ToDoDBOpenHelper(context, DATABASE_NAME, null,
-                DATABASE_VERSION);
+    LastPrizesDatabase(Context context) {
+        dbHelper = new ToDoDBOpenHelper(context
+        );
     }
 
     public void open() throws SQLException {
@@ -36,24 +36,25 @@ public class LastPrizesDatabase {
         }
     }
 
+    @SuppressWarnings("unused")
     public boolean getStatus() {
         Cursor results = getCursorForAllItemsFromDatabase();
         return results.moveToFirst();
     }
 
-    public boolean getStatusFull() {
+    boolean getStatusFull() {
         Cursor results = getCursorForAllItemsFromDatabase();
         results.moveToFirst();
         return results.moveToPosition(9);
     }
 
-    public long insertItemIntoDataBase(float prize) {
+    private void insertItemIntoDataBase(float prize) {
         ContentValues values = new ContentValues();
         values.put(KEY_PRIZE, String.valueOf(prize));
-        return db.insert(DATABASE_TABLE, null, values);
+        db.insert(DATABASE_TABLE, null, values);
     }
 
-    public void newPrize(float prize) {
+    void newPrize(float prize) {
         if (!getStatusFull()) {
             insertItemIntoDataBase(prize);
         }
@@ -68,16 +69,16 @@ public class LastPrizesDatabase {
         }
     }
 
-    public float getSum() {
+    float getSum() {
         float[] save = getItems();
         float sum = 0;
-        for (int i = 0; i < save.length; i++) {
-            sum = sum + save[i];
+        for (float aSave : save) {
+            sum = sum + aSave;
         }
         return sum;
     }
 
-    public void removeAllItemsFromDatabase() {
+    private void removeAllItemsFromDatabase() {
         db.delete(DATABASE_TABLE, null, null);
     }
 
@@ -85,7 +86,7 @@ public class LastPrizesDatabase {
         return db.query(DATABASE_TABLE, new String[]{KEY_ID, KEY_PRIZE}, null, null, null, null, null);
     }
 
-    public float[] getItems() {
+    private float[] getItems() {
         Cursor results = getCursorForAllItemsFromDatabase();
 
         int iName = results.getColumnIndex(KEY_PRIZE);
@@ -112,9 +113,8 @@ public class LastPrizesDatabase {
                 + " integer primary key autoincrement, " + KEY_PRIZE
                 + " text not null);";
 
-        public ToDoDBOpenHelper(Context c, String dbname,
-                                SQLiteDatabase.CursorFactory factory, int version) {
-            super(c, dbname, factory, version);
+        ToDoDBOpenHelper(Context c) {
+            super(c, LastPrizesDatabase.DATABASE_NAME, null, LastPrizesDatabase.DATABASE_VERSION);
         }
 
         @Override

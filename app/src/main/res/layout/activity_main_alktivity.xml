@@ -5,34 +5,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="de.daschubbm.alkchievements.MainAlktivity"
-    android:background="@android:color/white">
+    tools:context="de.daschubbm.alkchievements.MainAlktivity">
 
     <ImageView
+        android:id="@+id/explosion"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:src="@drawable/ex1"
-        android:id="@+id/explosion" />
+        android:src="@drawable/ex1" />
 
     <ImageView
+        android:id="@+id/fassl"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@drawable/oelfass"
-        android:id="@+id/fassl" />
+        android:src="@drawable/oelfass" />
 
     <ProgressBar
+        android:id="@+id/loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:id="@+id/loading"
+        android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:indeterminate="true" />
 
     <ListView
+        android:id="@+id/alkList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/alkList"
-        android:background="@android:color/white">
-    </ListView>
+        android:background="@android:color/white" />
 
 </RelativeLayout>

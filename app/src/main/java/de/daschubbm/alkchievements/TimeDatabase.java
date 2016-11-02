@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * Created by Jonathan on 02.10.2016.
  */
 
-public class TimeDatabase {
+class TimeDatabase {
     private static final String DATABASE_NAME = "time.db";
     private static final int DATABASE_VERSION = 1;
 
@@ -23,12 +23,12 @@ public class TimeDatabase {
     private static final String KEY_NAME = "name";
     private static final String KEY_DATE = "date";
 
-    private TimeDatabase.ToDoDBOpenHelper dbHelper;
+    private final TimeDatabase.ToDoDBOpenHelper dbHelper;
     private SQLiteDatabase db;
 
-    public TimeDatabase(Context context) {
-        dbHelper = new ToDoDBOpenHelper(context, DATABASE_NAME, null,
-                DATABASE_VERSION);
+    TimeDatabase(Context context) {
+        dbHelper = new ToDoDBOpenHelper(context
+        );
     }
 
     public void open() throws SQLException {
@@ -39,19 +39,19 @@ public class TimeDatabase {
         }
     }
 
-    public boolean getStatus() {
+    boolean getStatus() {
         Cursor results = getCursorForAllItemsFromDatabase();
         return results.moveToFirst();
     }
 
-    public long insertItemIntoDataBase(String name, String state) {
+    void insertItemIntoDataBase(String name, String state) {
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, name);
         values.put(KEY_DATE, state);
-        return db.insert(DATABASE_TABLE, null, values);
+        db.insert(DATABASE_TABLE, null, values);
     }
 
-    public void removeAllItemsFromDatabase() {
+    private void removeAllItemsFromDatabase() {
         db.delete(DATABASE_TABLE, null, null);
     }
 
@@ -59,7 +59,7 @@ public class TimeDatabase {
         return db.query(DATABASE_TABLE, new String[]{KEY_ID, KEY_NAME, KEY_DATE}, null, null, null, null, null);
     }
 
-    public String[] getItem(int pos) {
+    String[] getItem(int pos) {
         String[] item = new String[2];
         Cursor results = getCursorForAllItemsFromDatabase();
 
@@ -74,8 +74,8 @@ public class TimeDatabase {
         return item;
     }
 
-    public ArrayList<String[]> getItems() {
-        ArrayList<String[]> items = new ArrayList<String[]>();
+    private ArrayList<String[]> getItems() {
+        ArrayList<String[]> items = new ArrayList<>();
         String[] item;
         Cursor results = getCursorForAllItemsFromDatabase();
 
@@ -92,7 +92,7 @@ public class TimeDatabase {
         return items;
     }
 
-    public void updateValue(int id, String value) {
+    void updateValue(int id, String value) {
         ArrayList<String[]> tempo = getItems();
         removeAllItemsFromDatabase();
         for (int i = 0; i < tempo.size(); i++) {
@@ -111,9 +111,8 @@ public class TimeDatabase {
                 + " integer primary key autoincrement, " + KEY_NAME
                 + " text not null, " + KEY_DATE + " text);";
 
-        public ToDoDBOpenHelper(Context c, String dbname,
-                                SQLiteDatabase.CursorFactory factory, int version) {
-            super(c, dbname, factory, version);
+        ToDoDBOpenHelper(Context c) {
+            super(c, TimeDatabase.DATABASE_NAME, null, TimeDatabase.DATABASE_VERSION);
         }
 
         @Override
