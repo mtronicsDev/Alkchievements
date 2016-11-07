@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static de.daschubbm.alkchievements.R.id.add_flasche;
 
@@ -37,6 +39,10 @@ class Alkdapter extends ArrayAdapter<String[]> {
     private View.OnLongClickListener onRemoveRequest;
     private View.OnClickListener onKastenTap;
 
+    private ExecutorService uiInteractionThreadPool;
+    private Runnable kastenClick;
+    private StatefulRunnable addClick, removeClick;
+
     Alkdapter(MainAlktivity main, List<String[]> drinks) {
         super(main, R.layout.alk_item, drinks);
 
@@ -54,25 +60,35 @@ class Alkdapter extends ArrayAdapter<String[]> {
         images.put("Wasser", R.drawable.kasten_wasser);
         images.put("Schnaps", R.drawable.kasten_schnaps);
 
+        uiInteractionThreadPool = Executors.newSingleThreadExecutor();
+
+        initializeRunnables();
         initializeListeners();
     }
 
-    private void initializeListeners() {
-        onAddRequest = new View.OnClickListener() {
-            @SuppressLint("SetTextI18n")
+    private void initializeRunnables() {
+        kastenClick = new Runnable() {
             @Override
-            public void onClick(View view) {
-                String[] drink = (String[]) view.getTag();
+            public void run() {
+                main.addClickKasten();
+            }
+        };
 
-                TextView gschwoabt = (TextView) ((ViewGroup) view.getParent()).findViewById(R.id.anzahl);
+        addClick = new StatefulRunnable() {
+            private String[] drink;
+            private int newStock;
+            private int newGschwoabt;
 
-                int newGschwoabt = Integer.parseInt(drink[2]) + 1;
-                drink[2] = String.valueOf(newGschwoabt);
-                int newStock = Integer.parseInt(drink[3]) - 1;
-                drink[3] = String.valueOf(newStock);
+            @Override
+            public void setup(String[] drink, int newStock, int newGschwoabt) {
 
-                gschwoabt.setText("G'schwoabt: " + drink[2]);
+                this.drink = drink;
+                this.newStock = newStock;
+                this.newGschwoabt = newGschwoabt;
+            }
 
+            @Override
+            public void run() {
                 FirebaseDatabase.getInstance().getReference("drinks/" + drink[0] + "/stock")
                         .setValue(newStock);
 
@@ -105,57 +121,67 @@ class Alkdapter extends ArrayAdapter<String[]> {
             }
         };
 
+        removeClick = new StatefulRunnable() {
+            private String[] drink;
+            private int newStock;
+            private int newGschwoabt;
+
+            @Override
+            public void setup(String[] drink, int newStock, int newGschwoabt) {
+
+                this.drink = drink;
+                this.newStock = newStock;
+                this.newGschwoabt = newGschwoabt;
+            }
+
+            @Override
+            public void run() {
+                FirebaseDatabase.getInstance().getReference("drinks/" + drink[0] + "/stock")
+                        .setValue(newStock);
+
+                main.updateDrink(drink[0], newGschwoabt);
+                main.addStorno();
+
+                switch (drink[0]) {
+                    case "Bier":
+                        main.addEverBeer(false);
+                        main.addSessionBeer(false);
+                        break;
+                    case "Weizen":
+                        main.addSessionBeer(false);
+                        break;
+                    case "Radler":
+                        main.addSessionRadler(false);
+                        main.addSessionNonAlk(false);
+                        break;
+                    case "Wasser":
+                    case "Almdudler":
+                    case "Spezi":
+                    case "Apfelschorle":
+                        main.addSessionNonAlk(false);
+                        break;
+                    case "Schnaps":
+                        main.addSessionShot(false);
+                        break;
+                }
+            }
+        };
+    }
+
+    private void initializeListeners() {
+        onAddRequest = new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View view) {
+                addDrinkAsync(view);
+            }
+        };
+
         onRemoveRequest = new View.OnLongClickListener() {
             @SuppressLint("SetTextI18n")
             @Override
             public boolean onLongClick(View view) {
-                String[] drink = (String[]) view.getTag();
-
-                int gschwoabtCount = Integer.parseInt(drink[2]);
-
-                if (gschwoabtCount > 0) {
-                    TextView gschwoabt = (TextView) ((ViewGroup) view.getParent()).findViewById(R.id.anzahl);
-
-                    gschwoabtCount = Integer.parseInt(drink[2]) - 1;
-                    drink[2] = String.valueOf(gschwoabtCount);
-
-                    gschwoabt.setText("G'schwoabt: " + drink[2]);
-
-                    int newStock = Integer.parseInt(drink[3]);
-                    newStock += 1;
-                    drink[3] = String.valueOf(newStock);
-                    FirebaseDatabase.getInstance().getReference("drinks/" + drink[0] + "/stock")
-                            .setValue(newStock);
-
-                    main.updateDrink(drink[0], gschwoabtCount);
-                    main.addStorno();
-
-                    Toast.makeText(main, "Storniert \ud83d\ude12 Fettfinger!", Toast.LENGTH_SHORT).show();
-
-                    switch (drink[0]) {
-                        case "Bier":
-                            main.addEverBeer(false);
-                            main.addSessionBeer(false);
-                            break;
-                        case "Weizen":
-                            main.addSessionBeer(false);
-                            break;
-                        case "Radler":
-                            main.addSessionRadler(false);
-                            main.addSessionNonAlk(false);
-                            break;
-                        case "Wasser":
-                        case "Almdudler":
-                        case "Spezi":
-                        case "Apfelschorle":
-                            main.addSessionNonAlk(false);
-                            break;
-                        case "Schnaps":
-                            main.addSessionShot(false);
-                            break;
-                    }
-                }
-
+                removeDrinkAsync(view);
                 return true;
             }
         };
@@ -163,12 +189,53 @@ class Alkdapter extends ArrayAdapter<String[]> {
         onKastenTap = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                main.addClickKasten();
+                uiInteractionThreadPool.execute(kastenClick);
+
                 if (random.nextInt(30) == 1) {
                     main.showFassl();
                 }
             }
         };
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void addDrinkAsync(final View view) {
+        final String[] drink = (String[]) view.getTag();
+        final TextView gschwoabt = (TextView) ((ViewGroup) view.getParent()).findViewById(R.id.anzahl);
+
+        final int newGschwoabt = Integer.parseInt(drink[2]) + 1;
+        drink[2] = String.valueOf(newGschwoabt);
+        final int newStock = Integer.parseInt(drink[3]) - 1;
+        drink[3] = String.valueOf(newStock);
+
+        gschwoabt.setText("G'schwoabt: " + drink[2]);
+
+        addClick.setup(drink, newStock, newGschwoabt);
+        uiInteractionThreadPool.execute(addClick);
+
+        System.out.println("SYNC: " + Thread.currentThread().getName());
+    }
+
+    private void removeDrinkAsync(View view) {
+        final String[] drink = (String[]) view.getTag();
+        int gschwoabtCount = Integer.parseInt(drink[2]);
+
+        if (gschwoabtCount > 0) {
+            TextView gschwoabt = (TextView) ((ViewGroup) view.getParent()).findViewById(R.id.anzahl);
+
+            gschwoabtCount = Integer.parseInt(drink[2]) - 1;
+            drink[2] = String.valueOf(gschwoabtCount);
+
+            gschwoabt.setText("G'schwoabt: " + drink[2]);
+
+            int newStock = Integer.parseInt(drink[3]) + 1;
+            drink[3] = String.valueOf(newStock);
+
+            Toast.makeText(main, "Storniert \ud83d\ude12 Fettfinger!", Toast.LENGTH_SHORT).show();
+
+            removeClick.setup(drink, newStock, gschwoabtCount);
+            uiInteractionThreadPool.execute(removeClick);
+        }
     }
 
     @SuppressLint({"SetTextI18n", "InflateParams"})
@@ -216,5 +283,9 @@ class Alkdapter extends ArrayAdapter<String[]> {
                 return;
             }
         }
+    }
+
+    private interface StatefulRunnable extends Runnable {
+        void setup(String[] drink, int newStock, int newGschwoabt);
     }
 }

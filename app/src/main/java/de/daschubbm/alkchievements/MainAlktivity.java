@@ -43,7 +43,7 @@ import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class MainAlktivity extends AppCompatActivity {
 
-    private static final int[] BUILD_NUMBER = {1, 3, 0, 3};
+    private static final int[] BUILD_NUMBER = {1, 3, 0, 4};
     private final Map<String, Integer> stock = new HashMap<>();
     private int kastenClicks = 0;
     private Context context;
@@ -359,113 +359,143 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     public void checkSum(float prize) {
-        prizesDatabase.newPrize(prize);
-        if (prizesDatabase.getStatusFull()) {
-            float sum = prizesDatabase.getSum();
-            if (sum < 7 && alkchievementsDatabase.getState("sparfuchs") == 0) {
-                alkchievementsDatabase.setState("sparfuchs", 1);
-                Roast.showToast(this, R.drawable.sparfuchs, "Alkchievement erhalten!", "Sparfuchs");
+        synchronized (prizesDatabase) {
+
+            prizesDatabase.newPrize(prize);
+            if (prizesDatabase.getStatusFull()) {
+                float sum = prizesDatabase.getSum();
+
+                prizesDatabase.notify();
+                synchronized (alkchievementsDatabase) {
+                    if (sum < 7 && alkchievementsDatabase.getState("sparfuchs") == 0) {
+                        alkchievementsDatabase.setState("sparfuchs", 1);
+                        Roast.showToast(this, R.drawable.sparfuchs, "Alkchievement erhalten!", "Sparfuchs");
+                    }
+
+                    alkchievementsDatabase.notify();
+                }
             }
         }
     }
 
     public void addSessionBeer(boolean add) {
-        if (!(alkchievementsDatabase.getState("bierkenner") == 3)) {
-            @SuppressLint("SimpleDateFormat")
-            DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
-            String date = df.format(Calendar.getInstance().getTime());
+        synchronized (alkchievementsDatabase) {
+            if (!(alkchievementsDatabase.getState("bierkenner") == 3)) {
+                @SuppressLint("SimpleDateFormat")
+                DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+                String date = df.format(Calendar.getInstance().getTime());
 
-            if (timeDatabase.getItem(0)[1].equals("0")) {
-                timeDatabase.updateValue(0, date);
-                alkchievementsDatabase.addToState("bierkenner", 1);
-                return;
-            }
-
-            boolean isSession = timeDatabase.getItem(0)[1].split("/")[2].equals(date.split("/")[2]) && Integer.parseInt(date.split("/")[3]) - Integer.parseInt(timeDatabase.getItem(0)[1].split("/")[3]) < 2;
-            if (!isSession) {
-                boolean newDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(0)[1].split("/")[2]) == 1 || date.split("/")[2].equals("01");
-                if (newDay) {
-                    if (Integer.parseInt(date.split("/")[3]) < 2) {
-                        isSession = true;
+                synchronized (timeDatabase) {
+                    if (timeDatabase.getItem(0)[1].equals("0")) {
+                        timeDatabase.updateValue(0, date);
+                        alkchievementsDatabase.addToState("bierkenner", 1);
+                        return;
                     }
+
+                    boolean isSession = timeDatabase.getItem(0)[1].split("/")[2].equals(date.split("/")[2]) && Integer.parseInt(date.split("/")[3]) - Integer.parseInt(timeDatabase.getItem(0)[1].split("/")[3]) < 2;
+                    if (!isSession) {
+                        boolean newDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(0)[1].split("/")[2]) == 1 || date.split("/")[2].equals("01");
+                        if (newDay) {
+                            if (Integer.parseInt(date.split("/")[3]) < 2) {
+                                isSession = true;
+                            }
+                        }
+                    }
+
+                    if (isSession && add) {
+                        timeDatabase.updateValue(0, date);
+
+                        int state = alkchievementsDatabase.getState("bierkenner");
+
+                        if (state == 0) {
+                            alkchievementsDatabase.setState("bierkenner", 1);
+                            Roast.showToast(this, R.drawable.bierkenner, "Alkchievement Stufe 1/3 erhalten!",
+                                    alkchievementsDatabase.getName("bierkenner"));
+                        } else if (state == 1) {
+                            alkchievementsDatabase.setState("bierkenner", 2);
+                            Roast.showToast(this, R.drawable.bierkenner, "Alkchievement Stufe 2/3 erhalten!",
+                                    alkchievementsDatabase.getName("bierkenner"));
+                        } else if (state == 2) {
+                            alkchievementsDatabase.setState("bierkenner", 3);
+                            Roast.showToast(this, R.drawable.bierkenner, "Alkchievement Stufe 3/3 erhalten!",
+                                    alkchievementsDatabase.getName("bierkenner"));
+                        }
+                    }
+
+                    if (isSession && !add) {
+                        alkchievementsDatabase.addToState("bierkenner", -1);
+                    }
+
+                    if (!isSession && add) {
+                        timeDatabase.updateValue(0, date);
+                        alkchievementsDatabase.setState("bierkenner", 1);
+                    }
+
+                    if (!isSession && !add) {
+                        alkchievementsDatabase.setState("bierkenner", 0);
+                    }
+
+                    timeDatabase.notify();
                 }
             }
 
-            if (isSession && add) {
-                timeDatabase.updateValue(0, date);
-
-                int state = alkchievementsDatabase.getState("bierkenner");
-
-                if (state == 0) {
-                    alkchievementsDatabase.setState("bierkenner", 1);
-                    Roast.showToast(this, R.drawable.bierkenner, "Alkchievement Stufe 1/3 erhalten!",
-                            alkchievementsDatabase.getName("bierkenner"));
-                } else if (state == 1) {
-                    alkchievementsDatabase.setState("bierkenner", 2);
-                    Roast.showToast(this, R.drawable.bierkenner, "Alkchievement Stufe 2/3 erhalten!",
-                            alkchievementsDatabase.getName("bierkenner"));
-                } else if (state == 2) {
-                    alkchievementsDatabase.setState("bierkenner", 3);
-                    Roast.showToast(this, R.drawable.bierkenner, "Alkchievement Stufe 3/3 erhalten!",
-                            alkchievementsDatabase.getName("bierkenner"));
-                }
-            }
-
-            if (isSession && !add) {
-                alkchievementsDatabase.addToState("bierkenner", -1);
-            }
-
-            if (!isSession && add) {
-                timeDatabase.updateValue(0, date);
-                alkchievementsDatabase.setState("bierkenner", 1);
-            }
-
-            if (!isSession && !add) {
-                alkchievementsDatabase.setState("bierkenner", 0);
-            }
+            alkchievementsDatabase.notify();
         }
     }
 
     public void addFollowDay() {
-        if (!(alkchievementsDatabase.getState("stammgast") == 3)) {
-            @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
-            String date = df.format(Calendar.getInstance().getTime());
+        synchronized (alkchievementsDatabase) {
+            if (!(alkchievementsDatabase.getState("stammgast") == 3)) {
+                @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+                String date = df.format(Calendar.getInstance().getTime());
 
-            if (timeDatabase.getItem(4)[1].equals("0")) {
-                timeDatabase.updateValue(4, date);
-                database.updateValue(2, 1);
-                return;
-            }
+                synchronized (timeDatabase) {
+                    synchronized (database) {
+                        if (timeDatabase.getItem(4)[1].equals("0")) {
+                            timeDatabase.updateValue(4, date);
+                            database.updateValue(2, 1);
+                            return;
+                        }
 
-            boolean nextDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(4)[1].split("/")[2]) == 1;
-            if (!nextDay) {
-                String last = timeDatabase.getItem(4)[1].split("/")[2];
-                boolean newMonth = date.split("/")[2].equals("01") && (last.equals("28") || last.equals("29") || last.equals("30") || last.equals("31"));
-                if (newMonth) {
-                    nextDay = true;
+                        boolean nextDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(4)[1].split("/")[2]) == 1;
+                        if (!nextDay) {
+                            String last = timeDatabase.getItem(4)[1].split("/")[2];
+                            boolean newMonth = date.split("/")[2].equals("01") && (last.equals("28") || last.equals("29") || last.equals("30") || last.equals("31"));
+                            if (newMonth) {
+                                nextDay = true;
+                            }
+                        }
+
+                        if (nextDay) {
+                            timeDatabase.updateValue(4, date);
+
+                            int dayStreak = Integer.parseInt(database.getItem(2)[1]) + 1;
+                            database.updateValue(2, dayStreak);
+
+                            int state = alkchievementsDatabase.getState("stammgast");
+                            if (dayStreak >= 3 && state == 0) {
+                                alkchievementsDatabase.setState("stammgast", 1);
+                                Roast.showToast(this, R.drawable.stammgast, "Alkchievement Stufe 1/3 erhalten!",
+                                        alkchievementsDatabase.getName("stammgast"));
+                            } else if (dayStreak >= 5 && state == 1) {
+                                alkchievementsDatabase.setState("stammgast", 2);
+                                Roast.showToast(this, R.drawable.stammgast, "Alkchievement Stufe 2/3 erhalten!",
+                                        alkchievementsDatabase.getName("stammgast"));
+                            } else if (dayStreak >= 7 && state == 2) {
+                                alkchievementsDatabase.setState("stammgast", 3);
+                                Roast.showToast(this, R.drawable.stammgast, "Alkchievement Stufe 3/3 erhalten!",
+                                        alkchievementsDatabase.getName("stammgast"));
+                            }
+                        }
+
+                        database.notify();
+                    }
+
+                    timeDatabase.notify();
                 }
             }
 
-            if (nextDay) {
-                timeDatabase.updateValue(4, date);
-                int dayStreak = Integer.parseInt(database.getItem(2)[1]) + 1;
-                database.updateValue(2, dayStreak);
-
-                int state = alkchievementsDatabase.getState("stammgast");
-                if (dayStreak >= 3 && state == 0) {
-                    alkchievementsDatabase.setState("stammgast", 1);
-                    Roast.showToast(this, R.drawable.stammgast, "Alkchievement Stufe 1/3 erhalten!",
-                            alkchievementsDatabase.getName("stammgast"));
-                } else if (dayStreak >= 5 && state == 1) {
-                    alkchievementsDatabase.setState("stammgast", 2);
-                    Roast.showToast(this, R.drawable.stammgast, "Alkchievement Stufe 2/3 erhalten!",
-                            alkchievementsDatabase.getName("stammgast"));
-                } else if (dayStreak >= 7 && state == 2) {
-                    alkchievementsDatabase.setState("stammgast", 3);
-                    Roast.showToast(this, R.drawable.stammgast, "Alkchievement Stufe 3/3 erhalten!",
-                            alkchievementsDatabase.getName("stammgast"));
-                }
-            }
+            alkchievementsDatabase.notify();
         }
     }
 
@@ -478,187 +508,249 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     public void addSessionRadler(boolean add) {
-        if (!(alkchievementsDatabase.getState("kegelsportverein") == 1)) {
-            @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
-            String date = df.format(Calendar.getInstance().getTime());
+        synchronized (alkchievementsDatabase) {
+            if (!(alkchievementsDatabase.getState("kegelsportverein") == 1)) {
+                @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+                String date = df.format(Calendar.getInstance().getTime());
 
-            int radlerStreak = Integer.parseInt(database.getItem(3)[1]) + 1;
+                synchronized (database) {
+                    int radlerStreak = Integer.parseInt(database.getItem(3)[1]) + 1;
 
-            if (timeDatabase.getItem(1)[1].equals("0")) {
-                timeDatabase.updateValue(1, date);
-                database.updateValue(3, radlerStreak);
-                return;
-            }
+                    synchronized (timeDatabase) {
+                        if (timeDatabase.getItem(1)[1].equals("0")) {
+                            timeDatabase.updateValue(1, date);
+                            database.updateValue(3, radlerStreak);
+                            return;
+                        }
 
-            boolean isSession = timeDatabase.getItem(1)[1].split("/")[2].equals(date.split("/")[2]) && Integer.parseInt(date.split("/")[3]) - Integer.parseInt(timeDatabase.getItem(1)[1].split("/")[3]) < 2;
-            if (!isSession) {
-                boolean newDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(1)[1].split("/")[2]) == 1 || date.split("/")[2].equals("01");
-                if (newDay) {
-                    if (Integer.parseInt(date.split("/")[3]) < 2) {
-                        isSession = true;
+                        boolean isSession = timeDatabase.getItem(1)[1].split("/")[2].equals(date.split("/")[2]) && Integer.parseInt(date.split("/")[3]) - Integer.parseInt(timeDatabase.getItem(1)[1].split("/")[3]) < 2;
+                        if (!isSession) {
+                            boolean newDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(1)[1].split("/")[2]) == 1 || date.split("/")[2].equals("01");
+                            if (newDay) {
+                                if (Integer.parseInt(date.split("/")[3]) < 2) {
+                                    isSession = true;
+                                }
+                            }
+                        }
+
+                        if (isSession && add) {
+                            timeDatabase.updateValue(1, date);
+                            database.updateValue(3, radlerStreak);
+
+                            if (radlerStreak == 5 && alkchievementsDatabase.getState("kegelsportverein") == 0) {
+                                alkchievementsDatabase.setState("kegelsportverein", 1);
+                                Roast.showToast(this, R.drawable.kegelsportverein, "Alkchievement erhalten!",
+                                        alkchievementsDatabase.getName("kegelsportverein"));
+                            }
+                        }
+
+                        if (isSession && !add) {
+                            database.updateValue(3, radlerStreak - 2); //-2, da schon 1 hinzugefügt wurde
+                        }
+
+                        if (!isSession && add) {
+                            timeDatabase.updateValue(1, date);
+                            database.updateValue(3, 1);
+                        }
+
+                        if (!isSession && !add) {
+                            database.updateValue(3, 0);
+                        }
+
+                        timeDatabase.notify();
                     }
+
+                    database.notify();
                 }
             }
 
-            if (isSession && add) {
-                timeDatabase.updateValue(1, date);
-                database.updateValue(3, radlerStreak);
-
-                if (radlerStreak == 5 && alkchievementsDatabase.getState("kegelsportverein") == 0) {
-                    alkchievementsDatabase.setState("kegelsportverein", 1);
-                    Roast.showToast(this, R.drawable.kegelsportverein, "Alkchievement erhalten!",
-                            alkchievementsDatabase.getName("kegelsportverein"));
-                }
-            }
-
-            if (isSession && !add) {
-                database.updateValue(3, radlerStreak - 2); //-2, da schon 1 hinzugefügt wurde
-            }
-
-            if (!isSession && add) {
-                timeDatabase.updateValue(1, date);
-                database.updateValue(3, 1);
-            }
-
-            if (!isSession && !add) {
-                database.updateValue(3, 0);
-            }
+            alkchievementsDatabase.notify();
         }
     }
 
     public void addSessionNonAlk(boolean add) {
-        if (!(alkchievementsDatabase.getState("nullKommaNull") == 1)) {
-            @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
-            String date = df.format(Calendar.getInstance().getTime());
+        synchronized (alkchievementsDatabase) {
+            if (!(alkchievementsDatabase.getState("nullKommaNull") == 1)) {
+                @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+                String date = df.format(Calendar.getInstance().getTime());
 
-            int noAlkStreak = Integer.parseInt(database.getItem(4)[1]) + 1;
+                synchronized (database) {
+                    int noAlkStreak = Integer.parseInt(database.getItem(4)[1]) + 1;
 
-            if (timeDatabase.getItem(2)[1].equals("0")) {
-                timeDatabase.updateValue(2, date);
-                database.updateValue(4, noAlkStreak);
-                return;
-            }
+                    synchronized (timeDatabase) {
+                        if (timeDatabase.getItem(2)[1].equals("0")) {
+                            timeDatabase.updateValue(2, date);
+                            database.updateValue(4, noAlkStreak);
+                            return;
+                        }
 
-            boolean isSession = timeDatabase.getItem(2)[1].split("/")[2].equals(date.split("/")[2]) && Integer.parseInt(date.split("/")[3]) - Integer.parseInt(timeDatabase.getItem(2)[1].split("/")[3]) < 2;
-            if (!isSession) {
-                boolean newDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(2)[1].split("/")[2]) == 1 || date.split("/")[2].equals("01");
-                if (newDay) {
-                    if (Integer.parseInt(date.split("/")[3]) < 2) {
-                        isSession = true;
+                        boolean isSession = timeDatabase.getItem(2)[1].split("/")[2].equals(date.split("/")[2]) && Integer.parseInt(date.split("/")[3]) - Integer.parseInt(timeDatabase.getItem(2)[1].split("/")[3]) < 2;
+                        if (!isSession) {
+                            boolean newDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(2)[1].split("/")[2]) == 1 || date.split("/")[2].equals("01");
+                            if (newDay) {
+                                if (Integer.parseInt(date.split("/")[3]) < 2) {
+                                    isSession = true;
+                                }
+                            }
+                        }
+
+                        if (isSession && add) {
+                            timeDatabase.updateValue(2, date);
+                            database.updateValue(4, noAlkStreak);
+
+                            if (noAlkStreak == 5 && alkchievementsDatabase.getState("nullKommaNull") == 0) {
+                                alkchievementsDatabase.setState("nullKommaNull", 1);
+                                Roast.showToast(this, R.drawable.null_komma_null, "Alkchievement erhalten!",
+                                        alkchievementsDatabase.getName("nullKommaNull"));
+                            }
+                        }
+
+                        if (isSession && !add) {
+                            database.updateValue(4, noAlkStreak - 2);
+                        }
+
+                        if (!isSession && add) {
+                            timeDatabase.updateValue(2, date);
+                            database.updateValue(4, 1);
+                        }
+
+                        if (!isSession && !add) {
+                            database.updateValue(4, 0);
+                        }
+
+                        timeDatabase.notify();
                     }
+
+                    database.notify();
                 }
             }
 
-            if (isSession && add) {
-                timeDatabase.updateValue(2, date);
-                database.updateValue(4, noAlkStreak);
-
-                if (noAlkStreak == 5 && alkchievementsDatabase.getState("nullKommaNull") == 0) {
-                    alkchievementsDatabase.setState("nullKommaNull", 1);
-                    Roast.showToast(this, R.drawable.null_komma_null, "Alkchievement erhalten!",
-                            alkchievementsDatabase.getName("nullKommaNull"));
-                }
-            }
-
-            if (isSession && !add) {
-                database.updateValue(4, noAlkStreak - 2);
-            }
-
-            if (!isSession && add) {
-                timeDatabase.updateValue(2, date);
-                database.updateValue(4, 1);
-            }
-
-            if (!isSession && !add) {
-                database.updateValue(4, 0);
-            }
+            alkchievementsDatabase.notify();
         }
     }
 
     public void addSessionShot(boolean add) {
-        if (!(alkchievementsDatabase.getState("blauWieDasMeer") == 1)) {
-            @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
-            String date = df.format(Calendar.getInstance().getTime());
+        synchronized (alkchievementsDatabase) {
+            if (!(alkchievementsDatabase.getState("blauWieDasMeer") == 1)) {
+                @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("yyyy/MM/dd/HH/mm");
+                String date = df.format(Calendar.getInstance().getTime());
 
-            int killStreak = Integer.parseInt(database.getItem(5)[1]) + 1;
+                synchronized (database) {
+                    int killStreak = Integer.parseInt(database.getItem(5)[1]) + 1;
 
-            if (timeDatabase.getItem(3)[1].equals("0")) {
-                timeDatabase.updateValue(3, date);
-                database.updateValue(5, killStreak);
-                return;
-            }
+                    synchronized (timeDatabase) {
+                        if (timeDatabase.getItem(3)[1].equals("0")) {
+                            timeDatabase.updateValue(3, date);
+                            database.updateValue(5, killStreak);
+                            return;
+                        }
 
-            boolean isSession = timeDatabase.getItem(3)[1].split("/")[2].equals(date.split("/")[2]) && Integer.parseInt(date.split("/")[3]) - Integer.parseInt(timeDatabase.getItem(3)[1].split("/")[3]) < 2;
-            if (!isSession) {
-                boolean newDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(3)[1].split("/")[2]) == 1 || date.split("/")[2].equals("01");
-                if (newDay) {
-                    if (Integer.parseInt(date.split("/")[3]) < 2) {
-                        isSession = true;
+                        boolean isSession = timeDatabase.getItem(3)[1].split("/")[2].equals(date.split("/")[2]) && Integer.parseInt(date.split("/")[3]) - Integer.parseInt(timeDatabase.getItem(3)[1].split("/")[3]) < 2;
+                        if (!isSession) {
+                            boolean newDay = Integer.parseInt(date.split("/")[2]) - Integer.parseInt(timeDatabase.getItem(3)[1].split("/")[2]) == 1 || date.split("/")[2].equals("01");
+                            if (newDay) {
+                                if (Integer.parseInt(date.split("/")[3]) < 2) {
+                                    isSession = true;
+                                }
+                            }
+                        }
+
+                        if (isSession && add) {
+                            timeDatabase.updateValue(3, date);
+                            database.updateValue(5, killStreak);
+
+                            if (killStreak >= 5 && alkchievementsDatabase.getState("blauWieDasMeer") == 0) {
+                                alkchievementsDatabase.setState("blauWieDasMeer", 1);
+                                Roast.showToast(this, R.drawable.blau_wie_das_meer, "Alkchievement erhalten!",
+                                        alkchievementsDatabase.getName("blauWieDasMeer"));
+                            }
+                        }
+
+                        if (isSession && !add) {
+                            database.updateValue(5, killStreak - 2);
+                        }
+
+                        if (!isSession && add) {
+                            timeDatabase.updateValue(3, date);
+                            database.updateValue(5, 1);
+                        }
+
+                        if (!isSession && !add) {
+                            database.updateValue(5, 0);
+                        }
+
+                        timeDatabase.notify();
                     }
+
+                    database.notify();
                 }
             }
 
-            if (isSession && add) {
-                timeDatabase.updateValue(3, date);
-                database.updateValue(5, killStreak);
-
-                if (killStreak >= 5 && alkchievementsDatabase.getState("blauWieDasMeer") == 0) {
-                    alkchievementsDatabase.setState("blauWieDasMeer", 1);
-                    Roast.showToast(this, R.drawable.blau_wie_das_meer, "Alkchievement erhalten!",
-                            alkchievementsDatabase.getName("blauWieDasMeer"));
-                }
-            }
-
-            if (isSession && !add) {
-                database.updateValue(5, killStreak - 2);
-            }
-
-            if (!isSession && add) {
-                timeDatabase.updateValue(3, date);
-                database.updateValue(5, 1);
-            }
-
-            if (!isSession && !add) {
-                database.updateValue(5, 0);
-            }
+            alkchievementsDatabase.notify();
         }
     }
 
     public void addEverBeer(boolean add) {
-        int beerStreak = Integer.parseInt(database.getItem(6)[1]) + 1;
+        synchronized (alkchievementsDatabase) {
+            synchronized (database) {
+                int beerStreak = Integer.parseInt(database.getItem(6)[1]) + 1;
 
-        if (add) {
-            database.updateValue(6, beerStreak);
-            if (beerStreak >= 20 && alkchievementsDatabase.getState("kastenLeer") == 0) {
-                alkchievementsDatabase.setState("kastenLeer", 1);
-                Roast.showToast(this, R.drawable.kasten_leer, "Alkchievement erhalten!",
-                        alkchievementsDatabase.getName("kastenLeer"));
+                if (add) {
+                    database.updateValue(6, beerStreak);
+                    if (beerStreak >= 20 && alkchievementsDatabase.getState("kastenLeer") == 0) {
+                        alkchievementsDatabase.setState("kastenLeer", 1);
+                        Roast.showToast(this, R.drawable.kasten_leer, "Alkchievement erhalten!",
+                                alkchievementsDatabase.getName("kastenLeer"));
+                    }
+                }
+                if (!add) {
+                    database.updateValue(6, beerStreak - 2);
+                }
+
+                database.notify();
             }
-        }
-        if (!add) {
-            database.updateValue(6, beerStreak - 2);
+
+            alkchievementsDatabase.notify();
         }
     }
 
     public void addStorno() {
-        int stornoCount = Integer.parseInt(database.getItem(7)[1]) + 1;
-        database.updateValue(7, stornoCount);
-        if (stornoCount >= 5 && alkchievementsDatabase.getState("wurstfinger") == 0) {
-            alkchievementsDatabase.setState("wurstfinger", 1);
-            Roast.showToast(this, R.drawable.wurstfinger, "Alkchievement erhalten!",
-                    alkchievementsDatabase.getName("wurstfinger"));
+        synchronized (alkchievementsDatabase) {
+
+            synchronized (database) {
+                int stornoCount = Integer.parseInt(database.getItem(7)[1]) + 1;
+                database.updateValue(7, stornoCount);
+                if (stornoCount >= 5 && alkchievementsDatabase.getState("wurstfinger") == 0) {
+                    alkchievementsDatabase.setState("wurstfinger", 1);
+                    Roast.showToast(this, R.drawable.wurstfinger, "Alkchievement erhalten!",
+                            alkchievementsDatabase.getName("wurstfinger"));
+                }
+
+                database.notify();
+            }
+
+            alkchievementsDatabase.notify();
         }
     }
 
     public void addClickKasten() {
-        if (kastenClicks < 100 && alkchievementsDatabase.getState("hobbylos") == 0) {
-            kastenClicks += 1;
-            database.updateValue(8, kastenClicks);
-            if (kastenClicks >= 100 && alkchievementsDatabase.getState("hobbylos") == 0) {
-                alkchievementsDatabase.setState("hobbylos", 1);
-                Roast.showToast(this, R.drawable.hobbylos, "Alkchievement erhalten!",
-                        alkchievementsDatabase.getName("hobbylos"));
+        synchronized (alkchievementsDatabase) {
+            if (kastenClicks < 100 && alkchievementsDatabase.getState("hobbylos") == 0) {
+                kastenClicks += 1;
+
+                synchronized (database) {
+                    database.updateValue(8, kastenClicks);
+                    if (kastenClicks >= 100 && alkchievementsDatabase.getState("hobbylos") == 0) {
+                        alkchievementsDatabase.setState("hobbylos", 1);
+                        Roast.showToast(this, R.drawable.hobbylos, "Alkchievement erhalten!",
+                                alkchievementsDatabase.getName("hobbylos"));
+                    }
+
+                    database.notify();
+                }
             }
+
+            alkchievementsDatabase.notify();
         }
     }
 
@@ -723,15 +815,6 @@ public class MainAlktivity extends AppCompatActivity {
         fassl.setY(random.nextInt(layoutHeight - fasslHeight));
         fassl.setVisibility(View.VISIBLE);
         fassl.bringToFront();
-
-        fassl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mp.start();
-                explodeFassl((int) fassl.getX(), (int) fassl.getY());
-                fassl.setVisibility(View.GONE);
-            }
-        });
     }
 
     private void explodeFassl(int posX, int posY) {
@@ -786,5 +869,14 @@ public class MainAlktivity extends AppCompatActivity {
         explosion = (ImageView) findViewById(R.id.explosion);
         fassl.setVisibility(View.INVISIBLE);
         explosion.setVisibility(View.INVISIBLE);
+
+        fassl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mp.start();
+                explodeFassl((int) fassl.getX(), (int) fassl.getY());
+                fassl.setVisibility(View.GONE);
+            }
+        });
     }
 }
