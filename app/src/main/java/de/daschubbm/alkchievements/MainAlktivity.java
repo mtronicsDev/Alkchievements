@@ -70,6 +70,9 @@ public class MainAlktivity extends AppCompatActivity {
 
         context = this;
 
+        Intent hansl = new Intent(this, NotificationService.class);
+        startService(hansl);
+
         ConnectivityChecker.checkConnectivity(context);
 
         drinks = new HashMap<>();
@@ -801,6 +804,11 @@ public class MainAlktivity extends AppCompatActivity {
                 startActivity(hansl);
             }
         });
+    }
+
+    public void launchMessageEditor(@SuppressWarnings("UnusedParameters") MenuItem item) {
+        Intent hansl = new Intent(context, MessageEditorAlktivity.class);
+        startActivity(hansl);
     }
 
     public void showFassl() {

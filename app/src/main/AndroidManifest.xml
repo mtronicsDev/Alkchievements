@@ -36,10 +36,19 @@
         <activity
             android:name=".SettingsAlktivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".StockAlktivity" />
+        <activity
+            android:name=".StockAlktivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".NoConnectionAlktivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".MessageEditorAlktivity"
+            android:screenOrientation="portrait" />
+
+        <service
+            android:name=".NotificationService"
+            android:enabled="true" />
     </application>
 
 </manifest>
