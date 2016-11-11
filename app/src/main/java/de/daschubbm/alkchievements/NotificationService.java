@@ -30,7 +30,6 @@ public class NotificationService extends Service {
 
     private DataSnapshot currentDataSnapshot;
     private File currentFile;
-    private Exception dummy = new Exception();
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -124,7 +123,6 @@ public class NotificationService extends Service {
                 builder.setContentTitle(title)
                         .setContentText(message)
                         .setSmallIcon(R.drawable.message)
-                        .setLargeIcon(image)
                         .setStyle(new Notification.BigPictureStyle().bigPicture(image))
                         .setVibrate(new long[0])
                         .setPriority(Notification.PRIORITY_MAX);

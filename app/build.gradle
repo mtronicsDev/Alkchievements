@@ -2,9 +2,16 @@ apply plugin: 'com.android.application'
 
 //noinspection GroovyMissingReturnStatement
 android {
+    signingConfigs {
+        config {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('C:/Users/Maxi/.android/debug.keystore')
+            storePassword 'android'
+        }
+    }
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
-
     defaultConfig {
         applicationId "de.daschubbm.alkchievements"
         minSdkVersion 19
@@ -16,6 +23,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.config
         }
     }
 }
