@@ -27,7 +27,7 @@ import static de.daschubbm.alkchievements.R.id.add_flasche;
  * Created by Jonathan on 28.09.2016.
  */
 
-class Alkdapter extends ArrayAdapter<String[]> {
+class MainAlkdapter extends ArrayAdapter<String[]> {
     private final MainAlktivity main;
 
     private final Random random;
@@ -43,7 +43,7 @@ class Alkdapter extends ArrayAdapter<String[]> {
     private Runnable kastenClick;
     private StatefulRunnable addClick, removeClick;
 
-    Alkdapter(MainAlktivity main, List<String[]> drinks) {
+    MainAlkdapter(MainAlktivity main, List<String[]> drinks) {
         super(main, R.layout.alk_item, drinks);
 
         this.main = main;

@@ -5,18 +5,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseUser;
 
 import de.daschubbm.alkchievements.firebase.FirebaseManager;
+import de.daschubbm.alkchievements.firebase.ValueReadCallback;
+import de.daschubbm.alkchievements.util.ConnectivityChecker;
+import de.daschubbm.alkchievements.util.DataManager;
 
 public class LoginAlktivity extends AppCompatActivity {
 
-    private EditText nameTextField;
-
     private Context context;
-    private Database database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,32 +26,16 @@ public class LoginAlktivity extends AppCompatActivity {
         context = this;
 
         ConnectivityChecker.checkConnectivity(context);
+    }
 
-        nameTextField = (EditText) findViewById(R.id.name_text_field);
-        Button goButton = (Button) findViewById(R.id.go_button);
+    public void login(View view) {
+        EditText nameText = (EditText) findViewById(R.id.name);
 
-        database = new Database(this);
-        database.open();
+        final String name = nameText.getText().toString();
+        DataManager.write("name", name);
 
-        goButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String name = nameTextField.getText().toString();
-
-                if (!"".equals(name) && name.matches("[A-ZÄÖÜ][a-zäöüß]+")) {
-                    database.insertItemIntoDataBase("name", name);
-
-                    Toast.makeText(context, "Habedere " + database.getItem(0)[1] + ", du bist ja aa do!", Toast.LENGTH_SHORT).show();
-
-                    FirebaseManager.supplyPersonName(name);
-
-                    Intent hansl = new Intent(context, MainAlktivity.class);
-                    startActivity(hansl);
-                } else {
-                    Toast.makeText(context,
-                            "Gib g'fälligst dein Namen ein du Schelm!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        Intent hansl = new Intent(context, MainAlktivity.class);
+        hansl.putExtra("LOGIN", true);
+        startActivity(hansl);
     }
 }

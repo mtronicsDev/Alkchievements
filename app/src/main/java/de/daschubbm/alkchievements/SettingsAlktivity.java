@@ -22,6 +22,7 @@ import java.util.Map;
 import de.daschubbm.alkchievements.firebase.FirebaseManager;
 import de.daschubbm.alkchievements.firebase.ValuePair;
 import de.daschubbm.alkchievements.firebase.ValueReadCallback;
+import de.daschubbm.alkchievements.util.ConnectivityChecker;
 
 import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 

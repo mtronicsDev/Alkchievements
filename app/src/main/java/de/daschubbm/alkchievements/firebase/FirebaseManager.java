@@ -1,7 +1,16 @@
 package de.daschubbm.alkchievements.firebase;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
+import android.widget.EditText;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.auth.api.model.StringList;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,7 +53,12 @@ public final class FirebaseManager {
         currentVersionChangedCallbacks = new LinkedList<>();
         personChangedCallbacks = new LinkedList<>();
         adminPasswordChangedCallbacks = new LinkedList<>();
+    }
 
+    private FirebaseManager() {
+    }
+
+    private static void databaseHandshake() {
         DatabaseReference drinksRef = getDrinks(new ValueReadCallback<Map<String, ValuePair[]>>() {
             @Override
             public void onCallback(Map<String, ValuePair[]> data) {
@@ -164,9 +178,6 @@ public final class FirebaseManager {
         });
     }
 
-    private FirebaseManager() {
-    }
-
     private static void addDrink(DataSnapshot snapshot) {
         if (drinks == null) return;
 
@@ -277,7 +288,9 @@ public final class FirebaseManager {
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                callback.onCallback(Integer.valueOf(String.valueOf(dataSnapshot.getValue())));
+                String pw = String.valueOf(dataSnapshot.getValue());
+                if (pw == null || pw.equals("null")) pw = "0000";
+                callback.onCallback(Integer.valueOf(pw));
             }
 
             @Override

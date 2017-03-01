@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.daschubbm.alkchievements.util.ConnectivityChecker;
+
 public class AchievementsAlktivity extends AppCompatActivity {
 
     private final ArrayList<String[]> alkchievements = new ArrayList<>();

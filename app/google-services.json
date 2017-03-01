@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "181335462362",
-    "firebase_url": "https://alkchievements.firebaseio.com",
-    "project_id": "alkchievements",
-    "storage_bucket": "alkchievements.appspot.com"
+    "project_number": "807203489559",
+    "firebase_url": "https://alkchievements-36847.firebaseio.com",
+    "project_id": "alkchievements-36847",
+    "storage_bucket": "alkchievements-36847.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:181335462362:android:7b7b1596853564b0",
+        "mobilesdk_app_id": "1:807203489559:android:7b7b1596853564b0",
         "android_client_info": {
           "package_name": "de.daschubbm.alkchievements"
         }
       },
       "oauth_client": [
         {
-          "client_id": "181335462362-58kv9t9ur8rpfl65hpvfofqkliqb8i3n.apps.googleusercontent.com",
+          "client_id": "807203489559-lo77intmjgj7cp64s0kbgj9khj48a87s.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC2uo8VockHlJzRl-UUtUc97MaYcjKolsY"
+          "current_key": "AIzaSyBkf6Bne5uFoNMjiRP86RG0cGRbjZFSwr8"
         }
       ],
       "services": {

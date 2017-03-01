@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import de.daschubbm.alkchievements.util.ConnectivityChecker;
+
 public class NoConnectionAlktivity extends AppCompatActivity {
 
     private Class<Activity> origin;

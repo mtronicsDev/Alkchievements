@@ -17,12 +17,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -38,6 +38,8 @@ import de.daschubbm.alkchievements.firebase.FirebaseManager;
 import de.daschubbm.alkchievements.firebase.ValueChangedCallback;
 import de.daschubbm.alkchievements.firebase.ValuePair;
 import de.daschubbm.alkchievements.firebase.ValueReadCallback;
+import de.daschubbm.alkchievements.util.ConnectivityChecker;
+import de.daschubbm.alkchievements.util.DataManager;
 
 import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
@@ -47,7 +49,6 @@ public class MainAlktivity extends AppCompatActivity {
     private final Map<String, Integer> stock = new HashMap<>();
     private int kastenClicks = 0;
     private Context context;
-    private String name;
     private Database database;
     private AlkchievementsDatabase alkchievementsDatabase;
     private TimeDatabase timeDatabase;
@@ -59,14 +60,16 @@ public class MainAlktivity extends AppCompatActivity {
     private ImageView fassl;
     private ImageView explosion;
 
-    private Alkdapter adapter;
+    private MainAlkdapter adapter;
 
     private boolean drinksLoaded = false, numsLoaded = false;
+    private String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_alktivity);
+        getSupportActionBar().setTitle("");
 
         context = this;
 
@@ -78,50 +81,53 @@ public class MainAlktivity extends AppCompatActivity {
         drinks = new HashMap<>();
         numDrinks = new HashMap<>();
 
+        setupUserData();
+
         checkForUpdates();
 
-        if (!setupDatabase()) {
-            setupAlkchivements();
+        setupDatabase();
+        setupAlkchivements();
+        setupTimeDatabase();
+        setupPrizesDatabase();
+        setupFirebase();
 
-            setupTimeDatabase();
-            prizesDatabase = new LastPrizesDatabase(this);
-            prizesDatabase.open();
+        setupLayout();
 
-            setupFirebase();
-            performUpdateCleanup();
-
-            setupFassl();
-            kastenClicks = Integer.parseInt(database.getItem(8)[1]);
-        }
+        setupFassl();
+        setupKastenKlicks();
     }
 
-    private void performUpdateCleanup() {
-        FirebaseDatabase.getInstance().getReference("people/" + name)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        boolean cleanedUp = false;
+    private void setupLayout() {
+        ListView listView = (ListView) findViewById(R.id.alkList);
 
-                        for (DataSnapshot child : dataSnapshot.getChildren()) {
-                            String key = child.getKey();
-                            if (!key.equals("drinks") && !key.equals("achievements") && !key.equals("appVersion")) {
-                                //Needs cleanup
-                                FirebaseManager.writeValue("people/" + name + "/drinks/" + key, child.getValue());
-                                child.getRef().removeValue();
+        //listView.addHeaderView();
+    }
 
-                                numDrinks.put(key, Integer.valueOf(String.valueOf(child.getValue())));
-                                cleanedUp = true;
-                            }
-                        }
+    private void setupUserData() {
+        name = DataManager.defaultStorage.getString("name", "FOISCH!");
 
-                        if (cleanedUp) setupViews();
-                    }
+        if (getIntent().getBooleanExtra("LOGIN", false))
+            Toast.makeText(context, "Habedere "
+                    + name + ", (" + name + ") du bist ja aa do!", Toast.LENGTH_LONG).show();
+    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+    private void setupDatabase() {
+        database = new Database(this);
+        database.open();
+    }
 
-                    }
-                });
+    private void setupPrizesDatabase() {
+        prizesDatabase = new LastPrizesDatabase(this);
+        prizesDatabase.open();
+    }
+
+    private void setupKastenKlicks() {
+        String kastenStr = database.getItem(8)[1];
+        if (kastenStr == null || !kastenStr.matches("[0-9]+")) {
+            kastenStr = "0";
+            database.insertItemIntoDataBase("hobbylos", "0");
+        }
+        kastenClicks = Integer.parseInt(kastenStr);
     }
 
     private void checkForUpdates() {
@@ -215,6 +221,7 @@ public class MainAlktivity extends AppCompatActivity {
     private void setupAlkchivements() {
         alkchievementsDatabase = new AlkchievementsDatabase(name);
 
+        database.insertItemIntoDataBase("name_now_unused", "-1"); //1
         database.insertItemIntoDataBase("dummy", "-1"); //1
         database.insertItemIntoDataBase("stammgast", "0"); //2
         database.insertItemIntoDataBase("kegelsportverein", "0"); //3
@@ -234,23 +241,6 @@ public class MainAlktivity extends AppCompatActivity {
             timeDatabase.insertItemIntoDataBase("num_nonalk_session", "0");
             timeDatabase.insertItemIntoDataBase("num_shots_session", "0");
             timeDatabase.insertItemIntoDataBase("last_buy", "0");
-        }
-    }
-
-    private boolean setupDatabase() {
-        database = new Database(context);
-        database.open();
-
-        if (!database.getStatus()) {
-            Intent hansl = new Intent(context, LoginAlktivity.class);
-            startActivity(hansl);
-            finish();
-            return true;
-        } else {
-            name = database.getItem(0)[1];
-            //noinspection ConstantConditions
-            getSupportActionBar().setTitle(name);
-            return false;
         }
     }
 
@@ -350,6 +340,8 @@ public class MainAlktivity extends AppCompatActivity {
 
                     }
                 });
+
+        FirebaseManager.supplyPersonName(name);
 
         FirebaseManager.writeValue("people/" + name + "/appVersion", assembleBuildNumber());
     }
@@ -779,7 +771,7 @@ public class MainAlktivity extends AppCompatActivity {
         }
 
         ListView list = (ListView) findViewById(R.id.alkList);
-        adapter = new Alkdapter(this, drinksData);
+        adapter = new MainAlkdapter(this, drinksData);
         list.setAdapter(adapter);
 
         findViewById(R.id.loading).setVisibility(View.GONE);
@@ -787,7 +779,6 @@ public class MainAlktivity extends AppCompatActivity {
 
     public void launchBilling(@SuppressWarnings("UnusedParameters") MenuItem item) {
         Intent hansl = new Intent(context, BillAlktivity.class);
-        hansl.putExtra("NAME", name);
         startActivity(hansl);
     }
 

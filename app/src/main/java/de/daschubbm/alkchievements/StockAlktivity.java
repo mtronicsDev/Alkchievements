@@ -26,6 +26,7 @@ import de.daschubbm.alkchievements.firebase.FirebaseManager;
 import de.daschubbm.alkchievements.firebase.ValueChangedCallback;
 import de.daschubbm.alkchievements.firebase.ValuePair;
 import de.daschubbm.alkchievements.firebase.ValueReadCallback;
+import de.daschubbm.alkchievements.util.ConnectivityChecker;
 
 public class StockAlktivity extends AppCompatActivity {
 

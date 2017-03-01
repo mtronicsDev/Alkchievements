@@ -33,6 +33,8 @@ import java.util.Map;
 import de.daschubbm.alkchievements.firebase.FirebaseManager;
 import de.daschubbm.alkchievements.firebase.ValuePair;
 import de.daschubbm.alkchievements.firebase.ValueReadCallback;
+import de.daschubbm.alkchievements.util.ConnectivityChecker;
+import de.daschubbm.alkchievements.util.DataManager;
 
 import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
@@ -45,7 +47,7 @@ public class BillAlktivity extends AppCompatActivity {
     private AlkchievementsDatabase alkchievementsDatabase;
 
     private Context context;
-    private String name = "Hansl";
+    private String name;
     private boolean adminBilling;
 
     @Override
@@ -62,7 +64,7 @@ public class BillAlktivity extends AppCompatActivity {
         ConnectivityChecker.checkConnectivity(context);
 
         alkchievementsDatabase = AlkchievementsDatabase.getInstance();
-        name = getIntent().getStringExtra("NAME");
+        name = DataManager.defaultStorage.getString("name", null);
 
         adminBilling = getIntent().getBooleanExtra("ADMIN", false);
 
@@ -88,7 +90,7 @@ public class BillAlktivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot person : dataSnapshot.getChildren()) {
-                            String name = person.getKey();
+                            String otherName = person.getKey();
                             float moneyToPay = 0;
 
                             for (DataSnapshot drink : person.child("drinks").getChildren()) {
@@ -97,7 +99,7 @@ public class BillAlktivity extends AppCompatActivity {
                             }
 
                             if (moneyToPay > 0)
-                                debtors.add(new String[]{name, formatPrice(moneyToPay)});
+                                debtors.add(new String[]{otherName, formatPrice(moneyToPay)});
                         }
 
                         Log.d("ALKI", "Done with people");

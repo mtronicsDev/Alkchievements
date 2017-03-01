@@ -16,7 +16,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity
-            android:name=".MainAlktivity"
+            android:name=".LoadingAlktivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,6 +24,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MainAlktivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".LoginAlktivity"
             android:screenOrientation="portrait" />
@@ -49,6 +52,8 @@
         <service
             android:name=".NotificationService"
             android:enabled="true" />
+
+        <activity android:name=".RegisterAlktivity"></activity>
     </application>
 
 </manifest>

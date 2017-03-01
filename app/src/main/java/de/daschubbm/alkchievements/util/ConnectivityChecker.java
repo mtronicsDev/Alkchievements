@@ -1,19 +1,21 @@
-package de.daschubbm.alkchievements;
+package de.daschubbm.alkchievements.util;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import de.daschubbm.alkchievements.NoConnectionAlktivity;
+
 /**
  * Created by Maxi on 28.10.2016.
  */
 
-final class ConnectivityChecker {
+public final class ConnectivityChecker {
     private ConnectivityChecker() {
     }
 
-    static boolean isConnected(Context context) {
+    public static boolean isConnected(Context context) {
         ConnectivityManager manager
                 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -22,7 +24,7 @@ final class ConnectivityChecker {
         return info != null && info.isConnectedOrConnecting();
     }
 
-    static void checkConnectivity(Context context) {
+    public static void checkConnectivity(Context context) {
         if (!isConnected(context)) {
             Intent hansl = new Intent(context, NoConnectionAlktivity.class);
             hansl.putExtra("SOURCE_CONTEXT", context.getClass().getName());

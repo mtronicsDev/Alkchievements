@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">Alkchievements</string>
+
     <string name="rechnung_anzeigen">Rechnung anzeigen</string>
     <string name="rechnung_title">Rechnung</string>
     <string name="trophaeen_anzeigen">Trophäen anzeigen</string>
     <string name="einstellungen_oeffnen">Einstellungen öffnen</string>
     <string name="neue_nachricht">Neue Nachricht</string>
+
+    <string name="shared_preferences_name">de.daschubbm.alkchievementes.Default</string>
 </resources>

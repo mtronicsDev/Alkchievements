@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,25 +10,34 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="de.daschubbm.alkchievements.LoginAlktivity">
 
-    <EditText
-        android:id="@+id/name_text_field"
+    <android.support.v7.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:ems="10"
-        android:hint="Hier könnte dein Name stehen!"
-        android:inputType="textPersonName"
-        tools:ignore="HardcodedText" />
+        android:layout_centerHorizontal="true"
+        android:id="@+id/card_view"
+        app:cardBackgroundColor="?attr/colorPrimary">
 
-    <Button
-        android:id="@+id/go_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/name_text_field"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/name_text_field"
-        android:text="Auf z&apos;n Sauffa!"
-        tools:ignore="HardcodedText" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:id="@+id/name"
+                android:hint="Wie hoaßt du?"
+                android:inputType="textPersonName" />
+
+            <Button
+                android:text="Omöid'n"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="login"
+                android:id="@+id/login_button" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
 </RelativeLayout>
