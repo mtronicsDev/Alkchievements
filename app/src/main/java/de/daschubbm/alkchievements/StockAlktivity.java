@@ -6,12 +6,14 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
@@ -27,17 +29,19 @@ import de.daschubbm.alkchievements.firebase.ValueChangedCallback;
 import de.daschubbm.alkchievements.firebase.ValuePair;
 import de.daschubbm.alkchievements.firebase.ValueReadCallback;
 import de.daschubbm.alkchievements.util.ConnectivityChecker;
+import de.daschubbm.alkchievements.util.StockPloetAlkdapter;
 
 public class StockAlktivity extends AppCompatActivity {
 
-    private static int UNIMPORTANT_VARIABLE = -1;
+    private static int UNIMPORTANT_VARIABLE = 1111;
 
-    private ListView stock_list;
+    private RecyclerView stock_list;
     private Button button_stock;
     private TextView visibility_header;
 
-    private ArrayList<String[]> stock;
-    private StockAlkdapter adapter;
+    private ArrayList<String[]> stock = new ArrayList<>();
+    //private StockAlkdapter adapter;
+    private StockPloetAlkdapter adapter;
     private Context context;
 
     private ImageView dontMindMe;
@@ -53,7 +57,7 @@ public class StockAlktivity extends AppCompatActivity {
 
         ConnectivityChecker.checkConnectivity(context);
 
-        stock_list = (ListView) findViewById(R.id.stock_list);
+        stock_list = (RecyclerView) findViewById(R.id.rec_view);
         button_stock = (Button) findViewById(R.id.button_add_stock);
         visibility_header = (TextView) findViewById(R.id.stock_add_header);
         visibility_header.setVisibility(View.INVISIBLE);
@@ -64,6 +68,12 @@ public class StockAlktivity extends AppCompatActivity {
 
         retrieveAdminPassword();
         retrieveStock();
+        /*String[] uno = {"Horst", "2"};
+        String[] due = {"Bier", "1"};
+        stock.add(uno);
+        stock.add(due);*/
+
+        updateListView(false);
 
         button_stock.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("SetTextI18n")
@@ -78,11 +88,22 @@ public class StockAlktivity extends AppCompatActivity {
                     updateStock();
                     button_stock.setText("Bestand aufstocken");
                     visibility_header.setVisibility(View.INVISIBLE);
-                    adapter = new StockAlkdapter(false, context, stock);
-                    stock_list.setAdapter(adapter);
+                    //adapter = new StockAlkdapter(false, context, stock);
+                    //adapter = new StockPloetAlkdapter(stock, context, false);
+                    //stock_list.setAdapter(adapter);
+                    updateListView(false);
                 }
             }
         });
+    }
+
+    private void updateListView(boolean ad) {
+        adapter = new StockPloetAlkdapter(stock, context, ad);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        stock_list.setLayoutManager(mLayoutManager);
+        stock_list.setItemAnimator(new DefaultItemAnimator());
+        stock_list.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
     private void retrieveStock() {
@@ -102,8 +123,9 @@ public class StockAlktivity extends AppCompatActivity {
                     stock.add(new String[]{drink.getKey(), drinkStock});
                 }
 
-                adapter = new StockAlkdapter(false, context, stock);
-                stock_list.setAdapter(adapter);
+                //adapter = new StockAlkdapter(false, context, stock);
+                //stock_list.setAdapter(adapter);
+                updateListView(false);
 
                 findViewById(R.id.loading).setVisibility(View.GONE);
                 findViewById(R.id.table_header).setVisibility(View.VISIBLE);
@@ -122,8 +144,9 @@ public class StockAlktivity extends AppCompatActivity {
                             }
                         }
 
-                        adapter = new StockAlkdapter(false, context, stock);
-                        stock_list.setAdapter(adapter);
+                        //adapter = new StockAlkdapter(false, context, stock);
+                        //stock_list.setAdapter(adapter);
+                        updateListView(false);
                         break;
                     case CHANGED:
                         for (String[] drink : stock) {
@@ -135,8 +158,9 @@ public class StockAlktivity extends AppCompatActivity {
                             }
                         }
 
-                        adapter = new StockAlkdapter(false, context, stock);
-                        stock_list.setAdapter(adapter);
+                        //adapter = new StockAlkdapter(false, context, stock);
+                        //stock_list.setAdapter(adapter);
+                        updateListView(false);
                         break;
                     case REMOVED:
                         for (String[] drink : stock) {
@@ -146,8 +170,9 @@ public class StockAlktivity extends AppCompatActivity {
                             }
                         }
 
-                        adapter = new StockAlkdapter(false, context, stock);
-                        stock_list.setAdapter(adapter);
+                        //adapter = new StockAlkdapter(false, context, stock);
+                        //stock_list.setAdapter(adapter);
+                        updateListView(false);
                         break;
                 }
             }
@@ -193,8 +218,9 @@ public class StockAlktivity extends AppCompatActivity {
     private void doAdmin() {
         button_stock.setText("Hinzufügen");
         visibility_header.setVisibility(View.VISIBLE);
-        adapter = new StockAlkdapter(true, context, stock);
-        stock_list.setAdapter(adapter);
+        //adapter = new StockAlkdapter(true, context, stock);
+        //stock_list.setAdapter(adapter);
+        updateListView(true);
     }
 
     private void addStock(String tag, int num) {
@@ -210,12 +236,18 @@ public class StockAlktivity extends AppCompatActivity {
             }
         }
 
-        FirebaseDatabase.getInstance().getReference("drinks/" + tag + "/stock").setValue(newNum);
+        if (tag != null) {
+            FirebaseDatabase.getInstance().getReference("drinks/" + tag + "/stock").setValue(newNum);
+        }
         stock = stockNow;
     }
 
     private void updateStock() {
-        for (int i = 0; i < stock_list.getCount(); i++) {
+        int count = 0;
+        if (adapter != null) {
+            count = adapter.getItemCount();
+        }
+        for (int i = 0; i < count; i++) {
             View view = stock_list.getChildAt(i);
             if (view != null) {
                 EditText editText = (EditText) view.findViewById(R.id.stock_add);

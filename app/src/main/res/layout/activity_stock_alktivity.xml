@@ -61,12 +61,20 @@
 
     </LinearLayout>
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rec_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/table_header"
+        android:paddingBottom="50dp"
+        android:scrollbars="vertical"/>
+
+    <!--<ListView
         android:id="@+id/stock_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/table_header"
-        android:paddingBottom="50dp" />
+        android:paddingBottom="50dp" /> -->
 
     <Button
         android:id="@+id/button_add_stock"
