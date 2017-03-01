@@ -7,10 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 
-import com.google.firebase.auth.FirebaseUser;
-
-import de.daschubbm.alkchievements.firebase.FirebaseManager;
-import de.daschubbm.alkchievements.firebase.ValueReadCallback;
 import de.daschubbm.alkchievements.util.ConnectivityChecker;
 import de.daschubbm.alkchievements.util.DataManager;
 

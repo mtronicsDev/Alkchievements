@@ -1,20 +1,12 @@
 package de.daschubbm.alkchievements;
 
-import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.support.v7.app.AppCompatActivity;
 
-import com.google.firebase.auth.FirebaseUser;
-
-import de.daschubbm.alkchievements.firebase.FirebaseManager;
-import de.daschubbm.alkchievements.firebase.ValueReadCallback;
 import de.daschubbm.alkchievements.util.DataManager;
 
 import static de.daschubbm.alkchievements.util.ConnectivityChecker.checkConnectivity;
-import static de.daschubbm.alkchievements.util.DataManager.defaultStorage;
-import static de.daschubbm.alkchievements.util.DataManager.write;
 
 public class LoadingAlktivity extends AppCompatActivity {
 

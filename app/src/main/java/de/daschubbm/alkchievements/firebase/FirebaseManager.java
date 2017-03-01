@@ -2,15 +2,7 @@ package de.daschubbm.alkchievements.firebase;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.EditText;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.auth.api.model.StringList;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -58,7 +50,7 @@ public final class FirebaseManager {
     private FirebaseManager() {
     }
 
-    private static void databaseHandshake() {
+    public static void databaseHandshake() {
         DatabaseReference drinksRef = getDrinks(new ValueReadCallback<Map<String, ValuePair[]>>() {
             @Override
             public void onCallback(Map<String, ValuePair[]> data) {
@@ -193,9 +185,12 @@ public final class FirebaseManager {
     }
 
     private static void loadPersonInfo(String name) {
+        Log.d("ALKDEB", "LOAD ENTERED");
         DatabaseReference personRef = getPerson(name, new ValueReadCallback<Map<String, ValuePair[]>>() {
             @Override
             public void onCallback(Map<String, ValuePair[]> data) {
+                Log.d("ALKDEB", "CALLBACK ENTERED");
+
                 person = data;
 
                 if (personCallbacks != null) notifyAllReadCallbacks(personCallbacks, person);
@@ -359,10 +354,14 @@ public final class FirebaseManager {
     }
 
     private static DatabaseReference getPerson(@NonNull String person, final ValueReadCallback<Map<String, ValuePair[]>> callback) {
+        Log.d("ALKDEB", "GET ENTERED with name: " + person);
+
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("people/" + person);
+        Log.d("ALKDEB", reference.toString());
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("ALKDEB", "DATA CHANGE ENTERED");
                 Map<String, ValuePair[]> re = new HashMap<>((int) dataSnapshot.getChildrenCount());
 
                 for (DataSnapshot valueList : dataSnapshot.getChildren()) {
@@ -382,7 +381,7 @@ public final class FirebaseManager {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.e("ALKDEB", "Name fucked up!");
             }
         });
 

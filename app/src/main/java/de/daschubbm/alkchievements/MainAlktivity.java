@@ -108,7 +108,7 @@ public class MainAlktivity extends AppCompatActivity {
 
         if (getIntent().getBooleanExtra("LOGIN", false))
             Toast.makeText(context, "Habedere "
-                    + name + ", (" + name + ") du bist ja aa do!", Toast.LENGTH_LONG).show();
+                    + name + ", du bist ja aa do!", Toast.LENGTH_LONG).show();
     }
 
     private void setupDatabase() {
@@ -248,6 +248,7 @@ public class MainAlktivity extends AppCompatActivity {
         FirebaseManager.registerDrinksCallback(new ValueReadCallback<Map<String, ValuePair[]>>() {
             @Override
             public void onCallback(Map<String, ValuePair[]> data) {
+                Log.d("ALKDEB", "Entered drinks callback");
                 for (Map.Entry<String, ValuePair[]> child : data.entrySet()) {
                     for (ValuePair pair : child.getValue()) {
                         switch (pair.key) {
@@ -296,6 +297,8 @@ public class MainAlktivity extends AppCompatActivity {
         FirebaseManager.registerPersonCallback(new ValueReadCallback<Map<String, ValuePair[]>>() {
             @Override
             public void onCallback(Map<String, ValuePair[]> data) {
+                Log.d("ALKDEB", "Person callback basst");
+
                 if (data.get("drinks") == null) {
                     data.put("drinks", new ValuePair[0]);
                     FirebaseDatabase.getInstance()
@@ -308,6 +311,8 @@ public class MainAlktivity extends AppCompatActivity {
 
                 numsLoaded = true;
                 if (drinksLoaded) setupViews();
+
+                Log.d("ALKDEB", "Drinks: " + drinksLoaded + " Nums: " + numsLoaded);
             }
         }, null);
 
@@ -341,9 +346,13 @@ public class MainAlktivity extends AppCompatActivity {
                     }
                 });
 
+        Log.d("ALKDEB", "Supply wird nun aufgerufen");
         FirebaseManager.supplyPersonName(name);
+        Log.d("ALKDEB", "Supply ist abgeschlossen");
 
         FirebaseManager.writeValue("people/" + name + "/appVersion", assembleBuildNumber());
+
+        FirebaseManager.databaseHandshake();
     }
 
     private String assembleBuildNumber() {
@@ -754,6 +763,8 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     private void setupViews() {
+        Log.d("ALKVIEW", "BAsst");
+
         List<String[]> drinksData = new ArrayList<>(drinks.size());
 
         for (String drinkId : drinks.keySet()) {
