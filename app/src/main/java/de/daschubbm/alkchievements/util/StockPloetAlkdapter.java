@@ -21,6 +21,7 @@ public class StockPloetAlkdapter extends RecyclerView.Adapter<StockPloetAlkdapte
     private ArrayList<String[]> list;
     private final boolean admin;
     private final Context context;
+    private String tag;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView name, num;
@@ -44,6 +45,7 @@ public class StockPloetAlkdapter extends RecyclerView.Adapter<StockPloetAlkdapte
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.stock_item, parent, false);
+        itemView.setTag(tag);
 
         return new MyViewHolder(itemView);
     }
@@ -51,6 +53,7 @@ public class StockPloetAlkdapter extends RecyclerView.Adapter<StockPloetAlkdapte
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         String[] mess = list.get(position);
+        tag = mess[0];
         holder.name.setText(mess[0]);
         holder.num.setText(mess[1]);
         holder.add.setVisibility(View.INVISIBLE);

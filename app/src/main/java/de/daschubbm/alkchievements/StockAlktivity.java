@@ -228,9 +228,9 @@ public class StockAlktivity extends AppCompatActivity {
         ArrayList<String[]> stockNow = new ArrayList<>();
         for (int i = 0; i < stock.size(); i++) {
             if (stock.get(i)[0].equals(tag)) {
+                newNum = Integer.parseInt(stock.get(i)[1]) + num;
                 String[] dat = {stock.get(i)[0], String.valueOf(newNum)};
                 stockNow.add(dat);
-                newNum = Integer.parseInt(stock.get(i)[1]) + num;
             } else {
                 stockNow.add(stock.get(i));
             }
