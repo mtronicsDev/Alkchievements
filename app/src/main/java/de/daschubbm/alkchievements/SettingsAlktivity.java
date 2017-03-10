@@ -120,7 +120,7 @@ public class SettingsAlktivity extends AppCompatActivity {
             String[] newDrink = new String[]{drinkName, formatPrice(drinkPrice)};
 
             for (int i = 0; i < alkdapter.getCount(); i++) {
-                String[] item = alkdapter.getItem(0);
+                String[] item = alkdapter.getItem(i);
                 if (item != null && drinkName.equals(item[0])) alkdapter.remove(item);
             }
 
