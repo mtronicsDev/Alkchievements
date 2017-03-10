@@ -56,7 +56,9 @@ public final class FirebaseManager {
             public void onCallback(Map<String, ValuePair[]> data) {
                 drinks = data;
 
-                notifyAllReadCallbacks(drinksCallbacks, drinks);
+                if (drinksCallbacks != null) {
+                    notifyAllReadCallbacks(drinksCallbacks, drinks);
+                }
                 drinksCallbacks = null;
             }
         });
@@ -96,7 +98,9 @@ public final class FirebaseManager {
             public void onCallback(ValuePair[] data) {
                 currentVersion = data;
 
-                notifyAllReadCallbacks(currentVersionCallbacks, currentVersion);
+                if (currentVersionCallbacks != null) {
+                    notifyAllReadCallbacks(currentVersionCallbacks, currentVersion);
+                }
                 currentVersionCallbacks = null;
             }
         });
@@ -132,12 +136,14 @@ public final class FirebaseManager {
         database.open();
         if (database.getStatus()) loadPersonInfo(database.getItem(0)[1]);
 
-        DatabaseReference adminPasswordRef = getAdminPassword(new ValueReadCallback<Integer>() {
+        final DatabaseReference adminPasswordRef = getAdminPassword(new ValueReadCallback<Integer>() {
             @Override
             public void onCallback(Integer data) {
                 if (data != null) adminPassword = data;
 
-                notifyAllReadCallbacks(adminPasswordCallbacks, adminPassword);
+                if (adminPasswordCallbacks != null) {
+                    notifyAllReadCallbacks(adminPasswordCallbacks, adminPassword);
+                }
                 adminPasswordCallbacks = null;
             }
         });
@@ -193,7 +199,9 @@ public final class FirebaseManager {
 
                 person = data;
 
-                if (personCallbacks != null) notifyAllReadCallbacks(personCallbacks, person);
+                if (personCallbacks != null) {
+                    notifyAllReadCallbacks(personCallbacks, person);
+                }
                 personCallbacks = null;
             }
         });
