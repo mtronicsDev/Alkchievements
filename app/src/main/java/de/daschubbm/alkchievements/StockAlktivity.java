@@ -252,7 +252,7 @@ public class StockAlktivity extends AppCompatActivity {
             if (view != null) {
                 EditText editText = (EditText) view.findViewById(R.id.stock_add);
                 String string = editText.getText().toString();
-                String tag = (String) view.getTag();
+                String tag = adapter.getItem(i)[0];
 
                 if (string.matches("[0-9]+")) {
                     addStock(tag, Integer.parseInt(string));
