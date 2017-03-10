@@ -37,7 +37,6 @@ class SettingsAlkdapter extends ArrayAdapter<String[]> {
 
         super(context, R.layout.settings_drink_item, data);
         this.parentList = parentList;
-
         this.layoutResourceId = R.layout.settings_drink_item;
         this.context = context;
         drinks = data;
@@ -55,10 +54,29 @@ class SettingsAlkdapter extends ArrayAdapter<String[]> {
         }
 
         final String drinkName = drinks.get(position)[0];
-        String drinkPrice = drinks.get(position)[1];
+        final String drinkPrice = drinks.get(position)[1];
 
-        Switch toggle = (Switch) v.findViewById(R.id.drink_toggle);
+        final Switch toggle = (Switch) v.findViewById(R.id.drink_toggle);
+        /**if (Float.parseFloat(drinkPrice) > 1000) {
+            toggle.setChecked(false);
+        }**/
         toggle.setLongClickable(true);
+
+        /**toggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (toggle.isChecked()) {
+                    FirebaseDatabase.getInstance().getReference("drinks/" + drinkName + "/price").setValue(Float.parseFloat(drinkPrice) - 1000);
+                    Toast.makeText(context, "checked",
+                            Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    FirebaseDatabase.getInstance().getReference("drinks/" + drinkName + "/price").setValue(Float.parseFloat(drinkPrice) + 1000);
+                    Toast.makeText(context, "ned checked",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });**/
 
         toggle.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -130,6 +148,9 @@ class SettingsAlkdapter extends ArrayAdapter<String[]> {
 
             TextView price = (TextView) v.findViewById(R.id.drink_price);
             price.setText(drinkPrice);
+            /**if (Float.parseFloat(drinkPrice) > 1000) {
+                price.setText(NumberFormatter.formatPrice(Float.parseFloat(drinkPrice)-1000));
+            }**/
         }
         return v;
     }
