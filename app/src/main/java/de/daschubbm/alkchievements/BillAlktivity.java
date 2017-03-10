@@ -4,7 +4,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -152,56 +154,69 @@ public class BillAlktivity extends AppCompatActivity {
                     message += debtor[0] + ": \t" + debtor[1] + "€\n";
                 }
 
-                hansl.putExtra(Intent.EXTRA_TEXT, message);
-                hansl.setType("text/plain");
-                hansl.setPackage("com.whatsapp");
-                startActivity(hansl);
+                if (appInstalledOrNot("com.whatsapp")) {
 
-                final String finalMessage = message;
-                DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        switch (i) {
-                            case DialogInterface.BUTTON_POSITIVE:
-                                Toast.makeText(context, "Lösche...", Toast.LENGTH_SHORT).show();
+                    hansl.putExtra(Intent.EXTRA_TEXT, message);
+                    hansl.setType("text/plain");
+                    hansl.setPackage("com.whatsapp");
+                    startActivity(hansl);
 
-                                File backup = new File(getFilesDir(), Calendar.getInstance().getTime().toString().replaceAll("[: \\+A-Za-z]+", ""));
 
-                                try {
-                                    FileWriter writer = new FileWriter(backup);
-                                    writer.write(finalMessage);
-                                    writer.close();
-                                    Toast.makeText(context, "Backup der Rechnung angelegt: \n"
-                                            + backup.getAbsolutePath(), Toast.LENGTH_SHORT).show();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                    final String finalMessage = message;
+                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            switch (i) {
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    Toast.makeText(context, "Lösche...", Toast.LENGTH_SHORT).show();
 
-                                DatabaseReference people = FirebaseDatabase.getInstance().getReference("people");
+                                    File backup = new File(getFilesDir(), Calendar.getInstance().getTime().toString().replaceAll("[: \\+A-Za-z]+", ""));
 
-                                for (String[] debtor : debtors) {
-                                    people.child(debtor[0] + "/drinks").removeValue();
-                                }
+                                    try {
+                                        FileWriter writer = new FileWriter(backup);
+                                        writer.write(finalMessage);
+                                        writer.close();
+                                        Toast.makeText(context, "Backup der Rechnung angelegt: \n"
+                                                + backup.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
 
-                                Intent hansl = new Intent(context, SettingsAlktivity.class);
-                                startActivity(hansl);
-                                break;
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                Toast.makeText(context, "Dann hoid ned.", Toast.LENGTH_SHORT).show();
-                                break;
+                                    DatabaseReference people = FirebaseDatabase.getInstance().getReference("people");
+
+                                    for (String[] debtor : debtors) {
+                                        people.child(debtor[0] + "/drinks").removeValue();
+                                    }
+
+                                    Intent hansl = new Intent(context, SettingsAlktivity.class);
+                                    startActivity(hansl);
+                                    break;
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    Toast.makeText(context, "Dann hoid ned.", Toast.LENGTH_SHORT).show();
+                                    break;
+                            }
                         }
+                    };
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Rechnung löschen?");
+                    builder.setMessage("Wenn die Rechnung in WhatsApp gepostet wurde kann sie in der App gelöscht werden.");
+                    builder.setPositiveButton("Weg damit!", onClickListener);
+                    builder.setNegativeButton("Naa, dalossn!", onClickListener);
+                    AlertDialog dialog = builder.show();
+
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.RED);
+                    dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(Color.LTGRAY);
+                }
+                else {
+                    String appPackageName = "com.whatsapp";
+                    Toast.makeText(context, "Installier da hoid WhatsApp, du Hinterwaitler!!!", Toast.LENGTH_LONG).show();
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                    } catch (android.content.ActivityNotFoundException anfe) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
                     }
-                };
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Rechnung löschen?");
-                builder.setMessage("Wenn die Rechnung in WhatsApp gepostet wurde kann sie in der App gelöscht werden.");
-                builder.setPositiveButton("Weg damit!", onClickListener);
-                builder.setNegativeButton("Naa, dalossn!", onClickListener);
-                AlertDialog dialog = builder.show();
-
-                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.RED);
-                dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(Color.LTGRAY);
+                }
             }
         });
     }
@@ -264,5 +279,18 @@ public class BillAlktivity extends AppCompatActivity {
     public void launchStock(@SuppressWarnings("UnusedParameters") MenuItem item) {
         Intent hansl = new Intent(context, StockAlktivity.class);
         startActivity(hansl);
+    }
+
+    private boolean appInstalledOrNot(String uri) {
+        PackageManager pm = getPackageManager();
+        boolean app_installed;
+        try {
+            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+            app_installed = true;
+        }
+        catch (PackageManager.NameNotFoundException e) {
+            app_installed = false;
+        }
+        return app_installed;
     }
 }
