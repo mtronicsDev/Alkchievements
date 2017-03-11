@@ -777,8 +777,10 @@ public class MainAlktivity extends AppCompatActivity {
             if (gschwoabt == null) gschwoabt = 0;
             if (stock == null) stock = 0;
 
-            drinksData.add(new String[]{drinkId, formatPrice(price),
-                    String.valueOf(gschwoabt), String.valueOf(stock)});
+            if (price < 1000) {
+                drinksData.add(new String[]{drinkId, formatPrice(price),
+                        String.valueOf(gschwoabt), String.valueOf(stock)});
+            }
         }
 
         ListView list = (ListView) findViewById(R.id.alkList);

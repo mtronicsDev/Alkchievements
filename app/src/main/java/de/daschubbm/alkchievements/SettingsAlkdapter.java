@@ -57,26 +57,27 @@ class SettingsAlkdapter extends ArrayAdapter<String[]> {
         final String drinkPrice = drinks.get(position)[1];
 
         final Switch toggle = (Switch) v.findViewById(R.id.drink_toggle);
-        /**if (Float.parseFloat(drinkPrice) > 1000) {
+        toggle.setChecked(true);
+        if (Float.parseFloat(drinkPrice) > 1000) {
             toggle.setChecked(false);
-        }**/
+        }
         toggle.setLongClickable(true);
 
-        /**toggle.setOnClickListener(new View.OnClickListener() {
+        toggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (toggle.isChecked()) {
-                    FirebaseDatabase.getInstance().getReference("drinks/" + drinkName + "/price").setValue(Float.parseFloat(drinkPrice) - 1000);
-                    Toast.makeText(context, "checked",
-                            Toast.LENGTH_SHORT).show();
+                    if (Float.parseFloat(drinkPrice) > 1000) {
+                        FirebaseDatabase.getInstance().getReference("drinks/" + drinkName + "/price").setValue(Float.parseFloat(drinkPrice) - 1000);
+                    }
                 }
-                else {
-                    FirebaseDatabase.getInstance().getReference("drinks/" + drinkName + "/price").setValue(Float.parseFloat(drinkPrice) + 1000);
-                    Toast.makeText(context, "ned checked",
-                            Toast.LENGTH_SHORT).show();
+                if (!toggle.isChecked()){
+                    if (Float.parseFloat(drinkPrice) < 1000) {
+                        FirebaseDatabase.getInstance().getReference("drinks/" + drinkName + "/price").setValue(Float.parseFloat(drinkPrice) + 1000);
+                    }
                 }
             }
-        });**/
+        });
 
         toggle.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -148,9 +149,9 @@ class SettingsAlkdapter extends ArrayAdapter<String[]> {
 
             TextView price = (TextView) v.findViewById(R.id.drink_price);
             price.setText(drinkPrice);
-            /**if (Float.parseFloat(drinkPrice) > 1000) {
+            if (Float.parseFloat(drinkPrice) > 1000) {
                 price.setText(NumberFormatter.formatPrice(Float.parseFloat(drinkPrice)-1000));
-            }**/
+            }
         }
         return v;
     }

@@ -96,8 +96,12 @@ public class BillAlktivity extends AppCompatActivity {
                             float moneyToPay = 0;
 
                             for (DataSnapshot drink : person.child("drinks").getChildren()) {
+                                float price = beverages.get(drink.getKey());
+                                if (price > 1000) {
+                                    price = price - 1000;
+                                }
                                 moneyToPay += Integer.parseInt(String.valueOf(drink.getValue()))
-                                        * beverages.get(drink.getKey());
+                                        * price;
                             }
 
                             if (moneyToPay > 0)
