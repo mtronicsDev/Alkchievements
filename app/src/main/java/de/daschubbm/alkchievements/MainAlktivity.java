@@ -85,7 +85,7 @@ public class MainAlktivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d("HANSL", "dddddd");
-        init();
+        setupViews();
     }*/
 
     private void init() {
@@ -759,6 +759,7 @@ public class MainAlktivity extends AppCompatActivity {
             public void onCallback() {
                 Intent hansl = new Intent(context, SettingsAlktivity.class);
                 startActivity(hansl);
+                finish();
             }
         });
     }
