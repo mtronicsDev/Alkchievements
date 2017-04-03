@@ -76,6 +76,17 @@ public class MainAlktivity extends AppCompatActivity {
         Intent hansl = new Intent(this, NotificationService.class);
         startService(hansl);
 
+        init();
+    }
+
+    /*@Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("HANSL", "dddddd");
+        init();
+    }*/
+
+    private void init() {
         ConnectivityChecker.checkConnectivity(context);
 
         drinks = new HashMap<>();
@@ -254,6 +265,8 @@ public class MainAlktivity extends AppCompatActivity {
                         switch (pair.key) {
                             case "price":
                                 drinks.put(child.getKey(), Float.valueOf(String.valueOf(pair.value)));
+                                Log.d("OUT", child.getKey());
+                                Log.d("OUT", String.valueOf(pair.value));
                                 break;
                             case "stock":
                                 stock.put(child.getKey(), Integer.valueOf(String.valueOf(pair.value)));
@@ -304,9 +317,14 @@ public class MainAlktivity extends AppCompatActivity {
                     FirebaseDatabase.getInstance()
                             .getReference("people/" + name + "/drinks/Bier").setValue(0);
                 }
+                Log.d("BUU", "ois guad");
 
+                //de schleife rennt ned durch...
                 for (ValuePair pair : data.get("drinks")) {
+                    Log.d("BUU", "warum ned?");
                     numDrinks.put(pair.key, Integer.valueOf(String.valueOf(pair.value)));
+                    Log.d("OUT2", pair.key);
+                    Log.d("OUT2", String.valueOf(pair.value));
                 }
 
                 numsLoaded = true;
@@ -314,7 +332,17 @@ public class MainAlktivity extends AppCompatActivity {
 
                 Log.d("ALKDEB", "Drinks: " + drinksLoaded + " Nums: " + numsLoaded);
             }
-        }, null);
+        }, new ValueChangedCallback() {
+            @Override
+            public void onCallback(DataSnapshot changedNode, ChangeType changeType) {
+                Log.d("ALKDEB", "Hn<lslsds " + changedNode.getRef().getKey());
+                if (changedNode.getRef().getKey().equals("drinks")) {
+                    Log.d("ALKDEB", "Hn<fffffff");
+                    for (DataSnapshot child : changedNode.getChildren())
+                    numDrinks.put(child.getKey(),(int)((long)child.getValue()));
+                }
+            }
+        });
 
         FirebaseDatabase.getInstance().getReference("people/" + name + "/drinks")
                 .addChildEventListener(new ChildEventListener() {
@@ -768,16 +796,20 @@ public class MainAlktivity extends AppCompatActivity {
         List<String[]> drinksData = new ArrayList<>(drinks.size());
 
         for (String drinkId : drinks.keySet()) {
-            Float price = drinks.get(drinkId);
-            Integer gschwoabt = numDrinks.get(drinkId);
-            Integer stock = this.stock.get(drinkId);
+            if (drinks.get(drinkId) < 1000) {
+                Float price = drinks.get(drinkId);
+                Integer gschwoabt = numDrinks.get(drinkId);
+                Integer stock = this.stock.get(drinkId);
 
-            if (price == null)
-                throw new ApplicationFuckedUpError("Preis eines Getränks existiert nicht!");
-            if (gschwoabt == null) gschwoabt = 0;
-            if (stock == null) stock = 0;
+                Log.d("IN", String.valueOf(price));
+                Log.d("IN", String.valueOf(gschwoabt));
+                Log.d("IN", String.valueOf(stock));
 
-            if (price < 1000) {
+                if (price == null)
+                    throw new ApplicationFuckedUpError("Preis eines Getränks existiert nicht!");
+                if (gschwoabt == null) gschwoabt = 0;
+                if (stock == null) stock = 0;
+
                 drinksData.add(new String[]{drinkId, formatPrice(price),
                         String.valueOf(gschwoabt), String.valueOf(stock)});
             }

@@ -15,8 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import de.daschubbm.alkchievements.Application;
-import de.daschubbm.alkchievements.Database;
+import de.daschubbm.alkchievements.util.DataManager;
 
 /**
  * Created by Maxi on 17.10.2016.
@@ -132,9 +131,9 @@ public final class FirebaseManager {
             }
         });
 
-        Database database = new Database(Application.getContext());
-        database.open();
-        if (database.getStatus()) loadPersonInfo(database.getItem(0)[1]);
+        String name = DataManager.defaultStorage.getString("name", null);
+
+        if (name != null) loadPersonInfo(name);
 
         final DatabaseReference adminPasswordRef = getAdminPassword(new ValueReadCallback<Integer>() {
             @Override
