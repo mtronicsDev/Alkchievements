@@ -1,6 +1,8 @@
 package de.daschubbm.alkchievements;
 
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -67,9 +69,12 @@ public class SettingsAlktivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent hansl = new Intent(context, MainAlktivity.class);
-        startActivity(hansl);
-        finish();
+        Intent mStartActivity = new Intent(context, MainAlktivity.class);
+        int mPendingIntentId = 123456;
+        PendingIntent mPendingIntent = PendingIntent.getActivity(context, mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager mgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1, mPendingIntent);
+        System.exit(0);
     }
 
     public void performRequestedAction(final View view) {

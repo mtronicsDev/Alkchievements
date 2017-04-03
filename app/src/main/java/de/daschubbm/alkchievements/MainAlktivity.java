@@ -759,7 +759,7 @@ public class MainAlktivity extends AppCompatActivity {
             public void onCallback() {
                 Intent hansl = new Intent(context, SettingsAlktivity.class);
                 startActivity(hansl);
-                finish();
+                //finish();
             }
         });
     }
