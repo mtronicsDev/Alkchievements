@@ -28,11 +28,11 @@ class AlkchievementsDatabase {
         alkchievementDescriptions.put("stammgast",
                 new String[]{"Stammgast", "Beschließe %3,5,7% Tage in Folge eine Transaktion im Schubbm!"});
         alkchievementDescriptions.put("kegelsportverein",
-                new String[]{"Kegelsportverein", "Trinke 5 Radler an einem Abend!"});
+                new String[]{"Kegelsportverein", "Trinke 3 Radler an einem Abend!"});
         alkchievementDescriptions.put("nullKommaNull",
                 new String[]{"0,0", "Trinke 5 antialkoholische Getränke an einem Abend!"});
         alkchievementDescriptions.put("blauWieDasMeer",
-                new String[]{"Blau wie das Meer", "Trinke 5 Shots an einem Abend!"});
+                new String[]{"Blau wie das Meer", "Trinke 3 Shots an einem Abend!"});
         alkchievementDescriptions.put("kastenLeer",
                 new String[]{"Kasten leer", "Trinke insgesamt 20 Bier"});
         alkchievementDescriptions.put("schuldnerNummerEins",

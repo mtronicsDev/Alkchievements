@@ -28,8 +28,6 @@ import static de.daschubbm.alkchievements.NumberFormatter.formatPrice;
 
 public class SettingsAlktivity extends AppCompatActivity {
 
-    //private static final int UNIMPORTANT_VARIABLE = 1;
-
     private SettingsAlkdapter alkdapter;
     private ListView drinks;
     private Context context;
