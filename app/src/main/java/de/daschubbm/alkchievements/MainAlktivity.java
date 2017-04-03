@@ -765,7 +765,7 @@ public class MainAlktivity extends AppCompatActivity {
     }
 
     public void launchMessageEditor(@SuppressWarnings("UnusedParameters") MenuItem item) {
-        Intent hansl = new Intent(context, MessageEditorAlktivity.class);
+        Intent hansl = new Intent(context, BullshitActivity.class);
         startActivity(hansl);
     }
 

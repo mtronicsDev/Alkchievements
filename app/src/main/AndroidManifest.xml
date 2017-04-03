@@ -53,7 +53,10 @@
             android:name=".NotificationService"
             android:enabled="true" />
 
-        <activity android:name=".RegisterAlktivity"></activity>
+        <activity android:name=".BullshitActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".BullshitBingoActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>
